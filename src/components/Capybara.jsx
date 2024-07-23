@@ -2,7 +2,7 @@ import { useAnimations, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 
-import capybaraScene from "../assets/3d/capybara.glb";
+import capybaraScene from "../assets/3d/scene.gltf";
 
 const Capybara = ({ scale, position }) => {
   const capybaraRef = useRef();
@@ -10,7 +10,7 @@ const Capybara = ({ scale, position }) => {
   const { actions } = useAnimations(animations, capybaraRef);
 
   useEffect(() => {
-    actions["Idle"].play();
+    actions["Take 001"].play();
   }, [actions]);
 
   return (
@@ -18,7 +18,7 @@ const Capybara = ({ scale, position }) => {
       ref={capybaraRef}
       position={position}
       scale={scale}
-      rotation={[-0.3, 0, 3]}
+      rotation={[0, 0, 0]}
     >
       <primitive object={scene} />
     </mesh>
@@ -28,8 +28,8 @@ const Capybara = ({ scale, position }) => {
 const CapybaraCanvas = ({ scrollContainer }) => {
   const [rotationX, setRotationX] = useState(0);
   const [rotationY, setRotationY] = useState(0);
-  const [scale, setScale] = useState([2, 2, 2]);
-  const [position, setPosition] = useState([0.2, -0.7, 0]);
+  const [scale, setScale] = useState([0.5, 0.5, 0.5]);
+  const [position, setPosition] = useState([0, 0, 0]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,20 +42,20 @@ const CapybaraCanvas = ({ scrollContainer }) => {
 
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setScale([1, 1, 1]);
+        setScale([0.5, 0.5, 0.5]);
         setPosition([0.2, -0.1, 0]);
       } else if (window.innerWidth < 1024) {
-        setScale([1.33, 1.33, 1.33]);
+        setScale([0.65, 0.65, 0.65]);
         setPosition([0.2, -0.3, 0]);
       } else if (window.innerWidth < 1280) {
-        setScale([1.5, 1.5, 1.5]);
+        setScale([0.8, 0.8, 0.8]);
         setPosition([0.2, -0.4, 0]);
       } else if (window.innerWidth < 1536) {
-        setScale([1.66, 1.66, 1.66]);
+        setScale([0.5, 0.5, 0.5]);
         setPosition([0.2, -0.5, 0]);
       } else {
-        setScale([2, 2, 2]);
-        setPosition([0.2, -0.7, 0]);
+        setScale([0.5, 0.5, 0.5]);
+        setPosition([0, 0, 0]);
       }
     };
 
@@ -85,7 +85,7 @@ const CapybaraCanvas = ({ scrollContainer }) => {
           intensity={2}
         />
         <hemisphereLight
-          skyColor="#b1e1ff"
+          skyColor="#ffa500"
           groundColor="#000000"
           intensity={1}
         />
