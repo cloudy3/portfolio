@@ -27,3 +27,6 @@ dist-ssr
 
 # vscode
 .vscode
+
+# Personal Assets
+src/assets/3d/*
