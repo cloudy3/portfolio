@@ -1,13 +1,12 @@
 import { useAnimations, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
+import tokyoScene from "../assets/3d/tokyo.glb";
 
-import capybaraScene from "../assets/3d/scene.gltf";
-
-const Capybara = ({ scale, position }) => {
-  const capybaraRef = useRef();
-  const { scene, animations } = useGLTF(capybaraScene);
-  const { actions } = useAnimations(animations, capybaraRef);
+const Tokyo = ({ scale, position }) => {
+  const tokyoRef = useRef();
+  const { scene, animations } = useGLTF(tokyoScene);
+  const { actions } = useAnimations(animations, tokyoRef);
 
   useEffect(() => {
     actions["Take 001"].play();
@@ -15,21 +14,21 @@ const Capybara = ({ scale, position }) => {
 
   return (
     <mesh
-      ref={capybaraRef}
+      ref={tokyoRef}
       position={position}
       scale={scale}
-      rotation={[0, 0, 0]}
+      rotation={[-0.04, -2.05, 0]}
     >
       <primitive object={scene} />
     </mesh>
   );
 };
 
-const CapybaraCanvas = ({ scrollContainer }) => {
+const TokyoCanvas = ({ scrollContainer }) => {
   const [rotationX, setRotationX] = useState(0);
   const [rotationY, setRotationY] = useState(0);
   const [scale, setScale] = useState([0.5, 0.5, 0.5]);
-  const [position, setPosition] = useState([0, 0, 0]);
+  const [position, setPosition] = useState([0, 0, -3]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,8 +53,8 @@ const CapybaraCanvas = ({ scrollContainer }) => {
         setScale([0.5, 0.5, 0.5]);
         setPosition([0.2, -0.5, 0]);
       } else {
-        setScale([0.5, 0.5, 0.5]);
-        setPosition([0, 0, 0]);
+        setScale([0.02, 0.02, 0.02]);
+        setPosition([-0.1, 0.7, -2.5]);
       }
     };
 
@@ -76,20 +75,13 @@ const CapybaraCanvas = ({ scrollContainer }) => {
     >
       <Suspense>
         <directionalLight position={[1, 1, 1]} intensity={2} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 5, 10]} intensity={2} />
-        <spotLight
-          position={[0, 50, 10]}
-          angle={0.15}
-          penumbra={1}
-          intensity={2}
-        />
+        <ambientLight intensity={1} />
         <hemisphereLight
-          skyColor="#ffa500"
-          groundColor="#000000"
+          skyColor="#ffcd74"
+          groundColor="#add8e6"
           intensity={1}
         />
-        <Capybara
+        <Tokyo
           rotationX={rotationX}
           rotationY={rotationY}
           scale={scale}
@@ -100,4 +92,4 @@ const CapybaraCanvas = ({ scrollContainer }) => {
   );
 };
 
-export default CapybaraCanvas;
+export default TokyoCanvas;
