@@ -10,7 +10,7 @@
   box-sizing: border-box;
   font-family: "Montserrat", sans-serif;
   scroll-behavior: smooth;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .hash-span {
@@ -63,28 +63,9 @@
   z-index: 2;
 }
 
-.parallax__planets {
-  --parallax-speed: 290;
-  z-index: 3;
-}
-
 .parallax__sun {
   --parallax-speed: 270;
   z-index: 4;
-}
-
-.parallax__mountain1 {
-  --parallax-speed: 250;
-  z-index: 5;
-}
-
-.parallax__mountain2 {
-  --parallax-speed: 140;
-  z-index: 6;
-}
-
-.parallax__crater {
-  z-index: 7;
 }
 
 .parallax__content {
