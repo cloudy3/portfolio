@@ -47,7 +47,7 @@ const Navbar = () => {
           className="flex items-start"
           onClick={() => {
             setActive("hero");
-            window.scrollTo(0, 0);
+            window.animate({ scrollTop: 0 }, 500);
           }}
         >
           <p className="text-white text-[26px] lg:text-[36px] font-bold pointer-events-auto cursor-pointer flex">
@@ -65,14 +65,14 @@ const Navbar = () => {
               onClick={() => setActive(nav.id)}
             >
               {active === nav.id && (
-                <div className="fixed right-10 w-2 h-6 lg:h-8 bg-quaternary"></div>
+                <div className="fixed left-10 w-2 h-6 lg:h-8 bg-quaternary"></div>
               )}
               <a href={`#${nav.id}`}>{nav.title}</a>
             </li>
           ))}
         </ul>
 
-        <div className="sm:hidden flex flex-1 justify-end items-center">
+        <div className="sm:hidden flex flex-1 justify-start items-center">
           <img
             src={toggle ? close : menu}
             alt="menu"
@@ -83,9 +83,9 @@ const Navbar = () => {
           <div
             className={`${
               !toggle ? "hidden" : "flex"
-            } p-6 absolute top-20 right-0 mx-4 my-2 min-w-[140px] z-30 rounded-xl`}
+            } p-6 absolute top-20 left-0 mx-4 my-2 min-w-[140px] z-30 rounded-xl`}
           >
-            <ul className="list-none flex justify-end items-start flex-1 flex-col gap-4">
+            <ul className="list-none flex justify-start items-start flex-1 flex-col gap-4">
               {navLinks.map((nav) => (
                 <li
                   key={nav.id}

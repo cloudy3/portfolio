@@ -16,10 +16,6 @@ const Hero = ({ scrollContainer }) => {
         </div>
       </div>
       <TokyoCanvas scrollContainer={scrollContainer} />
-      <p>
-        Welcome to my portfolio. Scroll down to see more about my experience,
-        technologies, projects, and contact information.
-      </p>
     </section>
   );
 };
