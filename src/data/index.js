@@ -4,10 +4,6 @@ export const navLinks = [
     title: "Home",
   },
   {
-    id: "portfolio",
-    title: "Portfolio",
-  },
-  {
     id: "experience",
     title: "Experience",
   },
@@ -49,6 +45,4 @@ const experiences = [
   },
 ];
 
-const portfolio = [];
-
-export { experiences, portfolio };
+export { experiences };

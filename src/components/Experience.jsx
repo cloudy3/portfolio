@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import React, { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import { experiences } from "../data";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
@@ -53,11 +54,19 @@ const ExperienceDetails = ({ experience }) => {
 const Experience = () => {
   const [selectedJob, setSelectedJob] = useState(experiences[0]);
   const [isMobile, setIsMobile] = useState(false);
+  const controls = useAnimation();
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+  });
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
     };
+
+    if (inView) {
+      controls.start("show");
+    }
 
     handleResize(); // Check initial screen size
     window.addEventListener("resize", handleResize);
@@ -65,7 +74,7 @@ const Experience = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [controls, inView]);
 
   return (
     <div className="sm:my-20">
