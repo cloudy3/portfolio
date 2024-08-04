@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Contact, Experience, Hero, Navbar } from "./components";
+import { Resume } from "./components/Resume";
 
 const App = () => {
   const wrapperRef = useRef(null);
@@ -13,6 +14,7 @@ const App = () => {
           <div id="hero" className="z-10">
             <Hero scrollContainer={wrapperRef} />
           </div>
+          <Resume />
           <div id="experience" className="relative z-30 bg-primary">
             <Experience />
           </div>

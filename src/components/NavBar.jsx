@@ -42,20 +42,19 @@ const Navbar = () => {
   return (
     <nav className="w-full flex items-center bg-gradient-to-b from-black sm:bg-none p-8 sm:px-16 sm:py-10 fixed z-40 pointer-events-none">
       <div className="w-full flex items-start mx-auto">
+        <Link
+          to="/"
+          className="flex items-start"
+          onClick={() => {
+            setActive("hero");
+            window.animate({ scrollTop: 0 }, 500);
+          }}
+        >
+          <p className="text-white text-[26px] lg:text-[36px] font-bold pointer-events-auto cursor-pointer flex">
+            JF
+          </p>
+        </Link>
         <ul className="list-none hidden sm:flex flex-col gap-5">
-          <Link
-            to="/"
-            className="flex items-start"
-            onClick={() => {
-              setActive("hero");
-              window.animate({ scrollTop: 0 }, 500);
-            }}
-          >
-            <p className="text-white text-[26px] lg:text-[36px] font-bold pointer-events-auto cursor-pointer flex">
-              JF
-            </p>
-          </Link>
-
           {navLinks.map((nav) => (
             <li
               key={nav.id}
