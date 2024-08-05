@@ -220,3 +220,53 @@
       -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #ffffff;
   }
 }
+
+svg {
+  display: block;
+  margin: auto;
+  overflow: visible;
+  width: 50vmin;
+}
+
+.toggle-scene {
+  height: 100vh;
+  width: 100vw;
+}
+
+.toggle-scene__bulb {
+  fill: var(--off);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+  transform: scale(var(--on));
+  transition: fill 200ms linear, transform 200ms ease;
+}
+
+.toggle-scene__btn {
+  cursor: pointer;
+  fill: var(--base);
+  transition: transform 200ms ease;
+}
+
+.toggle-scene__btn:hover {
+  transform: scale(1.05);
+}
+
+.toggle-scene__btn:active {
+  transform: scale(0.95);
+}
+
+.toggle-scene__cords {
+  stroke: var(--base);
+  stroke-dasharray: 1, 12;
+  stroke-dashoffset: -4;
+}
+
+.toggle-scene__cord {
+  animation: pull 0.15s linear infinite;
+}
+
+@keyframes pull {
+  25% {
+    stroke-dasharray: 12, 1;
+    stroke-dashoffset: -9;
+  }
+}

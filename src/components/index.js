@@ -5,6 +5,7 @@ import CanvasLoader from "./Loader";
 import Navbar from "./Navbar";
 import Position from "./Position";
 import TokyoCanvas from "./Tokyo";
+import Lightbulb from "./Lightbulb";
 
 export {
   CanvasLoader,
@@ -14,4 +15,5 @@ export {
   Navbar,
   Position,
   TokyoCanvas,
+  Lightbulb,
 };
