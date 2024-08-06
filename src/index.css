@@ -221,52 +221,20 @@
   }
 }
 
-svg {
-  display: block;
-  margin: auto;
-  overflow: visible;
-  width: 50vmin;
-}
-
-.toggle-scene {
-  height: 100vh;
-  width: 100vw;
-}
-
-.toggle-scene__bulb {
-  fill: var(--off);
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
-  transform: scale(var(--on));
-  transition: fill 200ms linear, transform 200ms ease;
-}
-
-.toggle-scene__btn {
+.lightbulb-container {
   cursor: pointer;
-  fill: var(--base);
-  transition: transform 200ms ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
 }
 
-.toggle-scene__btn:hover {
-  transform: scale(1.05);
+.lightbulb-svg {
+  width: 100%;
+  height: 100%;
 }
 
-.toggle-scene__btn:active {
-  transform: scale(0.95);
-}
-
-.toggle-scene__cords {
-  stroke: var(--base);
-  stroke-dasharray: 1, 12;
-  stroke-dashoffset: -4;
-}
-
-.toggle-scene__cord {
-  animation: pull 0.15s linear infinite;
-}
-
-@keyframes pull {
-  25% {
-    stroke-dasharray: 12, 1;
-    stroke-dashoffset: -9;
-  }
+.lightbulb-bg {
+  background-color: transparent !important;
 }

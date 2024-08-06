@@ -9,7 +9,16 @@ const App = () => {
     <BrowserRouter>
       <div className="relative z-0 bg-primary">
         <Navbar />
-        <Lightbulb />
+        <Lightbulb
+          className="lightbulb-bg"
+          style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            zIndex: 1001, // Increase z-index to ensure it's on top
+            cursor: "pointer", // Add cursor pointer to indicate it's clickable
+          }}
+        />
         <div className="wrapper" ref={wrapperRef}>
           <div id="hero" className="z-10">
             <Hero scrollContainer={wrapperRef} />
