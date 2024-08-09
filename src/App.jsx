@@ -15,8 +15,7 @@ const App = () => {
             position: "fixed",
             top: 0,
             right: 0,
-            zIndex: 1001, // Increase z-index to ensure it's on top
-            cursor: "pointer", // Add cursor pointer to indicate it's clickable
+            cursor: "pointer",
           }}
         />
         <div className="wrapper" ref={wrapperRef}>

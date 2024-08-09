@@ -2,17 +2,16 @@ import { useState } from "react";
 import "../index.css";
 
 const Lightbulb = () => {
-  const [isActive, setIsActive] = useState(false);
+  const [isGlowing, setIsGlowing] = useState(false);
 
-  const toggleBackground = () => {
-    console.log("CLICKED!");
-    setIsActive(!isActive);
+  const toggleGlow = () => {
+    setIsGlowing(!isGlowing);
   };
 
   return (
     <div
-      className={`lightbulb-container ${isActive ? "active" : ""}`}
-      onClick={toggleBackground}
+      className={`lightbulb-container ${isGlowing ? "radiating" : ""} z-50`}
+      onClick={toggleGlow}
       style={{
         position: "fixed",
         top: 0,
@@ -30,7 +29,7 @@ const Lightbulb = () => {
       >
         <g
           transform="translate(0.000000,345.000000) scale(0.100000,-0.100000)"
-          fill="#000000"
+          fill={`${isGlowing ? "rgba(255, 255, 0, 1)" : "#000000"}`}
           stroke="none"
         >
           <path
