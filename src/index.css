@@ -240,22 +240,43 @@
 }
 
 .radiating {
-  animation: radiate 2s infinite alternate;
+  animation: radiate 200ms 1;
 }
 
 @keyframes radiate {
   0% {
     background-image: radial-gradient(
       farthest-corner at 50% 50%,
-      rgba(255, 255, 0, 0.5) 0%,
+      rgba(255, 255, 0, 0) 0%,
+      rgba(255, 255, 0, 0) 100%
+    );
+  }
+  20% {
+    background-image: radial-gradient(
+      farthest-corner at 50% 50%,
+      rgba(255, 255, 0, 0.2) 0%,
       rgba(255, 255, 0, 0) 50%
     );
   }
-  100% {
+  40% {
     background-image: radial-gradient(
       farthest-corner at 50% 50%,
-      rgba(255, 255, 0, 1) 0%,
-      rgba(255, 255, 0, 0) 100%
+      rgba(255, 255, 0, 0.4) 0%,
+      rgba(255, 255, 0, 0) 50%
+    );
+  }
+  60% {
+    background-image: radial-gradient(
+      farthest-corner at 50% 50%,
+      rgba(255, 255, 0, 0.6) 0%,
+      rgba(255, 255, 0, 0) 50%
+    );
+  }
+  80% {
+    background-image: radial-gradient(
+      farthest-corner at 50% 50%,
+      rgba(255, 255, 0, 0.8) 0%,
+      rgba(255, 255, 0, 0) 50%
     );
   }
 }

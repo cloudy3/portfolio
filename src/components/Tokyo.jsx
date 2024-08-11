@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import tokyoScene from "../assets/3d/tokyo.glb";
 
-const Tokyo = ({ scale, position }) => {
+const Tokyo = ({ scale, position, rotationX, rotationY }) => {
   const tokyoRef = useRef();
   const { scene, animations } = useGLTF(tokyoScene);
   const { actions } = useAnimations(animations, tokyoRef);
@@ -17,7 +17,7 @@ const Tokyo = ({ scale, position }) => {
       ref={tokyoRef}
       position={position}
       scale={scale}
-      rotation={[-0.04, -2.05, 0]}
+      rotation={[rotationX, rotationY, 0]}
     >
       <primitive object={scene} />
     </mesh>
@@ -25,14 +25,14 @@ const Tokyo = ({ scale, position }) => {
 };
 
 const TokyoCanvas = ({ scrollContainer }) => {
-  const [rotationX, setRotationX] = useState(0);
-  const [rotationY, setRotationY] = useState(0);
-  const [scale, setScale] = useState([0.5, 0.5, 0.5]);
-  const [position, setPosition] = useState([0, 0, -3]);
+  const [rotationX, setRotationX] = useState(-0.04);
+  const [rotationY, setRotationY] = useState(-2.05);
+  const [scale, setScale] = useState([0.4, 0.4, 0.4]);
+  const [position, setPosition] = useState([0.5, 0, -3]);
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = scrollContainer.current.scrollTop;
+      const scrollTop = scrollContainer.current?.scrollTop || 0;
       const rotationXValue = scrollTop * -0.0006;
       const rotationYValue = scrollTop * -0.00075;
       setRotationX(rotationXValue);
@@ -59,11 +59,13 @@ const TokyoCanvas = ({ scrollContainer }) => {
     };
 
     handleResize();
-    window.addEventListener("scroll", handleScroll);
+
+    const scrollElement = scrollContainer.current || window;
+    scrollElement.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      scrollElement.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
   }, [scrollContainer]);
