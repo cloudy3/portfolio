@@ -26,35 +26,36 @@ const Tokyo = ({ scale, position, rotationX, rotationY }) => {
 
 const TokyoCanvas = ({ scrollContainer }) => {
   const [rotationX, setRotationX] = useState(-0.04);
-  const [rotationY, setRotationY] = useState(-2.05);
-  const [scale, setScale] = useState([0.4, 0.4, 0.4]);
-  const [position, setPosition] = useState([0.5, 0, -3]);
+  const [rotationY, setRotationY] = useState(-1.65);
+  const [scale, setScale] = useState([0.018, 0.018, 0.018]);
+  const [position, setPosition] = useState([2, 0.2, -2.5]);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = scrollContainer.current?.scrollTop || 0;
-      const rotationXValue = scrollTop * -0.0006;
-      const rotationYValue = scrollTop * -0.00075;
+      // const rotationXValue = -0.04 + scrollTop * -0.0002;
+      const rotationXValue = -0.04;
+      const rotationYValue = -1.65 + scrollTop * -0.004;
       setRotationX(rotationXValue);
       setRotationY(rotationYValue);
     };
 
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setScale([0.5, 0.5, 0.5]);
-        setPosition([0.2, -0.1, 0]);
+        setScale([0.005, 0.005, 0.005]);
+        setPosition([0.2, 0, 0]);
       } else if (window.innerWidth < 1024) {
-        setScale([0.65, 0.65, 0.65]);
-        setPosition([0.2, -0.3, 0]);
+        setScale([0.008, 0.008, 0.008]);
+        setPosition([0.2, 0, 0]);
       } else if (window.innerWidth < 1280) {
-        setScale([0.8, 0.8, 0.8]);
-        setPosition([0.2, -0.4, 0]);
+        setScale([0.012, 0.012, 0.012]);
+        setPosition([0.2, 0, 0]);
       } else if (window.innerWidth < 1536) {
-        setScale([0.5, 0.5, 0.5]);
-        setPosition([0.2, -0.5, 0]);
+        setScale([0.018, 0.018, 0.018]);
+        setPosition([0.2, 0, 0]);
       } else {
-        setScale([0.02, 0.02, 0.02]);
-        setPosition([-0.1, 0.7, -2.5]);
+        setScale([0.015, 0.015, 0.015]);
+        setPosition([2, -0.4, -2.5]);
       }
     };
 
