@@ -54,25 +54,25 @@ const Contact = () => {
             type="text"
             name="name"
             placeholder="Enter your full name"
-            className="bg-tertiary p-4 text-white border font-medium"
+            className="bg-tertiary p-4 text-black border font-medium"
           />
           <span className="text-white font-medium mt-3">Email Address</span>
           <input
             type="text"
             name="email"
             placeholder="Enter your email address"
-            className="bg-tertiary p-4 text-white border font-medium"
+            className="bg-tertiary p-4 text-black border font-medium"
           />
           <span className="text-white font-medium mt-3">Message</span>
           <textarea
             name="message"
             placeholder="Enter your message"
             rows="10"
-            className="bg-tertiary p-4 text-white border font-medium"
+            className="bg-tertiary p-4 text-black border font-medium"
           />
           <button
             type="submit"
-            className="bg-tertiary py-3 px-8 w-fit text-white font-bold shadow-md shadow-primary "
+            className="bg-quaternary py-3 px-8 w-fit text-white font-bold shadow-md shadow-primary "
           >
             {loading ? "Sending..." : "Send"}
           </button>

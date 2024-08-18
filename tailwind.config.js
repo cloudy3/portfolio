@@ -6,8 +6,8 @@ module.exports = {
       colors: {
         primary: "#29363D",
         secondary: "#F0EFEB",
-        tertiary: "#0D3056",
-        quaternary: "#1689C8",
+        tertiary: "#EBF1F5",
+        quaternary: "#4F7FA9",
       },
       screens: {
         xs: "450px",
