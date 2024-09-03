@@ -38,6 +38,22 @@ const TokyoCanvas = ({ scrollContainer }) => {
       const rotationYValue = -1.65 + scrollTop * -0.004;
       setRotationX(rotationXValue);
       setRotationY(rotationYValue);
+
+      // Parallax effect for cat
+      const catElement = document.querySelector(".parallax__cat");
+      if (catElement) {
+        catElement.style.transform = `translateY(-50%) translateX(${
+          scrollTop * 0.1
+        }px)`;
+      }
+
+      // Parallax effect for stars
+      const starsElement = document.querySelector(".parallax__stars");
+      if (starsElement) {
+        starsElement.style.backgroundPosition = `${scrollTop * -0.5}px ${
+          scrollTop * 0.5
+        }px`;
+      }
     };
 
     const handleResize = () => {

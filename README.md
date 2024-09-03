@@ -1,8 +1,17 @@
-# My React Portfolio Website
+# Jing Feng's 3D Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to my 3D portfolio website! This project showcases my work using modern web technologies, including **React**, **Three.js**, and **TailwindCSS**.
 
-Currently, two official plugins are available:
+## 🛠️ Technologies Used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React**: A JavaScript library for building user interfaces.
+- **Three.js**: A JavaScript library for creating 3D graphics in the browser.
+- **@react-three/fiber**: A React renderer for Three.js.
+- **@react-three/drei**: Useful helpers for Three.js in React.
+- **TailwindCSS**: A utility-first CSS framework for rapid UI development.
+
+## 🚀 Features
+
+- **Interactive 3D Models**: Explore dynamic 3D scenes and animations.
+- **Responsive Design**: Adaptable layout for various screen sizes.
+- **Parallax Scrolling**: A visually engaging effect that enhances user experience.

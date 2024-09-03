@@ -19,7 +19,7 @@ const experiences = [
     company_name: "Bernhard Schulte",
     date: "Jul 2023 - Present",
     details: [
-      "Contributed to the development of <span style='color: white;'>two websites and two mobile apps</span> using <span style='color: white;'>Flutter</span>",
+      "Contributed to the development of <span style='color: white;'>a website, desktop app, and mobile app</span> using <span style='color: white;'>Flutter</span>",
       "Implemented <span style='color: white;'>Getx State Management</span> to <span style='color: white;'>optimize app performance</span> and enhance efficiency.",
       "Deployed <span style='color: white;'>Google Cloud Functions</span> to support various backend processes.",
       "<span style='color: white;'>Automated image compression</span> with Firebase Extensions, <span style='color: white;'>saving 96% storage space</span> and improving user experience.",
