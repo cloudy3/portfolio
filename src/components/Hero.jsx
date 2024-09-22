@@ -15,7 +15,7 @@ const Hero = ({ scrollContainer }) => {
           </div>
         </div>
       </div>
-      <img src="src\assets\cat.png" alt="Cat" className="parallax__cat" />
+      <img src="./cat.png" alt="Cat" className="parallax__cat" />
       <div className="parallax__stars"></div>
       <TokyoCanvas scrollContainer={scrollContainer} />
     </section>

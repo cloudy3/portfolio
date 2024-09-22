@@ -1,6 +1,6 @@
 # Jing Feng's 3D Portfolio
 
-Welcome to my 3D portfolio website! This project showcases my work using modern web technologies, including **React**, **Three.js**, and **TailwindCSS**.
+Welcome to my 3D portfolio website! This project showcases my work using modern web technologies, including **React**, **Three.js**, **Vite**, and **TailwindCSS**.
 
 ## 🛠️ Technologies Used
 
@@ -8,6 +8,7 @@ Welcome to my 3D portfolio website! This project showcases my work using modern 
 - **Three.js**: A JavaScript library for creating 3D graphics in the browser.
 - **@react-three/fiber**: A React renderer for Three.js.
 - **@react-three/drei**: Useful helpers for Three.js in React.
+- **Vite**: A fast build tool that improves development workflow.
 - **TailwindCSS**: A utility-first CSS framework for rapid UI development.
 
 ## 🚀 Features
