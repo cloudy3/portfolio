@@ -59,15 +59,15 @@ const TokyoCanvas = ({ scrollContainer }) => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setScale([0.005, 0.005, 0.005]);
-        setPosition([0.2, 0, 0]);
+        setPosition([0, -0.07, 0]);
       } else if (window.innerWidth < 1024) {
         setScale([0.008, 0.008, 0.008]);
         setPosition([0.2, 0, 0]);
       } else if (window.innerWidth < 1280) {
-        setScale([0.012, 0.012, 0.012]);
+        setScale([0.01, 0.01, 0.01]);
         setPosition([0.2, 0, 0]);
       } else if (window.innerWidth < 1536) {
-        setScale([0.018, 0.018, 0.018]);
+        setScale([0.012, 0.012, 0.012]);
         setPosition([0.2, 0, 0]);
       } else {
         setScale([0.015, 0.015, 0.015]);
