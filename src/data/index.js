@@ -19,15 +19,14 @@ const experiences = [
     company_name: "Bernhard Schulte",
     date: "Jul 2023 - Present",
     details: [
-      "Contributed to the development of <span style='color: white;'>a website, desktop app, and mobile app</span> using <span style='color: white;'>Flutter</span>",
-      "Implemented <span style='color: white;'>Getx State Management</span> to <span style='color: white;'>optimize app performance</span> and enhance efficiency.",
-      "Deployed <span style='color: white;'>Google Cloud Functions</span> to support various backend processes.",
-      "<span style='color: white;'>Automated image compression</span> with Firebase Extensions, <span style='color: white;'>saving 96% storage space</span> and improving user experience.",
-      "Integrated <span style='color: white;'>Microsoft APIs to enable seamless OneDrive file picker functionality</span> on web platforms, simplifying the process of uploading large quantities of images for clients.",
-      "Revamped Firestore database architecture, <span style='color: white;'>optimised data structure and updated over 3000 existing documents</span> to enhance scalability and performance.",
-      "Led the <span style='color: white;'>end-to-end process</span> of launching Android apps on <span style='color: white;'>Google Play Store</span>.",
-      "Implemented <span style='color: white;'>Firebase buckets</span> in <span style='color: white;'>multiple regions</span>",
-      "Established <span style='color: white;'>local database</span> using <span style='color: white;'>Hive</span> for offline app usage",
+      "Deployed a <span style='color: white;'>Google Compute Engine VM</span> to ingest <span style='color: white;'>global vessel data</span> via websocket, storing coordinates and destination info efficiently. <span style='color: white;'>Optimized</span> data handling for <span style='color: white;'>speed and cost</span>, and visualized live vessel positions on an interactive map within the company's web dashboard",
+      "Designed and deployed <span style='color: white;'>Python Flask API on Google Cloud Run</span> to handle <span style='color: white;'>large-scale image processing</span> tasks in the cloud efficiently over extended durations",
+      "<span style='color: white;'>Automated image compression</span> with Firebase Extensions, <span style='color: white;'>cutting storage costs by 96%</span> and streamlining CI/CD workflows",
+      "Integrated <span style='color: white;'>Microsoft OneDrive Picker API</span>, <span style='color: white;'>accelerating client upload</span> workflows by <span style='color: white;'>60%</span> for large image batches",
+      "<span style='color: white;'>Refactored Firestore schema</span> - redesigned collections and indexes, <span style='color: white;'>migrating 4,500+ documents</span> to support a more <span style='color: white;'>scalable data structure</span> for the website",
+      "Launched <span style='color: white;'>region-specific Cloud Storage buckets</span> and <span style='color: white;'>Firestore databases</span> (Asia, Europe), <span style='color: white;'>reducing data retrieval latency by 50%</span> in key markets",
+      "Built <span style='color: white;'>web and mobile apps</span> using <span style='color: white;'>Flutter</span> as part of a cross-functional team, delivering <span style='color: white;'>scalable</span> solutions for <span style='color: white;'>international maritime clients</span>",
+      "Led the <span style='color: white;'>end-to-end</span> process of launching <span style='color: white;'>Android</span> apps on <span style='color: white;'>Google Play Store</span>",
     ],
   },
   {
@@ -35,7 +34,7 @@ const experiences = [
     company_name: "Resync",
     date: "Jul 2021 - Dec 2021",
     details: [
-      "<span style='color: white;'>End-to-end development</span> for a start up as a <span style='color: white;'>full-stack software engineer</span>.",
+      "<span style='color: white;'>End-to-end development</span> for a start up as a <span style='color: white;'>full-stack software engineer</span>",
       "Implemented mobile notification features using <span style='color: white;'>Firebase, Firestore and Firebase Cloud Messaging</span>",
       "<span style='color: white;'>Deployed</span> Flutter app to the <span style='color: white;'>Google Play Store</span> and the <span style='color: white;'>Apple App Store</span>",
       "Designed and implemented components and services using <span style='color: white;'>Angular</span>",
@@ -50,8 +49,7 @@ const experiences = [
     company_name: "wecome",
     date: "Nov 2020 - Dec 2020",
     details: [
-      "Worked on a delivery app <span style='color: white;'>(Cates)</span> for delivery riders to deliver food from campus canteens to <span style='color: white;'>NTU Halls</span>, <span style='color: white;'>widely adopted by students</span> during the COVID-19 pandemic.",
-      "Developed the hybrid app using Flutter, <span style='color: white;'>integrating a web app into a native app</span> for the start-up company.",
+      "Built <span style='color: white;'>hybrid</span> delivery app for <span style='color: white;'>NTU</span> campus using <span style='color: white;'>Flutter</span> and <span style='color: white;'>WebView</span>, facilitating contactless food delivery through autonomous robots and supporting <span style='color: white;'>campus-wide adoption during COVID-19</span>",
     ],
   },
 ];
