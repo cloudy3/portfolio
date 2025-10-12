@@ -2,87 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Skill } from "@/types";
-// Professional profile data is now embedded in the component for a more personal touch
-
-// Professional skills data from Jing Feng's profile
-const SKILLS_DATA: Skill[] = [
-  // Top skills from professional experience
-  { name: "Flutter", category: "mobile", proficiency: 5, icon: "📱" },
-  { name: "Python", category: "backend", proficiency: 5, icon: "🐍" },
-  { name: "Google Cloud", category: "cloud", proficiency: 5, icon: "☁️" },
-  { name: "Firebase", category: "cloud", proficiency: 5, icon: "🔥" },
-  { name: "Dart", category: "mobile", proficiency: 5, icon: "🎯" },
-  { name: "TypeScript", category: "frontend", proficiency: 4, icon: "📘" },
-  { name: "React", category: "frontend", proficiency: 4, icon: "⚛️" },
-  { name: "Docker", category: "devops", proficiency: 4, icon: "🐳" },
-  { name: "PostgreSQL", category: "database", proficiency: 4, icon: "🐘" },
-  { name: "Node.js", category: "backend", proficiency: 4, icon: "🟢" },
-  { name: "Angular", category: "frontend", proficiency: 3, icon: "🅰️" },
-  { name: "Java", category: "backend", proficiency: 4, icon: "☕" },
-  // Technologies from this portfolio project
-  { name: "Next.js", category: "frontend", proficiency: 3, icon: "▲" },
-  { name: "Tailwind CSS", category: "frontend", proficiency: 3, icon: "🎨" },
-  { name: "Three.js", category: "frontend", proficiency: 3, icon: "🎮" },
-  { name: "GSAP", category: "frontend", proficiency: 3, icon: "✨" },
-  { name: "Jest", category: "testing", proficiency: 3, icon: "🧪" },
-];
-
-const SKILL_CATEGORIES = {
-  mobile: "Mobile",
-  frontend: "Frontend",
-  backend: "Backend",
-  cloud: "Cloud",
-  database: "Database",
-  devops: "DevOps",
-  testing: "Testing",
-} as const;
-
-interface SkillProgressBarProps {
-  skill: Skill;
-  index: number;
-}
-
-const SkillProgressBar = ({ skill, index }: SkillProgressBarProps) => {
-  const percentage = (skill.proficiency / 5) * 100;
-
-  return (
-    <div
-      className={`mb-6 transition-all duration-1000`}
-      style={{ transitionDelay: `${800 + index * 100}ms` }}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">{skill.icon}</span>
-          <span className="font-medium text-gray-900">{skill.name}</span>
-        </div>
-        <span className="text-sm text-gray-600 font-medium">
-          {skill.proficiency}/5
-        </span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <div
-          className="skill-progress-animated bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full"
-          style={
-            {
-              "--progress-width": `${percentage}%`,
-            } as React.CSSProperties
-          }
-        />
-      </div>
-    </div>
-  );
-};
 
 const AboutSection = () => {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-
-  const filteredSkills =
-    activeCategory === "all"
-      ? SKILLS_DATA
-      : SKILLS_DATA.filter((skill) => skill.category === activeCategory);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,15 +13,6 @@ const AboutSection = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-            // Animate progress bars
-            setTimeout(() => {
-              const progressBars = document.querySelectorAll(
-                ".skill-progress-animated"
-              );
-              progressBars.forEach((bar) => {
-                bar.classList.add("animate");
-              });
-            }, 500);
           }
         });
       },
@@ -244,7 +158,7 @@ const AboutSection = () => {
           </div>
         </div>
 
-        {/* Skills Section */}
+        {/* What I Bring Section */}
         <div className="border-t border-gray-200 pt-16">
           <div
             className={`text-center mb-12 transition-all duration-1000 delay-600 ${
@@ -253,55 +167,48 @@ const AboutSection = () => {
                 : "opacity-0 translate-y-8"
             }`}
           >
-            <h3 className="text-gray-900 mb-4">My Digital Toolkit</h3>
+            <h3 className="text-gray-900 mb-4">What I Bring to the Table</h3>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto text-center">
-              The technologies I&apos;ve befriended over the years (some more
-              cooperative than others)
+              Beyond the code, here&apos;s what makes me tick
             </p>
           </div>
 
-          {/* Skill Category Filter */}
+          {/* Value Propositions */}
           <div
-            className={`flex flex-wrap justify-center gap-2 mb-12 transition-all duration-1000 delay-700 ${
+            className={`grid md:grid-cols-3 gap-8 max-w-5xl mx-auto transition-all duration-1000 delay-700 ${
               isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
           >
-            <button
-              onClick={() => setActiveCategory("all")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                activeCategory === "all"
-                  ? "bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              All Skills
-            </button>
-            {Object.entries(SKILL_CATEGORIES).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => setActiveCategory(key)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeCategory === key
-                    ? "bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Skills Grid */}
-          <div
-            className={`grid md:grid-cols-2 gap-8 max-w-4xl mx-auto transition-all duration-1000 delay-800 ${
-              isVisible
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 -translate-x-8"
-            }`}
-          >
-            {filteredSkills.map((skill, index) => (
-              <SkillProgressBar key={skill.name} skill={skill} index={index} />
-            ))}
+            <div className="text-center p-6 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-4">🚀</div>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Full-Stack Expertise
+              </h4>
+              <p className="text-gray-600">
+                From Flutter mobile apps to Python backends on Google Cloud, I
+                build complete solutions end-to-end
+              </p>
+            </div>
+            <div className="text-center p-6 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-4">💡</div>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Problem Solver
+              </h4>
+              <p className="text-gray-600">
+                I don&apos;t just write code – I solve real business problems
+                with measurable impact (like 96% cost reduction)
+              </p>
+            </div>
+            <div className="text-center p-6 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-4">🌍</div>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Global Mindset
+              </h4>
+              <p className="text-gray-600">
+                Experience working with international teams and delivering
+                products used by users worldwide
+              </p>
+            </div>
           </div>
         </div>
       </div>

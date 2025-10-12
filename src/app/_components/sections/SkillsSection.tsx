@@ -25,10 +25,10 @@ const SkillCard = ({ skill, index, activeCategory }: SkillCardProps) => {
     setProgressWidth(0);
     setProgressOpacity(0);
 
-    // Start animations with proper timing
+    // Start animations with optimized timing
     const cardTimer = setTimeout(() => {
       setIsVisible(true);
-    }, 100 + index * 100);
+    }, 50 + index * 50);
 
     // Progress bar animation (starts after card is visible)
     const progressTimer = setTimeout(() => {
@@ -38,8 +38,8 @@ const SkillCard = ({ skill, index, activeCategory }: SkillCardProps) => {
       setTimeout(() => {
         const targetWidth = (skill.proficiency / 5) * 100;
         setProgressWidth(targetWidth);
-      }, 100);
-    }, 100 + index * 100 + 400);
+      }, 50);
+    }, 50 + index * 50 + 200);
 
     return () => {
       clearTimeout(cardTimer);
@@ -69,7 +69,7 @@ const SkillCard = ({ skill, index, activeCategory }: SkillCardProps) => {
       className={`skill-card bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
-      style={{ transitionDelay: `${100 + index * 100}ms` }}
+      style={{ transitionDelay: `${50 + index * 50}ms` }}
     >
       <div className="flex items-center mb-4">
         <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-2xl mr-4">
@@ -143,7 +143,7 @@ const SkillCategory = ({
     }
 
     return () => observer.disconnect();
-  }, [activeCategory]); // Reset when activeCategory changes
+  }, [activeCategory, category, skills.length]);
 
   const getCategoryTitle = (category: Skill["category"]) => {
     switch (category) {
@@ -235,6 +235,11 @@ const SkillsSection = () => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [categoryChangeKey, setCategoryChangeKey] = useState(0);
 
+  const handleCategoryClick = (category: Skill["category"] | "all") => {
+    setActiveCategory(category);
+    setCategoryChangeKey((prev) => prev + 1);
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -265,7 +270,6 @@ const SkillsSection = () => {
     if (activeCategory === "all") {
       return SKILLS_DATA;
     }
-    // Filter skills by their category property
     return SKILLS_DATA.filter((skill) => skill.category === activeCategory);
   };
 
@@ -323,10 +327,8 @@ const SkillsSection = () => {
           {categories.map((category) => (
             <button
               key={category}
-              onClick={() => {
-                setActiveCategory(category);
-                setCategoryChangeKey((prev) => prev + 1);
-              }}
+              onClick={() => handleCategoryClick(category)}
+              type="button"
               className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                 activeCategory === category
                   ? "bg-blue-600 text-white shadow-lg transform scale-105"
