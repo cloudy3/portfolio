@@ -7,6 +7,7 @@ import BrowserCompatibility from "./_components/ui/BrowserCompatibility";
 import PerformanceMonitor from "./_components/shared/PerformanceMonitor";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
+import SplashScreen from "./_components/ui/SplashScreen";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -62,6 +63,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} font-sans antialiased bg-white text-gray-900 overflow-x-hidden`}
       >
+        <SplashScreen />
         <PerformanceMonitor />
         <AccessibilityAuditor />
         <AccessibilityProvider>

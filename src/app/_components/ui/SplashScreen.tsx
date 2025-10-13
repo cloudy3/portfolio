@@ -169,17 +169,40 @@ export default function SplashScreen() {
       aria-busy={!isExiting}
     >
       <div className="splash-content">
-        <h1 className="splash-logo" aria-label="Jing Feng Portfolio">
-          Jing Feng
-        </h1>
-        <div
-          className="splash-loader"
-          aria-label="Loading"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={undefined}
-        />
+        {/* Animated geometric shapes */}
+        <div className="splash-shapes">
+          <div className="shape shape-1"></div>
+          <div className="shape shape-2"></div>
+          <div className="shape shape-3"></div>
+        </div>
+
+        {/* Animated logo with letter reveal */}
+        <div className="splash-logo-container">
+          <div className="splash-logo-letters">
+            <span className="letter" style={{ animationDelay: "0ms" }}>
+              J
+            </span>
+            <span className="letter" style={{ animationDelay: "100ms" }}>
+              F
+            </span>
+          </div>
+          <div className="splash-tagline">Portfolio</div>
+        </div>
+
+        {/* Enhanced loader with progress bar */}
+        <div className="splash-loader-container">
+          <div
+            className="splash-loader"
+            aria-label="Loading"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={undefined}
+          />
+          <div className="splash-progress-bar">
+            <div className="splash-progress-fill"></div>
+          </div>
+        </div>
       </div>
     </div>
   );
