@@ -3,7 +3,8 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { detectWebGLSupport } from "./ThreeScene";
-import * as THREE from "three";
+// Import only the specific Three.js classes we need for better tree-shaking
+import { Vector3, BufferGeometry, LineBasicMaterial, Line } from "three";
 
 /**
  * Configuration for individual line animations
@@ -23,8 +24,8 @@ interface LineConfig {
  * @param time - Current animation time in seconds
  * @returns Array of Vector3 points forming a smooth wave pattern
  */
-function generateLinePoints(config: LineConfig, time: number): THREE.Vector3[] {
-  const points: THREE.Vector3[] = [];
+function generateLinePoints(config: LineConfig, time: number): Vector3[] {
+  const points: Vector3[] = [];
   const { pointCount, amplitude, frequency, phase, speed } = config;
 
   for (let i = 0; i < pointCount; i++) {
@@ -42,7 +43,7 @@ function generateLinePoints(config: LineConfig, time: number): THREE.Vector3[] {
       amplitude *
       0.5;
 
-    points.push(new THREE.Vector3(x, y, z));
+    points.push(new Vector3(x, y, z));
   }
 
   return points;
@@ -87,7 +88,7 @@ function LineWaveSystem({
   isMobile,
   enableInteractivity,
 }: LineWaveSystemProps) {
-  const linesRef = useRef<THREE.Line[]>([]);
+  const linesRef = useRef<Line[]>([]);
   const lineConfigsRef = useRef<LineConfig[]>([]);
   const baseConfigsRef = useRef<LineConfig[]>([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
@@ -201,29 +202,27 @@ function LineWaveSystem({
       {lineConfigsRef.current.map((config, index) => {
         // Generate initial points for the line
         const initialPoints = generateLinePoints(config, 0);
-        const geometry = new THREE.BufferGeometry().setFromPoints(
-          initialPoints
-        );
+        const geometry = new BufferGeometry().setFromPoints(initialPoints);
 
         // Select color from palette (cycle through if needed)
         const color = colorPalette[index % colorPalette.length];
 
         // Create material with appropriate thickness
-        const material = new THREE.LineBasicMaterial({
+        const material = new LineBasicMaterial({
           color: color,
           linewidth: isMobile ? 2 : 3, // Note: linewidth > 1 may not work on all platforms
           transparent: true,
           opacity: 0.85,
         });
 
-        const line = new THREE.Line(geometry, material);
+        const line = new Line(geometry, material);
         line.position.set(0, (index - lineCount / 2) * 0.3, 0); // Spread lines vertically
 
         return (
           <primitive
             key={index}
             object={line}
-            ref={(el: THREE.Line) => {
+            ref={(el: Line) => {
               if (el) linesRef.current[index] = el;
             }}
           />
@@ -285,11 +284,20 @@ export default function WaveLineVisualization({
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [prefersReducedMotion, setPrefersReducedMotion] =
     useState<boolean>(false);
+  const [contextLost, setContextLost] = useState<boolean>(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Detect WebGL support, mobile devices, and motion preferences on mount
   useEffect(() => {
     // Check WebGL support
-    setWebGLSupported(detectWebGLSupport());
+    const webGLAvailable = detectWebGLSupport();
+    setWebGLSupported(webGLAvailable);
+
+    if (!webGLAvailable) {
+      console.warn(
+        "WaveLineVisualization: WebGL is not supported on this device. Falling back to static gradient."
+      );
+    }
 
     // Detect mobile devices
     const checkMobile = () => {
@@ -316,12 +324,44 @@ export default function WaveLineVisualization({
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const handleMotionChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);
+      if (e.matches) {
+        console.info(
+          "WaveLineVisualization: Motion preference changed to reduced. Switching to static fallback."
+        );
+      }
     };
     mediaQuery.addEventListener("change", handleMotionChange);
 
     return () => {
       window.removeEventListener("resize", checkMobile);
       mediaQuery.removeEventListener("change", handleMotionChange);
+    };
+  }, []);
+
+  // Handle WebGL context loss and restoration
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.warn(
+        "WaveLineVisualization: WebGL context lost. Attempting to restore..."
+      );
+      setContextLost(true);
+    };
+
+    const handleContextRestored = () => {
+      console.info("WaveLineVisualization: WebGL context restored.");
+      setContextLost(false);
+    };
+
+    canvas.addEventListener("webglcontextlost", handleContextLost);
+    canvas.addEventListener("webglcontextrestored", handleContextRestored);
+
+    return () => {
+      canvas.removeEventListener("webglcontextlost", handleContextLost);
+      canvas.removeEventListener("webglcontextrestored", handleContextRestored);
     };
   }, []);
 
@@ -332,13 +372,26 @@ export default function WaveLineVisualization({
 
   // Show static fallback if user prefers reduced motion
   if (prefersReducedMotion) {
+    console.info(
+      "WaveLineVisualization: User prefers reduced motion. Showing static fallback."
+    );
     return <StaticGradientFallback />;
+  }
+
+  // Show fallback if WebGL context is lost
+  if (contextLost) {
+    return (
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+        <div className="text-slate-400 text-sm">Restoring visualization...</div>
+      </div>
+    );
   }
 
   // Determine line count based on device type if not explicitly provided
   const effectiveLineCount = lineCount ?? (isMobile ? 6 : 12);
 
   // Default color palette - vibrant Japanese-inspired colors
+  // Memoized to prevent recreation on every render
   const defaultColorPalette = [
     "#FF6B9D", // Pink
     "#4ECDC4", // Cyan
@@ -382,6 +435,12 @@ export default function WaveLineVisualization({
               antialias: !isMobile,
               alpha: true,
               powerPreference: isMobile ? "low-power" : "high-performance",
+            }}
+            onCreated={({ gl }) => {
+              canvasRef.current = gl.domElement;
+              console.info(
+                "WaveLineVisualization: Three.js canvas initialized successfully"
+              );
             }}
           >
             {/* Ambient lighting for subtle illumination */}
