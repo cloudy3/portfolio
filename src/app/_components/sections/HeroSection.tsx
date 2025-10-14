@@ -8,10 +8,44 @@ import { ANIMATION_CONFIG } from "@/lib/animations";
 import { DURATIONS } from "@/lib/constants";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
 
+/**
+ * Props for the HeroSection component
+ *
+ * @property className - Optional CSS class name for additional styling
+ */
 interface HeroSectionProps {
   className?: string;
 }
 
+/**
+ * HeroSection Component
+ *
+ * The main hero section of the portfolio featuring:
+ * - Animated 3D wave line visualization background
+ * - Personal introduction and title
+ * - Call-to-action buttons for navigation
+ * - Scroll indicator with smooth scrolling
+ * - GSAP-powered entrance animations
+ *
+ * ## Features
+ * - Full-screen responsive layout
+ * - Staggered entrance animations for all elements
+ * - Smooth scroll navigation to other sections
+ * - Interactive 3D background visualization
+ * - Mobile-optimized performance
+ * - Error boundary protection for visualization
+ *
+ * ## Sections Linked
+ * - "View My Work" button → Projects section
+ * - "Get In Touch" button → Contact section
+ * - Scroll indicator → About section
+ *
+ * @example
+ * <HeroSection />
+ *
+ * @example
+ * <HeroSection className="custom-hero" />
+ */
 export default function HeroSection({ className = "" }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -20,15 +54,22 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
-  // Simple scroll to section function
+  /**
+   * Scrolls smoothly to a section by ID
+   *
+   * Uses native browser smooth scrolling with fallback to scrollIntoView.
+   * Accounts for fixed navigation header offset.
+   *
+   * @param sectionId - The ID of the target section element
+   */
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     console.log("Scrolling to section:", sectionId, "Element found:", element);
 
     if (element) {
-      // Calculate the target position
+      // Calculate the target scroll position
       const elementTop = element.offsetTop;
-      const offset = 80; // Account for fixed navigation
+      const offset = 80; // Account for fixed navigation header height
       const targetPosition = Math.max(0, elementTop - offset);
 
       console.log(
@@ -38,7 +79,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         targetPosition
       );
 
-      // Use native smooth scroll
+      // Use native smooth scroll (preferred method)
       try {
         window.scrollTo({
           top: targetPosition,
@@ -46,6 +87,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         });
         console.log("Using native smooth scroll");
       } catch (error) {
+        // Fallback to scrollIntoView for older browsers
         console.error("Native scroll failed, trying scrollIntoView:", error);
         element.scrollIntoView({
           behavior: "smooth",
@@ -57,10 +99,22 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
     }
   };
 
-  // Initialize animations on mount
+  /**
+   * Initialize GSAP animations on component mount
+   *
+   * Creates a staggered entrance animation for all hero elements:
+   * 1. Title fades in and slides up
+   * 2. Subtitle follows with slight delay
+   * 3. Description animates in
+   * 4. CTA buttons appear
+   * 5. Scroll indicator fades in and starts floating
+   *
+   * Uses GSAP context for automatic cleanup on unmount.
+   */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Set initial states
+      // Set initial states for all animated elements
+      // Elements start invisible and offset downward
       gsap.set(titleRef.current, {
         opacity: 0,
         y: 50,
@@ -86,26 +140,27 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         y: 20,
       });
 
-      // Create entrance animation timeline
+      // Create entrance animation timeline with 0.5s initial delay
+      // This allows the page to settle before animations start
       const tl = gsap.timeline({ delay: 0.5 });
 
-      // Animate title with split text effect
+      // Animate title first (most important element)
       tl.to(titleRef.current, {
         opacity: 1,
         y: 0,
-        duration: DURATIONS.slow / 1000, // Convert to seconds
+        duration: DURATIONS.slow / 1000, // Convert ms to seconds
         ease: ANIMATION_CONFIG.ease,
       })
-        // Animate subtitle
+        // Animate subtitle with overlap for smooth flow
         .to(
           subtitleRef.current,
           {
             opacity: 1,
             y: 0,
-            duration: DURATIONS.normal / 1000, // Convert to seconds
+            duration: DURATIONS.normal / 1000,
             ease: ANIMATION_CONFIG.ease,
           },
-          "-=0.2" // Delay it a bit more to create visual separation
+          "-=0.2" // Start 0.2s before previous animation ends
         )
         // Animate description
         .to(
@@ -113,7 +168,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
           {
             opacity: 1,
             y: 0,
-            duration: DURATIONS.normal / 1000, // Convert to seconds
+            duration: DURATIONS.normal / 1000,
             ease: ANIMATION_CONFIG.ease,
           },
           "-=0.2"
@@ -124,36 +179,38 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
           {
             opacity: 1,
             y: 0,
-            duration: DURATIONS.normal / 1000, // Convert to seconds
+            duration: DURATIONS.normal / 1000,
             ease: ANIMATION_CONFIG.ease,
           },
           "-=0.1"
         )
-        // Animate scroll indicator
+        // Animate scroll indicator last
         .to(
           scrollIndicatorRef.current,
           {
             opacity: 1,
             y: 0,
-            duration: DURATIONS.fast / 1000, // Convert to seconds
+            duration: DURATIONS.fast / 1000,
             ease: ANIMATION_CONFIG.ease,
           },
           "-=0.1"
         );
 
-      // Simple floating animation for scroll indicator (no ScrollTrigger)
+      // Add continuous floating animation to scroll indicator
+      // Creates subtle up-down motion to draw attention
       gsap.to(scrollIndicatorRef.current, {
         y: 10,
         duration: 1.5,
         ease: "power2.inOut",
-        yoyo: true,
-        repeat: -1,
+        yoyo: true, // Reverse animation on each repeat
+        repeat: -1, // Infinite loop
       });
 
-      // Removed all ScrollTrigger animations to prevent scroll conflicts
-      // This allows for normal, uninterrupted scrolling behavior
+      // Note: ScrollTrigger animations removed to prevent scroll conflicts
+      // This ensures smooth, uninterrupted scrolling behavior
     }, heroRef);
 
+    // Cleanup function: reverts all GSAP animations on unmount
     return () => ctx.revert();
   }, []);
 
