@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 /**
  * SplashScreen Component
  *
- * Displays a loading splash screen on initial page load.
+ * Japanese-inspired music visualization themed splash screen.
+ * Displays on initial page load with animated wave lines and vibrant colors.
  * Automatically exits when page resources are loaded and minimum display time has elapsed.
  *
  * State Management:
@@ -15,10 +16,11 @@ import { useState, useEffect } from "react";
  * - domReady: Tracks if DOM is fully loaded
  * - fontsReady: Tracks if fonts are loaded
  * - prefersReducedMotion: Tracks user's motion preference
+ * - mounted: Tracks component mount for entrance animations
  *
  * Accessibility Features:
  * - ARIA attributes: role="status", aria-live="polite", aria-busy
- * - Semantic HTML: Uses <h1> for proper heading hierarchy
+ * - Semantic HTML: Uses proper heading hierarchy
  * - Progressbar role: Loading indicator has proper ARIA progressbar attributes
  * - Focus management: No focus trapping, non-interactive component
  * - Reduced motion support: Respects prefers-reduced-motion preference
@@ -33,6 +35,12 @@ export default function SplashScreen() {
   const [fontsReady, setFontsReady] = useState<boolean>(false);
   const [prefersReducedMotion, setPrefersReducedMotion] =
     useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  // Trigger mount animation
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Detect prefers-reduced-motion preference
   // Requirement: 4.3
@@ -48,22 +56,12 @@ export default function SplashScreen() {
       setPrefersReducedMotion(event.matches);
     };
 
-    // Add event listener (with fallback for older browsers)
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", handleChange);
-    } else {
-      // Fallback for older browsers
-      mediaQuery.addListener(handleChange);
-    }
+    // Add event listener
+    mediaQuery.addEventListener("change", handleChange);
 
     // Cleanup
     return () => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener("change", handleChange);
-      } else {
-        // Fallback for older browsers
-        mediaQuery.removeListener(handleChange);
-      }
+      mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
 
@@ -160,50 +158,182 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`splash-screen ${isExiting ? "exiting" : ""} ${
-        prefersReducedMotion ? "reduce-motion" : ""
-      }`}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden transition-opacity duration-600 ${
+        isExiting ? "opacity-0 pointer-events-none" : "opacity-100"
+      } ${prefersReducedMotion ? "reduce-motion" : ""}`}
       role="status"
       aria-live="polite"
       aria-label="Loading website content"
       aria-busy={!isExiting}
     >
-      <div className="splash-content">
-        {/* Animated geometric shapes */}
-        <div className="splash-shapes">
-          <div className="shape shape-1"></div>
-          <div className="shape shape-2"></div>
-          <div className="shape shape-3"></div>
-        </div>
+      {/* Light gradient background matching hero section */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 z-0"></div>
 
-        {/* Animated logo with letter reveal */}
-        <div className="splash-logo-container">
-          <div className="splash-logo-letters">
-            <span className="letter" style={{ animationDelay: "0ms" }}>
-              J
-            </span>
-            <span className="letter" style={{ animationDelay: "100ms" }}>
-              F
-            </span>
+      {/* Animated wave lines background */}
+      {!prefersReducedMotion && (
+        <div className="absolute inset-0 z-10">
+          {/* Top wave lines */}
+          <div className="absolute top-1/4 left-0 right-0 flex flex-col gap-8 opacity-60">
+            <div
+              className={`h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent rounded-full transition-all duration-1000 ${
+                mounted ? "animate-wave-slide" : "opacity-0"
+              }`}
+              style={{ animationDelay: "0ms" }}
+              aria-hidden="true"
+            ></div>
+            <div
+              className={`h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full transition-all duration-1000 ${
+                mounted ? "animate-wave-slide" : "opacity-0"
+              }`}
+              style={{ animationDelay: "200ms" }}
+              aria-hidden="true"
+            ></div>
+            <div
+              className={`h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full transition-all duration-1000 ${
+                mounted ? "animate-wave-slide" : "opacity-0"
+              }`}
+              style={{ animationDelay: "400ms" }}
+              aria-hidden="true"
+            ></div>
           </div>
-          <div className="splash-tagline">Portfolio</div>
+
+          {/* Bottom wave lines */}
+          <div className="absolute bottom-1/4 left-0 right-0 flex flex-col gap-8 opacity-60">
+            <div
+              className={`h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent rounded-full transition-all duration-1000 ${
+                mounted ? "animate-wave-slide-reverse" : "opacity-0"
+              }`}
+              style={{ animationDelay: "100ms" }}
+              aria-hidden="true"
+            ></div>
+            <div
+              className={`h-1 bg-gradient-to-r from-transparent via-rose-400 to-transparent rounded-full transition-all duration-1000 ${
+                mounted ? "animate-wave-slide-reverse" : "opacity-0"
+              }`}
+              style={{ animationDelay: "300ms" }}
+              aria-hidden="true"
+            ></div>
+            <div
+              className={`h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent rounded-full transition-all duration-1000 ${
+                mounted ? "animate-wave-slide-reverse" : "opacity-0"
+              }`}
+              style={{ animationDelay: "500ms" }}
+              aria-hidden="true"
+            ></div>
+          </div>
+        </div>
+      )}
+
+      {/* Center content */}
+      <div className="relative z-20 text-center px-4">
+        {/* Animated logo/icon */}
+        <div className="mb-8 flex justify-center" aria-hidden="true">
+          <div className="relative w-20 h-20">
+            {/* Outer ring */}
+            <div
+              className={`absolute inset-0 rounded-full border-4 transition-all duration-700 ${
+                mounted && !prefersReducedMotion
+                  ? "animate-spin-slow opacity-100"
+                  : "opacity-0"
+              }`}
+              style={{
+                borderImage:
+                  "linear-gradient(135deg, #FF6B9D, #AA96DA, #4ECDC4) 1",
+              }}
+            ></div>
+            {/* Inner ring */}
+            <div
+              className={`absolute inset-2 rounded-full border-4 border-amber-400 transition-all duration-700 ${
+                mounted && !prefersReducedMotion
+                  ? "animate-spin-slow-reverse opacity-80"
+                  : "opacity-0"
+              }`}
+            ></div>
+            {/* Center dot */}
+            <div
+              className={`absolute inset-0 m-auto w-4 h-4 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 transition-all duration-500 ${
+                mounted && !prefersReducedMotion
+                  ? "animate-pulse-slow opacity-100"
+                  : mounted
+                  ? "opacity-100"
+                  : "opacity-0"
+              }`}
+            ></div>
+          </div>
         </div>
 
-        {/* Enhanced loader with progress bar */}
-        <div className="splash-loader-container">
+        {/* Loading text */}
+        <div
+          className={`transition-all duration-700 ${
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <h1 className="text-2xl sm:text-3xl font-semibold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent mb-3">
+            Loading
+          </h1>
+          <p className="text-slate-600 text-sm sm:text-base">
+            Preparing your experience...
+          </p>
+        </div>
+
+        {/* Animated dots */}
+        <div
+          className="flex justify-center gap-2 mt-6"
+          role="progressbar"
+          aria-label="Loading progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={undefined}
+        >
           <div
-            className="splash-loader"
-            aria-label="Loading"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={undefined}
-          />
-          <div className="splash-progress-bar">
-            <div className="splash-progress-fill"></div>
-          </div>
+            className={`w-2 h-2 rounded-full bg-pink-400 ${
+              !prefersReducedMotion ? "animate-bounce" : ""
+            }`}
+            style={{ animationDelay: "0ms" }}
+            aria-hidden="true"
+          ></div>
+          <div
+            className={`w-2 h-2 rounded-full bg-purple-400 ${
+              !prefersReducedMotion ? "animate-bounce" : ""
+            }`}
+            style={{ animationDelay: "150ms" }}
+            aria-hidden="true"
+          ></div>
+          <div
+            className={`w-2 h-2 rounded-full bg-cyan-400 ${
+              !prefersReducedMotion ? "animate-bounce" : ""
+            }`}
+            style={{ animationDelay: "300ms" }}
+            aria-hidden="true"
+          ></div>
         </div>
       </div>
+
+      {/* Decorative gradient orbs */}
+      {!prefersReducedMotion && (
+        <div
+          className="absolute inset-0 z-5 pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            className={`absolute top-1/4 left-1/4 w-64 h-64 bg-pink-200 rounded-full blur-3xl transition-all duration-1000 ${
+              mounted ? "opacity-20" : "opacity-0"
+            }`}
+          ></div>
+          <div
+            className={`absolute bottom-1/4 right-1/4 w-64 h-64 bg-cyan-200 rounded-full blur-3xl transition-all duration-1000 ${
+              mounted ? "opacity-20" : "opacity-0"
+            }`}
+            style={{ transitionDelay: "200ms" }}
+          ></div>
+          <div
+            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-200 rounded-full blur-3xl transition-all duration-1000 ${
+              mounted ? "opacity-15" : "opacity-0"
+            }`}
+            style={{ transitionDelay: "400ms" }}
+          ></div>
+        </div>
+      )}
     </div>
   );
 }

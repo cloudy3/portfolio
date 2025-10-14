@@ -1129,352 +1129,121 @@ select:focus-visible {
   will-change: width, opacity;
 }
 
-/* Splash Screen Styles */
-.splash-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary-navy) 0%,
-    #1a1a3e 50%,
-    #0f0f23 100%
-  );
-  transition: opacity 600ms ease-out;
-  -webkit-transition: opacity 600ms ease-out;
-  -moz-transition: opacity 600ms ease-out;
-  -o-transition: opacity 600ms ease-out;
-  overflow: hidden;
-}
+/* Japanese-inspired Loading Screen Animations */
 
-.splash-screen.exiting {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.splash-content {
-  text-align: center;
-  position: relative;
-  z-index: 2;
-  animation: fadeInUp 600ms ease-out;
-  -webkit-animation: fadeInUp 600ms ease-out;
-  -moz-animation: fadeInUp 600ms ease-out;
-  -o-animation: fadeInUp 600ms ease-out;
-}
-
-/* Animated geometric shapes background */
-.splash-shapes {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.shape {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.1;
-  filter: blur(40px);
-  -webkit-filter: blur(40px);
-}
-
-.shape-1 {
-  width: 300px;
-  height: 300px;
-  background: var(--color-accent-gold);
-  top: -150px;
-  left: -150px;
-  animation: float 8s ease-in-out infinite;
-  -webkit-animation: float 8s ease-in-out infinite;
-}
-
-.shape-2 {
-  width: 400px;
-  height: 400px;
-  background: var(--color-accent-amber);
-  bottom: -200px;
-  right: -200px;
-  animation: float 10s ease-in-out infinite reverse;
-  -webkit-animation: float 10s ease-in-out infinite reverse;
-}
-
-.shape-3 {
-  width: 250px;
-  height: 250px;
-  background: #4f46e5;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  animation: pulse 6s ease-in-out infinite;
-  -webkit-animation: pulse 6s ease-in-out infinite;
-}
-
-/* Logo container with enhanced styling */
-.splash-logo-container {
-  margin-bottom: 3rem;
-}
-
-.splash-logo-letters {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.splash-logo-letters .letter {
-  font-size: clamp(3rem, 8vw, 5rem);
-  font-weight: 700;
-  color: var(--color-primary-white);
-  letter-spacing: 0.1em;
-  font-family: var(--font-poppins);
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(30px) rotateX(-90deg);
-  -webkit-transform: translateY(30px) rotateX(-90deg);
-  animation: letterReveal 0.6s ease-out forwards;
-  -webkit-animation: letterReveal 0.6s ease-out forwards;
-  text-shadow: 0 0 30px rgba(230, 184, 0, 0.5);
-}
-
-.splash-tagline {
-  font-size: clamp(0.875rem, 2vw, 1.125rem);
-  font-weight: 400;
-  color: var(--color-accent-gold);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: fadeIn 0.8s ease-out 0.4s forwards;
-  -webkit-animation: fadeIn 0.8s ease-out 0.4s forwards;
-}
-
-/* Enhanced loader container */
-.splash-loader-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.splash-loader {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--color-accent-gold);
-  border-right-color: var(--color-accent-amber);
-  border-radius: 50%;
-  animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-  -webkit-animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-  -moz-animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-  -o-animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-  box-shadow: 0 0 20px rgba(230, 184, 0, 0.3);
-}
-
-/* Progress bar */
-.splash-progress-bar {
-  width: 200px;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.splash-progress-fill {
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--color-accent-gold),
-    var(--color-accent-amber)
-  );
-  border-radius: 10px;
-  animation: progressFill 2s ease-in-out infinite;
-  -webkit-animation: progressFill 2s ease-in-out infinite;
-  box-shadow: 0 0 10px var(--color-accent-gold);
-}
-
-/* Fade in and slide up animation for splash content */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-    -webkit-transform: translateY(20px);
-    -moz-transform: translateY(20px);
-    -o-transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
-    -moz-transform: translateY(0);
-    -o-transform: translateY(0);
-  }
-}
-
-/* Letter reveal animation with 3D effect */
-@keyframes letterReveal {
+/* Wave slide animation - left to right */
+@keyframes wave-slide {
   0% {
+    transform: translateX(-100%);
     opacity: 0;
-    transform: translateY(30px) rotateX(-90deg);
-    -webkit-transform: translateY(30px) rotateX(-90deg);
   }
   50% {
-    opacity: 0.5;
+    opacity: 1;
   }
   100% {
-    opacity: 1;
-    transform: translateY(0) rotateX(0deg);
-    -webkit-transform: translateY(0) rotateX(0deg);
+    transform: translateX(100%);
+    opacity: 0;
   }
 }
 
-@-webkit-keyframes letterReveal {
+.animate-wave-slide {
+  animation: wave-slide 3s ease-in-out infinite;
+}
+
+/* Wave slide animation - right to left */
+@keyframes wave-slide-reverse {
   0% {
+    transform: translateX(100%);
     opacity: 0;
-    -webkit-transform: translateY(30px) rotateX(-90deg);
   }
   50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-    -webkit-transform: translateY(0) rotateX(0deg);
-  }
-}
-
-/* Floating animation for shapes */
-@keyframes float {
-  0%,
-  100% {
-    transform: translate(0, 0);
-    -webkit-transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(30px, 30px);
-    -webkit-transform: translate(30px, 30px);
-  }
-}
-
-@-webkit-keyframes float {
-  0%,
-  100% {
-    -webkit-transform: translate(0, 0);
-  }
-  50% {
-    -webkit-transform: translate(30px, 30px);
-  }
-}
-
-/* Pulse animation for center shape */
-@keyframes pulse {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    -webkit-transform: translate(-50%, -50%) scale(1);
-    opacity: 0.1;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    -webkit-transform: translate(-50%, -50%) scale(1.2);
-    opacity: 0.15;
-  }
-}
-
-@-webkit-keyframes pulse {
-  0%,
-  100% {
-    -webkit-transform: translate(-50%, -50%) scale(1);
-    opacity: 0.1;
-  }
-  50% {
-    -webkit-transform: translate(-50%, -50%) scale(1.2);
-    opacity: 0.15;
-  }
-}
-
-/* Progress bar fill animation */
-@keyframes progressFill {
-  0% {
-    width: 0%;
-    opacity: 0.5;
-  }
-  50% {
-    width: 70%;
     opacity: 1;
   }
   100% {
-    width: 100%;
-    opacity: 0.8;
-  }
-}
-
-@-webkit-keyframes progressFill {
-  0% {
-    width: 0%;
-    opacity: 0.5;
-  }
-  50% {
-    width: 70%;
-    opacity: 1;
-  }
-  100% {
-    width: 100%;
-    opacity: 0.8;
-  }
-}
-
-@-webkit-keyframes fadeInUp {
-  from {
+    transform: translateX(-100%);
     opacity: 0;
-    -webkit-transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    -webkit-transform: translateY(0);
   }
 }
 
-@-moz-keyframes fadeInUp {
-  from {
-    opacity: 0;
-    -moz-transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    -moz-transform: translateY(0);
-  }
+.animate-wave-slide-reverse {
+  animation: wave-slide-reverse 3s ease-in-out infinite;
 }
 
-@-o-keyframes fadeInUp {
-  from {
-    opacity: 0;
-    -o-transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    -o-transform: translateY(0);
-  }
-}
-
-/* Spinning loader animation */
-@keyframes spin {
+/* Slow spin animation */
+@keyframes spin-slow {
   from {
     transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
-    -webkit-transform: rotate(360deg);
-    -moz-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
   }
 }
 
-@-webkit-keyframes spin {
+.animate-spin-slow {
+  animation: spin-slow 4s linear infinite;
+}
+
+/* Slow reverse spin animation */
+@keyframes spin-slow-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 3s linear infinite;
+}
+
+/* Slow pulse animation */
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* Webkit prefixed versions for better browser support */
+@-webkit-keyframes wave-slide {
+  0% {
+    -webkit-transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes wave-slide-reverse {
+  0% {
+    -webkit-transform: translateX(100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes spin-slow {
   from {
     -webkit-transform: rotate(0deg);
   }
@@ -1483,380 +1252,34 @@ select:focus-visible {
   }
 }
 
-@-moz-keyframes spin {
+@-webkit-keyframes spin-slow-reverse {
   from {
-    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(360deg);
   }
   to {
-    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(0deg);
   }
 }
 
-@-o-keyframes spin {
-  from {
-    -o-transform: rotate(0deg);
+@-webkit-keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
   }
-  to {
-    -o-transform: rotate(360deg);
+  50% {
+    opacity: 0.7;
+    -webkit-transform: scale(1.1);
   }
 }
 
-/* Reduced motion support for splash screen */
-/* Requirement: 4.3 - Respect prefers-reduced-motion preference */
+/* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .splash-screen,
-  .splash-content,
-  .splash-loader,
-  .splash-logo-letters .letter,
-  .splash-tagline,
-  .splash-progress-fill,
-  .shape {
-    animation-duration: 0.01ms !important;
-    -webkit-animation-duration: 0.01ms !important;
-    -moz-animation-duration: 0.01ms !important;
-    -o-animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    -webkit-animation-iteration-count: 1 !important;
-    -moz-animation-iteration-count: 1 !important;
-    -o-animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    -webkit-transition-duration: 0.01ms !important;
-    -moz-transition-duration: 0.01ms !important;
-    -o-transition-duration: 0.01ms !important;
-  }
-
-  /* Disable all animations */
-  .splash-loader,
-  .splash-logo-letters .letter,
-  .splash-tagline,
-  .splash-progress-fill,
-  .shape {
+  .animate-wave-slide,
+  .animate-wave-slide-reverse,
+  .animate-spin-slow,
+  .animate-spin-slow-reverse,
+  .animate-pulse-slow {
     animation: none !important;
-    -webkit-animation: none !important;
-    -moz-animation: none !important;
-    -o-animation: none !important;
-  }
-
-  /* Disable slide-up animation for content */
-  .splash-content {
-    animation: none !important;
-    -webkit-animation: none !important;
-    -moz-animation: none !important;
-    -o-animation: none !important;
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    -webkit-transform: translateY(0) !important;
-    -moz-transform: translateY(0) !important;
-    -o-transform: translateY(0) !important;
-  }
-
-  /* Show letters immediately */
-  .splash-logo-letters .letter {
-    opacity: 1 !important;
-    transform: translateY(0) rotateX(0deg) !important;
-    -webkit-transform: translateY(0) rotateX(0deg) !important;
-  }
-
-  /* Show tagline immediately */
-  .splash-tagline {
-    opacity: 1 !important;
-  }
-
-  /* Hide animated shapes */
-  .shape {
-    display: none !important;
-  }
-}
-
-/* Class-based reduced motion support for JavaScript detection */
-/* Requirement: 4.3 - Disable animations when reduced motion is preferred */
-.splash-screen.reduce-motion,
-.splash-screen.reduce-motion .splash-content,
-.splash-screen.reduce-motion .splash-loader,
-.splash-screen.reduce-motion .splash-logo-letters .letter,
-.splash-screen.reduce-motion .splash-tagline,
-.splash-screen.reduce-motion .splash-progress-fill,
-.splash-screen.reduce-motion .shape {
-  animation-duration: 0.01ms !important;
-  -webkit-animation-duration: 0.01ms !important;
-  -moz-animation-duration: 0.01ms !important;
-  -o-animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  -webkit-animation-iteration-count: 1 !important;
-  -moz-animation-iteration-count: 1 !important;
-  -o-animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  -webkit-transition-duration: 0.01ms !important;
-  -moz-transition-duration: 0.01ms !important;
-  -o-transition-duration: 0.01ms !important;
-}
-
-/* Disable all animations when reduced motion is active */
-.splash-screen.reduce-motion .splash-loader,
-.splash-screen.reduce-motion .splash-logo-letters .letter,
-.splash-screen.reduce-motion .splash-tagline,
-.splash-screen.reduce-motion .splash-progress-fill,
-.splash-screen.reduce-motion .shape {
-  animation: none !important;
-  -webkit-animation: none !important;
-  -moz-animation: none !important;
-  -o-animation: none !important;
-}
-
-/* Disable slide-up animation for content when reduced motion is active */
-.splash-screen.reduce-motion .splash-content {
-  animation: none !important;
-  -webkit-animation: none !important;
-  -moz-animation: none !important;
-  -o-animation: none !important;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  -webkit-transform: translateY(0) !important;
-  -moz-transform: translateY(0) !important;
-  -o-transform: translateY(0) !important;
-}
-
-/* Show letters immediately when reduced motion is active */
-.splash-screen.reduce-motion .splash-logo-letters .letter {
-  opacity: 1 !important;
-  transform: translateY(0) rotateX(0deg) !important;
-  -webkit-transform: translateY(0) rotateX(0deg) !important;
-}
-
-/* Show tagline immediately when reduced motion is active */
-.splash-screen.reduce-motion .splash-tagline {
-  opacity: 1 !important;
-}
-
-/* Hide animated shapes when reduced motion is active */
-.splash-screen.reduce-motion .shape {
-  display: none !important;
-}
-
-/* Responsive splash screen styles */
-/* Requirements: 5.1, 5.2, 5.3, 5.4, 5.5 */
-
-/* Mobile devices (portrait and landscape) */
-/* Requirement: 5.1 - Properly scaled splash screen on mobile */
-@media (max-width: 640px) {
-  .splash-logo-letters .letter {
-    font-size: clamp(2.5rem, 10vw, 3.5rem);
-  }
-
-  .splash-tagline {
-    font-size: clamp(0.75rem, 2vw, 0.875rem);
-    letter-spacing: 0.2em;
-  }
-
-  .splash-logo-container {
-    margin-bottom: 2rem;
-  }
-
-  .splash-loader {
-    width: 40px;
-    height: 40px;
-    border-width: 2.5px;
-  }
-
-  .splash-progress-bar {
-    width: 150px;
-  }
-
-  .splash-content {
-    padding: 1rem;
-    max-width: 90vw;
-  }
-
-  .shape-1 {
-    width: 200px;
-    height: 200px;
-  }
-
-  .shape-2 {
-    width: 250px;
-    height: 250px;
-  }
-
-  .shape-3 {
-    width: 150px;
-    height: 150px;
-  }
-}
-
-/* Extra small mobile devices */
-/* Requirement: 5.1 - Ensure readability on smallest screens */
-@media (max-width: 375px) {
-  .splash-logo-letters .letter {
-    font-size: clamp(2rem, 9vw, 3rem);
-  }
-
-  .splash-tagline {
-    font-size: 0.75rem;
-  }
-
-  .splash-loader {
-    width: 35px;
-    height: 35px;
-    border-width: 2px;
-  }
-
-  .splash-progress-bar {
-    width: 120px;
-  }
-}
-
-/* Mobile landscape orientation */
-/* Requirement: 5.4 - Maintain proper layout on orientation change */
-@media (max-width: 896px) and (orientation: landscape) {
-  .splash-logo {
-    font-size: clamp(1.5rem, 5vh, 2rem);
-    margin-bottom: 1rem;
-  }
-
-  .splash-loader {
-    width: 28px;
-    height: 28px;
-  }
-
-  .splash-content {
-    padding: 0.75rem;
-  }
-}
-
-/* Tablets (portrait) */
-/* Requirement: 5.2 - Adapt splash screen layout for tablets */
-@media (min-width: 641px) and (max-width: 768px) {
-  .splash-logo {
-    font-size: clamp(2rem, 6vw, 2.75rem);
-    margin-bottom: 1.75rem;
-  }
-
-  .splash-loader {
-    width: 36px;
-    height: 36px;
-  }
-
-  .splash-content {
-    padding: 1.5rem;
-  }
-}
-
-/* Tablets (landscape) and small desktops */
-/* Requirement: 5.2 - Adapt splash screen layout for tablets */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .splash-logo {
-    font-size: clamp(2.25rem, 5vw, 3rem);
-    margin-bottom: 1.75rem;
-  }
-
-  .splash-loader {
-    width: 38px;
-    height: 38px;
-  }
-
-  .splash-content {
-    padding: 2rem;
-  }
-}
-
-/* Desktop and larger screens */
-/* Requirement: 5.3 - Center and scale elements for optimal desktop viewing */
-@media (min-width: 1025px) {
-  .splash-logo {
-    font-size: clamp(2.5rem, 4vw, 3.5rem);
-    margin-bottom: 2rem;
-  }
-
-  .splash-loader {
-    width: 40px;
-    height: 40px;
-  }
-
-  .splash-content {
-    padding: 2rem;
-    max-width: 600px;
-  }
-}
-
-/* Large desktop screens */
-/* Requirement: 5.3 - Ensure proper scaling on large displays */
-@media (min-width: 1440px) {
-  .splash-logo {
-    font-size: 3.5rem;
-    margin-bottom: 2.25rem;
-  }
-
-  .splash-loader {
-    width: 44px;
-    height: 44px;
-  }
-}
-
-/* Ultra-wide and 4K displays */
-/* Requirement: 5.3 - Maintain readability on very large screens */
-@media (min-width: 1920px) {
-  .splash-logo {
-    font-size: 4rem;
-    margin-bottom: 2.5rem;
-    max-width: 800px;
-  }
-
-  .splash-loader {
-    width: 48px;
-    height: 48px;
-    border-width: 4px;
-  }
-
-  .splash-content {
-    max-width: 800px;
-  }
-}
-
-/* Ensure proper centering across all viewports */
-/* Requirement: 5.5 - Text and graphics remain properly proportioned */
-.splash-screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-}
-
-.splash-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-
-/* Prevent text overflow on small screens */
-/* Requirement: 5.5 - Ensure text remains readable */
-.splash-logo {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-  -webkit-hyphens: auto;
-  -moz-hyphens: auto;
-  -ms-hyphens: auto;
-  text-align: center;
-  max-width: 100%;
-}
-
-/* Tablet landscape orientation specific adjustments */
-/* Requirement: 5.4 - Maintain proper layout on orientation change */
-@media (min-width: 641px) and (max-width: 1024px) and (orientation: landscape) {
-  .splash-logo {
-    font-size: clamp(2rem, 4vh, 2.5rem);
-    margin-bottom: 1.25rem;
-  }
-
-  .splash-loader {
-    width: 32px;
-    height: 32px;
-  }
-
-  .splash-content {
-    padding: 1rem;
   }
 }
