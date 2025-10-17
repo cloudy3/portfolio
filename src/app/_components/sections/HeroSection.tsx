@@ -255,10 +255,11 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         {/* Main Title */}
         <h1
           ref={titleRef}
-          className="text-slate-900 mb-8 sm:mb-12 md:mb-16 leading-relaxed"
+          className="text-slate-900 mb-8 sm:mb-10 md:mb-12"
+          style={{ lineHeight: "1.2" }}
         >
-          <span className="block">Hi,</span>
-          <span className="block bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent">
+          <span className="block mb-2">Hi,</span>
+          <span className="block bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent pb-2">
             I&apos;m Jing Feng
           </span>
         </h1>
@@ -266,7 +267,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         {/* Subtitle */}
         <h3
           ref={subtitleRef}
-          className="text-slate-700 mb-3 sm:mb-4 mt-12 sm:mt-16 md:mt-20 font-light px-2"
+          className="text-slate-700 mb-3 sm:mb-4 mt-4 sm:mt-6 font-light px-2"
         >
           {JING_FENG_PROFILE.title}
         </h3>
