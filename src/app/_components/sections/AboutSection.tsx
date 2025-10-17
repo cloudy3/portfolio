@@ -55,24 +55,24 @@ const AboutSection = () => {
           <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto"></div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start mb-12 sm:mb-16">
-          {/* Left Column - Photo and Personal Info */}
+        {/* Main Content */}
+        <div className="max-w-4xl mx-auto mb-12 sm:mb-16">
+          {/* Photo and Content Wrapper */}
           <div
-            className={`space-y-6 sm:space-y-8 transition-all duration-1000 delay-200 ${
+            className={`flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 transition-all duration-1000 delay-200 ${
               isVisible
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 -translate-x-8"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
             }`}
           >
-            {/* Photo Placeholder */}
-            <div className="relative">
-              <div className="aspect-square max-w-xs sm:max-w-sm md:max-w-md mx-auto lg:mx-0 rounded-2xl shadow-lg overflow-hidden">
+            {/* Photo */}
+            <div className="relative w-52 sm:w-60 md:w-80 mx-auto md:mx-0 flex-shrink-0">
+              <div className="aspect-square rounded-2xl shadow-lg overflow-hidden">
                 <Image
                   src="/images/placeholder-avatar.svg"
                   alt="Professional Photo Placeholder"
-                  width={400}
-                  height={400}
+                  width={256}
+                  height={256}
                   className="w-full h-full object-cover"
                   loading="lazy"
                   placeholder="blur"
@@ -80,80 +80,53 @@ const AboutSection = () => {
                 />
               </div>
               {/* Decorative elements */}
-              <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-6 h-6 sm:w-8 sm:h-8 bg-amber-400 rounded-full opacity-80"></div>
-              <div className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 w-4 h-4 sm:w-6 sm:h-6 bg-orange-500 rounded-full opacity-60"></div>
+              <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-5 h-5 sm:w-6 sm:h-6 bg-amber-400 rounded-full opacity-80"></div>
+              <div className="absolute -bottom-2 -left-2 sm:-bottom-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 bg-orange-500 rounded-full opacity-60"></div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
-                <div className="text-xl sm:text-2xl font-bold text-gray-900">
-                  ∞
-                </div>
-                <div className="text-xs sm:text-sm text-gray-600">
-                  Cups of Coffee
-                </div>
+            {/* Professional Summary */}
+            <div className="space-y-6 max-w-prose">
+              <div className="prose prose-lg max-w-none">
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-5">
+                  Hey there! I&apos;m the kind of developer who gets genuinely
+                  excited about turning coffee into code and complex problems
+                  into elegant solutions. While others see bugs, I see puzzles
+                  waiting to be solved.
+                </p>
+
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-5">
+                  Currently, I&apos;m making waves in the maritime industry (pun
+                  intended) by building cloud-native apps that help ships
+                  navigate the digital ocean. My superpower? Taking ideas from
+                  &ldquo;wouldn&apos;t it be cool if...&rdquo; to &ldquo;wow,
+                  this actually works!&rdquo;.
+                </p>
+
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-8">
+                  When I&apos;m not wrestling with <strong>Flutter</strong>{" "}
+                  widgets or architecting <strong>Python</strong> backends on{" "}
+                  <strong>Google Cloud</strong>, you&apos;ll find me diving deep
+                  into the latest tech trends (because staying curious is half
+                  the job, right?). I believe the best code is like a good joke
+                  – if you have to explain it, it probably needs refactoring.
+                </p>
               </div>
-              <div className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
-                <div className="text-xl sm:text-2xl font-bold text-gray-900">
-                  96%
-                </div>
-                <div className="text-xs sm:text-sm text-gray-600">
-                  Problems Solved
-                </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <button
+                  onClick={handleDownloadCV}
+                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 sm:px-8 py-3 rounded-full font-semibold hover:from-amber-500 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:scale-95 touch-manipulation"
+                >
+                  Download CV
+                </button>
+                <a
+                  href="#contact"
+                  className="border-2 border-gray-900 text-gray-900 px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-all duration-300 text-center active:scale-95 touch-manipulation"
+                >
+                  Get In Touch
+                </a>
               </div>
-            </div>
-          </div>
-
-          {/* Right Column - Professional Summary */}
-          <div
-            className={`space-y-6 transition-all duration-1000 delay-400 ${
-              isVisible
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-8"
-            }`}
-          >
-            <div className="prose prose-lg max-w-none">
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Hey there! I&apos;m the kind of developer who gets genuinely
-                excited about turning coffee into code and complex problems into
-                elegant solutions. While others see bugs, I see puzzles waiting
-                to be solved.
-              </p>
-
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Currently, I&apos;m making waves in the maritime industry (pun
-                intended) by building cloud-native apps that help ships navigate
-                the digital ocean. My superpower? Taking ideas from
-                &ldquo;wouldn&apos;t it be cool if...&rdquo; to &ldquo;wow, this
-                actually works!&rdquo; – like that time I helped cut storage
-                costs by 96% with some clever image optimization magic.
-              </p>
-
-              <p className="text-lg text-gray-700 leading-relaxed mb-8">
-                When I&apos;m not wrestling with <strong>Flutter</strong>{" "}
-                widgets or architecting <strong>Python</strong> backends on{" "}
-                <strong>Google Cloud</strong>, you&apos;ll find me diving deep
-                into the latest tech trends (because staying curious is half the
-                job, right?). I believe the best code is like a good joke – if
-                you have to explain it, it probably needs refactoring.
-              </p>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button
-                onClick={handleDownloadCV}
-                className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 sm:px-8 py-3 rounded-full font-semibold hover:from-amber-500 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:scale-95 touch-manipulation"
-              >
-                Download CV
-              </button>
-              <a
-                href="#contact"
-                className="border-2 border-gray-900 text-gray-900 px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-all duration-300 text-center active:scale-95 touch-manipulation"
-              >
-                Get In Touch
-              </a>
             </div>
           </div>
         </div>
