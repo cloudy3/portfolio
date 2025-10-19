@@ -32,10 +32,8 @@ const AboutSection = () => {
   }, []);
 
   const handleDownloadCV = () => {
-    // In a real implementation, this would download an actual CV file
-    // For now, we'll create a placeholder action
     const link = document.createElement("a");
-    link.href = "/resume.pdf"; // This would be the actual path to your CV
+    link.href = "/resume.pdf";
     link.download = "Cheah_Jing_Feng_Resume.pdf";
     document.body.appendChild(link);
     link.click();
@@ -56,10 +54,10 @@ const AboutSection = () => {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-4xl mx-auto mb-12 sm:mb-16">
+        <div className="max-w-6xl mx-auto mb-12 sm:mb-16">
           {/* Photo and Content Wrapper */}
           <div
-            className={`flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 transition-all duration-1000 delay-200 ${
+            className={`flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-18 transition-all duration-1000 delay-200 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-8"
@@ -103,12 +101,10 @@ const AboutSection = () => {
                 </p>
 
                 <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-8">
-                  When I&apos;m not wrestling with <strong>Flutter</strong>{" "}
-                  widgets or architecting <strong>Python</strong> backends on{" "}
-                  <strong>Google Cloud</strong>, you&apos;ll find me diving deep
-                  into the latest tech trends (because staying curious is half
-                  the job, right?). I believe the best code is like a good joke
-                  – if you have to explain it, it probably needs refactoring.
+                  I&apos;m always diving deep into the latest tech trends
+                  (because staying curious is half the job, right?). I believe
+                  the best code is like a good joke, if you have to explain it,
+                  it probably needs refactoring.
                 </p>
               </div>
 
