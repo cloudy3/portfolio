@@ -18,9 +18,9 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Jing Feng's Portfolio",
-  description:
-    "A modern portfolio website with Mont-Fort inspired design and smooth animations",
-  keywords: "portfolio, web development, design, accessibility, performance",
+  description: "JF's modern portfolio website",
+  keywords:
+    "Jing Feng, portfolio, web development, design, accessibility, performance, website",
   authors: [{ name: "Cheah Jing Feng" }],
   icons: {
     icon: [
@@ -37,16 +37,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Jing Feng's Portfolio",
-    description:
-      "A modern portfolio website with Mont-Fort inspired design and smooth animations",
+    description: "JF's modern portfolio website",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "Jing Feng's Portfolio",
-    description:
-      "A modern portfolio website with Mont-Fort inspired design and smooth animations",
+    description: "JF's modern portfolio website",
   },
   robots: {
     index: true,
