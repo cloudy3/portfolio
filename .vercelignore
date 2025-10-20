@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+
+# Testing
+coverage
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+__mocks__
+
+# Development files
+.env.local
+.env*.local
+
+# IDE
+.vscode
+.idea
+.kiro
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Reports
+lighthouse-report.html
+lighthouse-mobile-report.html
+audit-reports
+
+# Scripts (not needed for deployment)
+scripts
+
+# Documentation
+*.md
+!README.md
