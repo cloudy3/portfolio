@@ -1,5 +1,7 @@
 # 🎯 Portfolio Website
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/YOUR_REPO)
+
 > A modern portfolio website that doesn't just look good—it performs like a Formula 1 car and is more accessible than a public library.
 
 Built with Next.js 15, Three.js, and an unhealthy obsession with performance metrics.
@@ -195,12 +197,20 @@ npm run audit:bundle
 
 ## 🚀 Deployment
 
-Optimized for Vercel with:
+**One-Click Deploy to Vercel:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/YOUR_REPO)
+
+Or follow the [detailed deployment guide](./DEPLOYMENT.md).
+
+**Features:**
 
 - Automatic deployments from main branch
 - Preview deployments for PRs
 - Edge function optimization
 - Global CDN distribution
+- Built-in image optimization
+- Zero configuration required
 
 ## 📝 What This Demonstrates
 
