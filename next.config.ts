@@ -38,7 +38,13 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
-  // Webpack optimizations
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {
+    // Turbopack handles code splitting and optimizations automatically
+    // Most webpack optimizations are built-in to Turbopack
+  },
+
+  // Webpack optimizations (fallback for webpack builds)
   webpack: (config, { isServer, dev }) => {
     // Optimize bundle size
     if (!dev && !isServer) {
