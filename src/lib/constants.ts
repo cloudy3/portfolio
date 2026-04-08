@@ -1,31 +1,34 @@
 // Design constants and configuration values
 
-// Color palette
+/** Semantic palette — mirrors CSS variables in globals.css */
 export const COLORS = {
-  primary: {
-    navy: "#1a1a2e",
-    white: "#f8f9fa",
+  surface: {
+    page: "#faf8f5",
+    subtle: "#f3f1ed",
+    elevated: "#ffffff",
+    inverse: "#161618",
   },
   accent: {
-    gold: "#ffd700",
-    amber: "#f59e0b",
+    cyan: "#06b6d4",
+    blue: "#2563eb",
+    lime: "#84cc16",
+    violet: "#7c3aed",
   },
-  secondary: {
-    gray: "#6c757d",
-    lightGray: "#adb5bd",
-    darkGray: "#495057",
+  text: {
+    primary: "#1a1a1c",
+    secondary: "#4a4a52",
+    muted: "#6b6b76",
   },
-  success: "#28a745",
-  error: "#dc3545",
-  warning: "#ffc107",
-  info: "#17a2b8",
+  success: "#16a34a",
+  error: "#dc2626",
+  warning: "#ca8a04",
+  info: "#0891b2",
 } as const;
 
-// Typography scale
 export const TYPOGRAPHY = {
   fontFamily: {
-    sans: ["Inter", "system-ui", "sans-serif"],
-    mono: ["JetBrains Mono", "Fira Code", "monospace"],
+    sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+    mono: ["var(--font-mono)", "ui-monospace", "monospace"],
   },
   fontSize: {
     xs: "0.75rem",
@@ -90,11 +93,10 @@ export const DURATIONS = {
   slower: 750,
 } as const;
 
-// Navigation items
 export const NAVIGATION_ITEMS = [
   { id: "hero", label: "Home", href: "#hero" },
+  { id: "work", label: "Work", href: "#work", path: "/projects" },
   { id: "about", label: "About", href: "#about" },
-  { id: "projects", label: "Projects", href: "#projects" },
   { id: "skills", label: "Skills", href: "#skills" },
   { id: "experience", label: "Experience", href: "#experience" },
   { id: "contact", label: "Contact", href: "#contact" },

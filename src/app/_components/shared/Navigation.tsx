@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { NAVIGATION_ITEMS, Z_INDEX } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -8,286 +10,229 @@ interface NavigationProps {
   className?: string;
 }
 
+function scrollToSectionId(id: string) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  const headerOffset = 80;
+  const top =
+    element.getBoundingClientRect().top + window.scrollY - headerOffset;
+  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+}
+
 export default function Navigation({ className }: NavigationProps) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [isScrolled, setIsScrolled] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isHome = pathname === "/";
 
-  // Handle scroll events for active section highlighting and navbar styling
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let locomotiveScroll: any = null;
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 24);
+      if (!isHome) return;
 
-    const handleScroll = (scrollY?: number) => {
-      const currentScrollY = scrollY || window.scrollY;
-      setIsScrolled(currentScrollY > 50);
-
-      // If we're at the very top, always show hero as active
-      if (currentScrollY < 100) {
+      if (window.scrollY < 80) {
         setActiveSection("hero");
         return;
       }
 
-      // Find active section based on scroll position
       const sections = NAVIGATION_ITEMS.map((item) => item.id);
-      let currentSection = "hero";
-
+      let current = "hero";
       for (const sectionId of sections) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          // Adjust the threshold for better detection
-          if (rect.top <= 150 && rect.bottom >= 150) {
-            currentSection = sectionId;
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 140 && rect.bottom >= 140) {
+            current = sectionId;
           }
         }
       }
-
-      setActiveSection(currentSection);
+      setActiveSection(current);
     };
 
-    // Initial call to set correct state
     handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isHome]);
 
-    // Try to hook into Locomotive Scroll instance
-    const initLocomotiveListener = () => {
-      // Check if Locomotive Scroll is available on window
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((window as any).locomotiveScroll) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        locomotiveScroll = (window as any).locomotiveScroll;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        locomotiveScroll.on("scroll", (args: any) => {
-          handleScroll(args.scroll.y);
-        });
-      } else {
-        // Fallback to regular scroll events
-        window.addEventListener("scroll", () => handleScroll(), {
-          passive: true,
-        });
-      }
-    };
-
-    // Try immediately, then with a delay for Locomotive Scroll to initialize
-    initLocomotiveListener();
-    const timeoutId = setTimeout(initLocomotiveListener, 1000);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (locomotiveScroll && locomotiveScroll.off) {
-        locomotiveScroll.off("scroll", handleScroll);
-      }
-      window.removeEventListener("scroll", () => handleScroll());
-    };
-  }, []);
-
-  // Intersection Observer for better section detection
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: "-5% 0px -70% 0px",
-      threshold: 0.1,
-    };
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      // Find the section that's most visible
-      let mostVisibleSection = "";
-      let maxVisibility = 0;
-
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio > maxVisibility) {
-          const sectionId = entry.target.id;
-          if (
-            sectionId &&
-            NAVIGATION_ITEMS.some((item) => item.id === sectionId)
-          ) {
-            mostVisibleSection = sectionId;
-            maxVisibility = entry.intersectionRatio;
-          }
-        }
-      });
-
-      if (mostVisibleSection) {
-        setActiveSection(mostVisibleSection);
-      }
-    }, observerOptions);
-
-    // Observe all sections with a delay to ensure they're rendered
-    const observeSections = () => {
-      NAVIGATION_ITEMS.forEach((item) => {
-        const element = document.getElementById(item.id);
-        if (element && observerRef.current) {
-          observerRef.current.observe(element);
-        }
-      });
-    };
-
-    // Delay observation to ensure sections are rendered
-    const timeoutId = setTimeout(observeSections, 500);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, []);
-
-  // Handle smooth scroll to section
-  const handleNavClick = (href: string) => {
-    const targetId = href.replace("#", "");
-    const element = document.getElementById(targetId);
-
-    if (element) {
-      // Force navbar to update immediately
-      setIsScrolled(true);
-      setActiveSection(targetId);
-
-      // Try to use Locomotive Scroll's scrollTo method first
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const locomotiveScroll = (window as any).locomotiveScroll;
-      if (locomotiveScroll && locomotiveScroll.scrollTo) {
-        locomotiveScroll.scrollTo(element, {
-          offset: -80, // Account for fixed navbar
-          duration: 1000,
-          easing: [0.25, 0.0, 0.35, 1.0],
-        });
-      } else {
-        // Fallback to regular scroll
-        const headerOffset = 80;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
-      }
+    if (!isHome) {
+      if (pathname.startsWith("/projects")) setActiveSection("work");
+      return;
     }
 
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        let best = "";
+        let ratio = 0;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > ratio) {
+            const id = entry.target.id;
+            if (NAVIGATION_ITEMS.some((item) => item.id === id)) {
+              best = id;
+              ratio = entry.intersectionRatio;
+            }
+          }
+        });
+        if (best) setActiveSection(best);
+      },
+      { root: null, rootMargin: "-8% 0px -55% 0px", threshold: [0, 0.1, 0.25] }
+    );
+
+    const t = setTimeout(() => {
+      NAVIGATION_ITEMS.forEach((item) => {
+        const el = document.getElementById(item.id);
+        if (el && observerRef.current) observerRef.current.observe(el);
+      });
+    }, 300);
+
+    return () => {
+      clearTimeout(t);
+      observerRef.current?.disconnect();
+    };
+  }, [isHome, pathname]);
+
+  const handleNavClick = (href: string) => {
     setIsOpen(false);
+    const id = href.replace("#", "");
+    if (isHome) {
+      scrollToSectionId(id);
+    }
   };
 
-  // Close mobile menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const onClick = (event: MouseEvent) => {
       const nav = document.getElementById("mobile-nav");
-      const button = document.getElementById("mobile-menu-button");
-
+      const btn = document.getElementById("mobile-menu-button");
       if (
         isOpen &&
         nav &&
-        button &&
+        btn &&
         !nav.contains(event.target as Node) &&
-        !button.contains(event.target as Node)
+        !btn.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
   }, [isOpen]);
+
+  const navLinkClass = (id: string, path?: string) => {
+    const onProjects = pathname.startsWith("/projects");
+    const active =
+      (path && onProjects && id === "work") ||
+      (!path && isHome && activeSection === id);
+    return cn(
+      "relative px-3 py-2 text-sm font-medium transition-colors rounded-md",
+      active
+        ? "text-accent-cyan"
+        : "text-content-secondary hover:text-content-primary"
+    );
+  };
 
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 transition-all duration-300 z-50",
-        isScrolled
-          ? "bg-white/90 backdrop-blur-md shadow-lg"
-          : "bg-transparent",
+        "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 border-b",
+        isScrolled || !isHome
+          ? "bg-surface-elevated/92 backdrop-blur-md border-border-subtle shadow-sm"
+          : "bg-transparent border-transparent",
         className
       )}
       style={{ zIndex: Z_INDEX.fixed }}
+      aria-label="Main"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand */}
-          <div className="flex-shrink-0">
-            <button
-              onClick={() => handleNavClick("#hero")}
-              className={cn(
-                "text-xl font-bold transition-colors duration-300",
-                isScrolled ? "text-gray-900" : "text-white"
-              )}
-            >
-              Portfolio
-            </button>
-          </div>
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <div className="container-custom max-w-content">
+        <div className="flex h-16 items-center justify-between">
+          <Link
+            href="/"
+            className={cn(
+              "text-sm font-semibold tracking-tight transition-colors",
+              isScrolled || !isHome
+                ? "text-content-primary"
+                : "text-content-primary drop-shadow-sm"
+            )}
+          >
+            JF
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
-              {NAVIGATION_ITEMS.map((item) => (
-                <button
+          <div className="hidden md:flex items-center gap-1">
+            {NAVIGATION_ITEMS.map((item) =>
+              "path" in item && item.path ? (
+                <Link
                   key={item.id}
-                  onClick={() => handleNavClick(item.href)}
-                  className={cn(
-                    "px-3 py-2 text-sm font-medium transition-all duration-300 relative",
-                    "hover:scale-105 hover:opacity-80",
-                    activeSection === item.id
-                      ? isScrolled
-                        ? "text-blue-600"
-                        : "text-yellow-400"
-                      : isScrolled
-                      ? "text-gray-700 hover:text-gray-900"
-                      : "text-white/90 hover:text-white"
-                  )}
+                  href={item.path}
+                  className={navLinkClass(item.id, item.path)}
                 >
                   {item.label}
-                  {activeSection === item.id && (
+                  {pathname.startsWith("/projects") && item.id === "work" ? (
                     <span
-                      className={cn(
-                        "absolute bottom-0 left-0 right-0 h-0.5 transition-colors duration-300",
-                        isScrolled ? "bg-blue-600" : "bg-yellow-400"
-                      )}
+                      className="absolute bottom-1 left-3 right-3 h-px bg-accent-cyan/80"
+                      aria-hidden
                     />
-                  )}
+                  ) : null}
+                </Link>
+              ) : isHome ? (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleNavClick(item.href)}
+                  className={navLinkClass(item.id)}
+                >
+                  {item.label}
+                  {activeSection === item.id ? (
+                    <span
+                      className="absolute bottom-1 left-3 right-3 h-px bg-accent-cyan/80"
+                      aria-hidden
+                    />
+                  ) : null}
                 </button>
-              ))}
-            </div>
+              ) : (
+                <Link
+                  key={item.id}
+                  href={`/${item.href}`}
+                  className={navLinkClass(item.id)}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               id="mobile-menu-button"
+              type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className={cn(
-                "inline-flex items-center justify-center p-3 rounded-md transition-all duration-300 touch-manipulation",
-                "active:scale-95",
-                isScrolled
-                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200"
-                  : "text-white hover:text-gray-300 hover:bg-white/10 active:bg-white/20"
-              )}
+              className="inline-flex items-center justify-center rounded-md p-2 text-content-primary hover:bg-surface-subtle"
               aria-expanded={isOpen}
-              aria-label={isOpen ? "Close main menu" : "Open main menu"}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               <span className="sr-only">
                 {isOpen ? "Close" : "Open"} main menu
               </span>
-              {/* Hamburger icon */}
-              <div className="w-6 h-6 relative">
+              <div className="flex h-5 w-6 flex-col justify-center gap-1.5">
                 <span
                   className={cn(
-                    "absolute block h-0.5 w-6 transform transition-all duration-300",
-                    isScrolled ? "bg-gray-700" : "bg-white",
-                    isOpen ? "rotate-45 translate-y-2" : "translate-y-0"
+                    "h-0.5 w-full bg-content-primary transition-transform origin-center",
+                    isOpen && "translate-y-2 rotate-45"
                   )}
                 />
                 <span
                   className={cn(
-                    "absolute block h-0.5 w-6 transform transition-all duration-300 translate-y-2",
-                    isScrolled ? "bg-gray-700" : "bg-white",
-                    isOpen ? "opacity-0" : "opacity-100"
+                    "h-0.5 w-full bg-content-primary transition-opacity",
+                    isOpen && "opacity-0"
                   )}
                 />
                 <span
                   className={cn(
-                    "absolute block h-0.5 w-6 transform transition-all duration-300 translate-y-4",
-                    isScrolled ? "bg-gray-700" : "bg-white",
-                    isOpen ? "-rotate-45 -translate-y-2" : "translate-y-0"
+                    "h-0.5 w-full bg-content-primary transition-transform origin-center",
+                    isOpen && "-translate-y-2 -rotate-45"
                   )}
                 />
               </div>
@@ -296,31 +241,44 @@ export default function Navigation({ className }: NavigationProps) {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
       <div
         id="mobile-nav"
         className={cn(
-          "md:hidden transition-all duration-300 overflow-hidden",
-          "bg-white/95 backdrop-blur-md shadow-lg",
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          "md:hidden overflow-hidden border-b border-border-subtle bg-surface-elevated transition-all duration-300",
+          isOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {NAVIGATION_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.href)}
-              className={cn(
-                "block w-full text-left px-4 py-3 text-base font-medium transition-all duration-300 rounded-lg touch-manipulation",
-                "active:scale-95 active:bg-gray-200",
-                activeSection === item.id
-                  ? "text-blue-600 bg-blue-50 border-l-4 border-blue-600"
-                  : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="flex flex-col gap-1 px-4 py-3">
+          {NAVIGATION_ITEMS.map((item) =>
+            "path" in item && item.path ? (
+              <Link
+                key={item.id}
+                href={item.path}
+                onClick={() => setIsOpen(false)}
+                className="rounded-md px-3 py-3 text-left text-base font-medium text-content-primary hover:bg-surface-subtle"
+              >
+                {item.label}
+              </Link>
+            ) : isHome ? (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleNavClick(item.href)}
+                className="rounded-md px-3 py-3 text-left text-base font-medium text-content-primary hover:bg-surface-subtle"
+              >
+                {item.label}
+              </button>
+            ) : (
+              <Link
+                key={item.id}
+                href={`/${item.href}`}
+                onClick={() => setIsOpen(false)}
+                className="rounded-md px-3 py-3 text-left text-base font-medium text-content-primary hover:bg-surface-subtle"
+              >
+                {item.label}
+              </Link>
+            )
+          )}
         </div>
       </div>
     </nav>

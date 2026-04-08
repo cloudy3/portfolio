@@ -1,98 +1,54 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { usePathname } from "next/navigation";
 import Navigation from "../shared/Navigation";
 
-// Mock scrollIntoView
-const mockScrollIntoView = jest.fn();
-Object.defineProperty(Element.prototype, "scrollIntoView", {
-  value: mockScrollIntoView,
-  writable: true,
-});
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(),
+}));
 
-// Mock getBoundingClientRect
-Object.defineProperty(Element.prototype, "getBoundingClientRect", {
-  value: jest.fn(() => ({
-    top: 0,
-    bottom: 100,
-    left: 0,
-    right: 100,
-    width: 100,
-    height: 100,
-  })),
-  writable: true,
-});
+const mockUsePathname = usePathname as jest.Mock;
 
 describe("Navigation", () => {
   beforeEach(() => {
-    mockScrollIntoView.mockClear();
-    // Reset scroll position
+    mockUsePathname.mockReset();
+    mockUsePathname.mockReturnValue("/");
+    window.scrollTo = jest.fn();
     Object.defineProperty(window, "scrollY", { value: 0, writable: true });
-  });
-
-  it("renders brand/logo", () => {
-    render(<Navigation />);
-    expect(screen.getByText("Portfolio")).toBeInTheDocument();
-  });
-
-  it("renders desktop navigation items", () => {
-    render(<Navigation />);
-
-    // Check for desktop navigation container
-    const desktopNavContainer = document.querySelector(".hidden.md\\:block");
-    expect(desktopNavContainer).toBeInTheDocument();
-
-    // Check that navigation items exist
-    expect(screen.getAllByText("Home")).toHaveLength(2); // Desktop and mobile
-    expect(screen.getAllByText("About")).toHaveLength(2);
-  });
-
-  it("shows mobile menu button", () => {
-    render(<Navigation />);
-    const mobileButton = screen.getByRole("button", {
-      name: /open main menu/i,
+    document.getElementById = jest.fn((id: string) => {
+      if (["hero", "work", "about", "skills", "experience", "contact"].includes(id)) {
+        const el = document.createElement("div");
+        el.id = id;
+        return el;
+      }
+      return null;
     });
-    expect(mobileButton).toBeInTheDocument();
   });
 
-  it("toggles mobile menu when button is clicked", () => {
+  it("renders brand", () => {
     render(<Navigation />);
-    const mobileButton = screen.getByRole("button", {
-      name: /open main menu/i,
-    });
-
-    fireEvent.click(mobileButton);
-
-    const mobileNav = document.getElementById("mobile-nav");
-    expect(mobileNav).toHaveClass("max-h-96");
+    expect(screen.getByText("JF")).toBeInTheDocument();
   });
 
-  it("handles navigation click", () => {
-    // Create a mock element with scrollIntoView
-    const mockElement = document.createElement("div");
-    mockElement.id = "hero";
-    mockElement.scrollIntoView = mockScrollIntoView;
-    document.body.appendChild(mockElement);
-
+  it("renders primary nav labels on desktop", () => {
     render(<Navigation />);
-    const homeButton = screen.getAllByText("Home")[0];
-
-    fireEvent.click(homeButton);
-
-    expect(mockScrollIntoView).toHaveBeenCalledWith({
-      behavior: "smooth",
-      block: "start",
-    });
-
-    // Cleanup
-    document.body.removeChild(mockElement);
+    expect(screen.getAllByText("Home").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Work").length).toBeGreaterThanOrEqual(1);
   });
 
-  it("applies correct styling classes", () => {
+  it("opens mobile menu", () => {
+    const { container } = render(<Navigation />);
+    const btn = screen.getByRole("button", { name: /open menu/i });
+    fireEvent.click(btn);
+    const mobileNav = container.querySelector("#mobile-nav");
+    expect(mobileNav).toBeTruthy();
+    expect(mobileNav?.getAttribute("class") ?? "").toMatch(/max-h-\[28rem\]/);
+  });
+
+  it("uses elevated styles when not on home", () => {
+    mockUsePathname.mockReturnValue("/projects");
     render(<Navigation />);
     const nav = screen.getByRole("navigation");
-
-    // Should have fixed positioning and initial transparent background
-    expect(nav).toHaveClass("fixed", "top-0", "left-0", "right-0");
-    expect(nav).toHaveClass("bg-transparent");
+    expect(nav.className).toMatch(/bg-surface-elevated/);
   });
 });

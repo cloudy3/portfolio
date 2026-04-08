@@ -10,6 +10,8 @@ import {
   getAllTechnologies,
   getProjectsByTechnology,
   getRecentProjects,
+  getProjectBySlug,
+  getAllProjectSlugs,
 } from "../projectData";
 
 describe("Project Data Management", () => {
@@ -40,11 +42,11 @@ describe("Project Data Management", () => {
 
   describe("filterProjectsByTechnology", () => {
     it("should filter projects by technology (case insensitive)", () => {
-      const result = filterProjectsByTechnology(sampleProjects, "react");
+      const result = filterProjectsByTechnology(sampleProjects, "python");
       expect(
         result.every((project) =>
           project.technologies.some((tech) =>
-            tech.toLowerCase().includes("react")
+            tech.toLowerCase().includes("python")
           )
         )
       ).toBe(true);
@@ -68,19 +70,19 @@ describe("Project Data Management", () => {
 
   describe("searchProjects", () => {
     it("should search projects by title", () => {
-      const result = searchProjects(sampleProjects, "E-Commerce");
+      const result = searchProjects(sampleProjects, "Diving");
       expect(
         result.some((project) =>
-          project.title.toLowerCase().includes("e-commerce")
+          project.title.toLowerCase().includes("diving")
         )
       ).toBe(true);
     });
 
     it("should search projects by description", () => {
-      const result = searchProjects(sampleProjects, "e-commerce");
+      const result = searchProjects(sampleProjects, "maritime");
       expect(
         result.some((project) =>
-          project.description.toLowerCase().includes("e-commerce")
+          project.description.toLowerCase().includes("maritime")
         )
       ).toBe(true);
     });
@@ -97,7 +99,7 @@ describe("Project Data Management", () => {
     });
 
     it("should be case insensitive", () => {
-      const result = searchProjects(sampleProjects, "REACT");
+      const result = searchProjects(sampleProjects, "FLUTTER");
       expect(result.length).toBeGreaterThan(0);
     });
 
@@ -243,9 +245,9 @@ describe("Project Data Management", () => {
 
   describe("getProjectsByTechnology", () => {
     it("should return projects that use specific technology", () => {
-      const result = getProjectsByTechnology(sampleProjects, "React");
+      const result = getProjectsByTechnology(sampleProjects, "Flutter");
       expect(
-        result.every((project) => project.technologies.includes("React"))
+        result.every((project) => project.technologies.includes("Flutter"))
       ).toBe(true);
     });
 
@@ -289,6 +291,24 @@ describe("Project Data Management", () => {
       expect(
         result.every((project) => new Date(project.completedAt) >= now)
       ).toBe(true);
+    });
+  });
+
+  describe("getProjectBySlug", () => {
+    it("returns project by id slug", () => {
+      expect(getProjectBySlug("portfolio-website")?.title).toContain(
+        "Portfolio"
+      );
+    });
+
+    it("returns undefined for unknown slug", () => {
+      expect(getProjectBySlug("unknown-slug-xyz")).toBeUndefined();
+    });
+  });
+
+  describe("getAllProjectSlugs", () => {
+    it("returns all project ids", () => {
+      expect(getAllProjectSlugs()).toEqual(sampleProjects.map((p) => p.id));
     });
   });
 });
