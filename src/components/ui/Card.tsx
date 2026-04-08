@@ -15,9 +15,9 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={cn(
-        "bg-white rounded-lg shadow-md border border-gray-200",
+        "rounded-lg border border-border-subtle bg-surface-elevated shadow-sm",
         hover &&
-          "transition-transform duration-300 hover:scale-105 hover:shadow-lg",
+          "transition-shadow duration-300 ease-out hover:shadow-md hover:border-accent-cyan/25",
         className
       )}
     >
@@ -60,7 +60,7 @@ export const CardFooter: React.FC<CardFooterProps> = ({
   className,
 }) => {
   return (
-    <div className={cn("px-6 py-4 border-t border-gray-200", className)}>
+    <div className={cn("px-6 py-4 border-t border-border-subtle", className)}>
       {children}
     </div>
   );

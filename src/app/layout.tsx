@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
 import ScrollProvider from "./_components/shared/ScrollProvider";
@@ -7,20 +7,30 @@ import BrowserCompatibility from "./_components/ui/BrowserCompatibility";
 import PerformanceMonitor from "./_components/shared/PerformanceMonitor";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
-import SplashScreen from "./_components/ui/SplashScreen";
 
-const poppins = Poppins({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-poppins",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Jing Feng's Portfolio",
-  description: "JF's modern portfolio website",
+  title: {
+    default: "Jing Feng — Software Engineer",
+    template: "%s | Jing Feng",
+  },
+  description:
+    "Full-stack engineer building calm, reliable systems with Flutter, Python, and Google Cloud.",
   keywords:
-    "Jing Feng, portfolio, web development, design, accessibility, performance, website",
+    "Jing Feng, software engineer, Flutter, Python, Google Cloud, full-stack, portfolio",
   authors: [{ name: "Cheah Jing Feng" }],
   icons: {
     icon: [
@@ -36,15 +46,17 @@ export const metadata: Metadata = {
     title: "JF Portfolio",
   },
   openGraph: {
-    title: "Jing Feng's Portfolio",
-    description: "JF's modern portfolio website",
+    title: "Jing Feng — Software Engineer",
+    description:
+      "Full-stack engineer — Flutter, Python, Google Cloud, and product-minded delivery.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jing Feng's Portfolio",
-    description: "JF's modern portfolio website",
+    title: "Jing Feng — Software Engineer",
+    description:
+      "Full-stack engineer — Flutter, Python, Google Cloud, and product-minded delivery.",
   },
   robots: {
     index: true,
@@ -72,16 +84,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${poppins.variable} font-sans antialiased bg-white text-gray-900 overflow-x-hidden`}
+        className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}
       >
-        <SplashScreen />
         <PerformanceMonitor />
         <AccessibilityAuditor />
         <AccessibilityProvider>
           <BrowserCompatibility />
           <Navigation />
           <ScrollProvider>
-            <main id="main-content" className="relative">
+            <main id="main-content" className="relative pt-16">
               {children}
             </main>
           </ScrollProvider>

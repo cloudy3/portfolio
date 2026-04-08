@@ -1,12 +1,21 @@
 import { Project } from "@/types";
 
-// Jing Feng's real project data reflecting professional experience and technology stack
 export const sampleProjects: Project[] = [
   {
     id: "image-processing-api",
     title: "Cloud-Native Image Processing API",
     description:
       "Python Flask API deployed on Google Cloud Run for large-scale image processing with automated compression.",
+    role: "End-to-end API design, cloud deployment, and integrations",
+    problem:
+      "Teams needed reliable large-scale image handling with efficient storage and smoother bulk uploads from enterprise file sources.",
+    solution:
+      "Built a Flask API on Cloud Run with automated compression via Firebase Extensions, OneDrive Picker integration for batch uploads, and solid error handling and monitoring.",
+    outcomes: [
+      "Automated compression pipeline tied to Firebase Extensions",
+      "Integrated Microsoft OneDrive Picker for large batch uploads",
+      "Streamlined CI/CD and operational monitoring for the service",
+    ],
     longDescription:
       "Designed and implemented a Python Flask API deployed on Google Cloud Run for large-scale image processing operations. The system includes automated image compression using Firebase Extensions, resulting in 96% reduction in storage costs. Integrated with Microsoft OneDrive Picker API to accelerate client upload workflows by 60% for large image batches. The API handles long-running tasks efficiently and includes comprehensive error handling and monitoring. Successfully streamlined CI/CD processes and improved overall system performance.",
     technologies: [
@@ -28,6 +37,16 @@ export const sampleProjects: Project[] = [
     title: "Diving Application for Maritime Services",
     description:
       "Full-stack Flutter application for dive marine services with real-time data synchronization and offline capabilities.",
+    role: "Led end-to-end product development",
+    problem:
+      "Field teams relied on manual vessel inspection workflows with limited real-time visibility and unreliable connectivity offshore.",
+    solution:
+      "Delivered a cross-platform Flutter app with offline-first patterns, cloud-backed sync, and reporting tailored to dive marine operations.",
+    outcomes: [
+      "Digitized manual inspection procedures",
+      "Deployed to Singapore operations with European rollout initiated",
+      "Integrated Google Cloud for scalable backend services",
+    ],
     longDescription:
       "Led the complete end-to-end development of a comprehensive diving application for Dive Marine Services. The application digitizes manual vessel inspection procedures, provides real-time reporting capabilities, and supports offline functionality for field divers. Built with Flutter for cross-platform compatibility and integrated with Google Cloud services for scalable backend operations. Successfully deployed to Singapore team and initiated rollout to European teams.",
     technologies: [
@@ -50,6 +69,16 @@ export const sampleProjects: Project[] = [
     title: "Global Vessel Telemetry System",
     description:
       "Real-time vessel tracking system built on Google Compute Engine with interactive dashboard for global maritime operations.",
+    role: "Full-stack development on ingestion pipeline and dashboard",
+    problem:
+      "Maritime operations required low-latency visualization of global vessel positions with data residency considerations across regions.",
+    solution:
+      "Implemented WebSocket ingestion, a live dashboard on Compute Engine, and region-scoped Firestore and Cloud Storage for Asia and Europe.",
+    outcomes: [
+      "Real-time ship positions in an interactive dashboard",
+      "Region-specific storage reducing retrieval latency substantially",
+      "Handles large-scale telemetry processing",
+    ],
     longDescription:
       "Developed a comprehensive vessel tracking system that ingests global vessel telemetry data via WebSocket connections. The system is deployed on Google Compute Engine and features an interactive live-tracking dashboard that visualizes ship positions in real-time. Implemented region-specific Cloud Storage and Firestore instances across Asia and Europe, resulting in 50% reduction in data-retrieval latency. The system handles large-scale data processing and provides critical operational insights for maritime clients.",
     technologies: [
@@ -74,6 +103,16 @@ export const sampleProjects: Project[] = [
     title: "NEA Energy Management Mobile App",
     description:
       "Flutter mobile application with push notifications for energy consumption tracking, adopted by the National Environment Agency.",
+    role: "End-to-end mobile delivery (internship at Resync)",
+    problem:
+      "Organizations needed clearer energy consumption visibility and timely alerts for building and facility stakeholders.",
+    solution:
+      "Built a Flutter app with FCM notifications, sync and offline support, and analytics-oriented views for consumption data.",
+    outcomes: [
+      "Adopted by NEA and other organizations",
+      "FCM-based notification workflows",
+      "Analytics-focused UX for consumption tracking",
+    ],
     longDescription:
       "Delivered an end-to-end Flutter mobile application with Firebase Cloud Messaging (FCM) push notifications for energy management and consumption tracking. The application was successfully adopted by the National Environment Agency (NEA) and other prominent organizations. Built during internship at Resync, the app enables smart tracking and visualization of energy consumption, providing users with critical data for optimization and cost efficiency. Features include real-time data synchronization, offline capabilities, and comprehensive analytics dashboard.",
     technologies: [
@@ -94,15 +133,25 @@ export const sampleProjects: Project[] = [
     id: "portfolio-website",
     title: "Professional Portfolio Website",
     description:
-      "Modern portfolio website built with Next.js, featuring 3D animations, responsive design, and optimized performance.",
+      "Modern portfolio website built with Next.js, subtle motion, responsive design, and optimized performance.",
+    role: "Design, implementation, and deployment",
+    problem:
+      "Needed a fast, accessible site that presents engineering work clearly without feeling like a generic template.",
+    solution:
+      "Next.js App Router with Tailwind, structured project pages, Framer Motion for UI motion, and performance-conscious lazy loading.",
+    outcomes: [
+      "SSR for SEO and shareable project URLs",
+      "CI/CD deploy pipeline to Vercel",
+      "Accessibility and responsive layout across breakpoints",
+    ],
     longDescription:
-      "Built a responsive portfolio using Next.js and Tailwind CSS (with AI assistance) featuring Server-Side Rendering (SSR) for SEO optimization, dynamic project pages, and CI/CD deployment pipeline to Vercel. The website showcases professional experience, technical skills, and project portfolio with modern web technologies. Includes Three.js 3D animations, GSAP scroll animations, and maintains excellent performance metrics with Core Web Vitals compliance. The site is fully accessible and optimized for all device sizes.",
+      "Built a responsive portfolio using Next.js and Tailwind CSS (with AI assistance) featuring Server-Side Rendering (SSR) for SEO optimization, dynamic project pages, and CI/CD deployment pipeline to Vercel. The website showcases professional experience, technical skills, and project portfolio with modern web technologies. Includes Three.js for a restrained hero visual, Framer Motion for interface motion, and attention to Core Web Vitals. The site is accessible and optimized for all device sizes.",
     technologies: [
       "Next.js",
       "TypeScript",
       "Tailwind CSS",
       "Three.js",
-      "GSAP",
+      "Framer Motion",
       "Vercel",
       "AI Assistance",
     ],
@@ -115,11 +164,12 @@ export const sampleProjects: Project[] = [
   },
 ];
 
-// Utility functions for project data management
+export const getProjectBySlug = (slug: string): Project | undefined =>
+  sampleProjects.find((p) => p.id === slug);
 
-/**
- * Filter projects by category
- */
+export const getAllProjectSlugs = (): string[] =>
+  sampleProjects.map((p) => p.id);
+
 export const filterProjectsByCategory = (
   projects: Project[],
   category: string
@@ -130,9 +180,6 @@ export const filterProjectsByCategory = (
   return projects.filter((project) => project.category === category);
 };
 
-/**
- * Filter projects by technology
- */
 export const filterProjectsByTechnology = (
   projects: Project[],
   technology: string
@@ -144,9 +191,6 @@ export const filterProjectsByTechnology = (
   );
 };
 
-/**
- * Search projects by title or description
- */
 export const searchProjects = (
   projects: Project[],
   searchTerm: string
@@ -160,9 +204,6 @@ export const searchProjects = (
   );
 };
 
-/**
- * Sort projects by completion date (newest first)
- */
 export const sortProjectsByDate = (
   projects: Project[],
   ascending: boolean = false
@@ -174,30 +215,20 @@ export const sortProjectsByDate = (
   });
 };
 
-/**
- * Sort projects with featured projects first
- */
 export const sortProjectsByFeatured = (projects: Project[]): Project[] => {
   return [...projects].sort((a, b) => {
     if (a.featured && !b.featured) return -1;
     if (!a.featured && b.featured) return 1;
-    // If both are featured or both are not featured, sort by date
     return (
       new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
     );
   });
 };
 
-/**
- * Get featured projects only
- */
 export const getFeaturedProjects = (projects: Project[]): Project[] => {
   return projects.filter((project) => project.featured);
 };
 
-/**
- * Get projects by category with counts
- */
 export const getProjectCategoryCounts = (
   projects: Project[]
 ): Record<string, number> => {
@@ -216,9 +247,6 @@ export const getProjectCategoryCounts = (
   return counts;
 };
 
-/**
- * Get all unique technologies from projects
- */
 export const getAllTechnologies = (projects: Project[]): string[] => {
   const technologies = new Set<string>();
   projects.forEach((project) => {
@@ -227,9 +255,6 @@ export const getAllTechnologies = (projects: Project[]): string[] => {
   return Array.from(technologies).sort();
 };
 
-/**
- * Get projects that use a specific technology
- */
 export const getProjectsByTechnology = (
   projects: Project[],
   technology: string
@@ -239,9 +264,6 @@ export const getProjectsByTechnology = (
   );
 };
 
-/**
- * Get recent projects (within last N months)
- */
 export const getRecentProjects = (
   projects: Project[],
   months: number = 6
@@ -254,9 +276,6 @@ export const getRecentProjects = (
   );
 };
 
-/**
- * Get projects by technology stack alignment with professional experience
- */
 export const getProjectsByTechStack = (
   projects: Project[]
 ): {

@@ -69,13 +69,6 @@ const nextConfig: NextConfig = {
             priority: 20,
             reuseExistingChunk: true,
           },
-          gsap: {
-            test: /[\\/]node_modules[\\/]gsap[\\/]/,
-            name: "gsap",
-            chunks: "all",
-            priority: 20,
-            reuseExistingChunk: true,
-          },
           common: {
             name: "common",
             minChunks: 2,

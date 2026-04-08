@@ -5,6 +5,14 @@ export interface Project {
   title: string;
   description: string;
   longDescription?: string;
+  /** Primary responsibility on the project */
+  role?: string;
+  /** Problem or context (1–2 sentences) */
+  problem?: string;
+  /** Approach / what you built */
+  solution?: string;
+  /** Observable outcomes or scope (no invented metrics) */
+  outcomes?: string[];
   technologies: string[];
   category: "web" | "mobile" | "desktop" | "other";
   images: string[];
@@ -35,8 +43,6 @@ export interface Experience {
 
 export interface Skill {
   name: string;
-  proficiency: 1 | 2 | 3 | 4 | 5;
-  yearsOfExperience?: number;
   category: string;
   icon?: string;
 }
@@ -100,6 +106,8 @@ export interface NavigationItem {
   id: string;
   label: string;
   href: string;
+  /** App Router path when linking to a full page (e.g. /projects) */
+  path?: string;
 }
 
 export interface ContactForm {

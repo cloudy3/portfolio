@@ -11,28 +11,6 @@ interface MockFrameState {
   clock: { getElapsedTime: () => number };
 }
 
-// Define mock classes outside of jest.mock
-class MockBufferGeometry {
-  attributes = { position: { needsUpdate: false } };
-  setFromPoints() {
-    return this;
-  }
-}
-
-class MockLineBasicMaterial {
-  constructor(public params: Record<string, unknown>) {}
-}
-
-class MockLine {
-  geometry: MockBufferGeometry;
-  material: MockLineBasicMaterial;
-  position = { set: jest.fn() };
-  constructor(geometry: MockBufferGeometry, material: MockLineBasicMaterial) {
-    this.geometry = geometry;
-    this.material = material;
-  }
-}
-
 // Mock React Three Fiber
 jest.mock("@react-three/fiber", () => ({
   Canvas: ({ children, onCreated }: MockCanvasProps) => {
@@ -54,15 +32,35 @@ jest.mock("@react-three/fiber", () => ({
   }),
 }));
 
-// Mock Three.js classes
-jest.mock("three", () => ({
-  Vector3: class Vector3 {
-    constructor(public x = 0, public y = 0, public z = 0) {}
-  },
-  BufferGeometry: MockBufferGeometry,
-  LineBasicMaterial: MockLineBasicMaterial,
-  Line: MockLine,
-}));
+// Mock Three.js classes (defined inside factory to avoid TDZ)
+jest.mock("three", () => {
+  class MBufferGeometry {
+    attributes = { position: { needsUpdate: false } };
+    setFromPoints() {
+      return this;
+    }
+  }
+  class MLineBasicMaterial {
+    constructor(public params: Record<string, unknown>) {}
+  }
+  class MLine {
+    geometry: MBufferGeometry;
+    material: MLineBasicMaterial;
+    position = { set: jest.fn() };
+    constructor(geometry: MBufferGeometry, material: MLineBasicMaterial) {
+      this.geometry = geometry;
+      this.material = material;
+    }
+  }
+  return {
+    Vector3: class Vector3 {
+      constructor(public x = 0, public y = 0, public z = 0) {}
+    },
+    BufferGeometry: MBufferGeometry,
+    LineBasicMaterial: MLineBasicMaterial,
+    Line: MLine,
+  };
+});
 
 // Mock detectWebGLSupport
 jest.mock("../ThreeScene", () => ({

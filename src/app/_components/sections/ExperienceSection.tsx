@@ -10,6 +10,10 @@ import {
   getPastExperiences,
   getTotalExperienceYears,
 } from "@/lib/data/experience";
+import { Container } from "../ui/Container";
+import { Section } from "../ui/Section";
+import { SectionHeader } from "../ui/SectionHeader";
+import { FadeIn } from "../motion/FadeIn";
 
 interface ExperienceCardProps {
   experience: Experience;
@@ -77,42 +81,40 @@ const ExperienceCard = ({
   return (
     <div
       ref={cardRef}
-      className={`experience-card relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-700 overflow-hidden ${
+      className={`relative rounded-lg border border-white/10 bg-white/[0.04] backdrop-blur-sm transition-all duration-700 overflow-hidden ${
         isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
       }`}
       style={{ transitionDelay: `${index * 200}ms` }}
     >
-      {/* Timeline connector */}
-      <div className="absolute left-6 top-0 w-0.5 h-full bg-gradient-to-b from-blue-500 to-purple-600"></div>
-      <div className="absolute left-4 top-8 w-4 h-4 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
+      <div className="absolute left-6 top-0 w-px h-full bg-gradient-to-b from-accent-cyan/50 to-accent-blue/20" />
+      <div className="absolute left-[1.15rem] top-8 h-2.5 w-2.5 rounded-full bg-accent-cyan border-2 border-surface-inverse" />
 
-      <div className="pl-16 pr-8 py-8">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4">
-          <div className="flex items-start mb-4 lg:mb-0">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-2xl mr-4 flex-shrink-0">
-              {experience.logo || "🏢"}
+      <div className="pl-14 pr-6 py-7 md:pl-16 md:pr-8 md:py-8">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
+          <div className="flex items-start mb-0">
+            <div className="w-11 h-11 rounded-md border border-white/15 bg-white/5 flex items-center justify-center font-mono text-xs text-content-inverse-muted mr-4 flex-shrink-0">
+              {experience.company.slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <h3 className="card-title text-gray-900">
+              <h3 className="text-lg font-semibold text-content-inverse tracking-tight">
                 {experience.position}
               </h3>
-              <h4 className="card-subtitle text-blue-600">
+              <h4 className="text-sm font-medium text-accent-cyan/90 mt-0.5">
                 {experience.company}
               </h4>
-              <div className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-600 gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center text-sm text-content-inverse-muted gap-2 mt-2">
                 <span>
-                  {formatDate(experience.startDate)} -{" "}
+                  {formatDate(experience.startDate)} —{" "}
                   {experience.endDate
                     ? formatDate(experience.endDate)
                     : "Present"}
                 </span>
-                <span className="hidden sm:inline">•</span>
+                <span className="hidden sm:inline opacity-40">·</span>
                 <span className="font-medium">{getDuration()}</span>
                 {!experience.endDate && (
                   <>
-                    <span className="hidden sm:inline">•</span>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="hidden sm:inline opacity-40">·</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[0.65rem] font-mono uppercase tracking-wider bg-accent-lime/15 text-accent-lime">
                       Current
                     </span>
                   </>
@@ -122,28 +124,27 @@ const ExperienceCard = ({
           </div>
 
           <button
+            type="button"
             onClick={onToggle}
-            className="flex-shrink-0 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors duration-200 text-sm font-medium"
+            className="flex-shrink-0 px-4 py-2 rounded-md border border-white/15 text-content-inverse text-sm font-medium hover:border-accent-cyan/40 transition-colors"
           >
-            {isExpanded ? "Show Less" : "Show More"}
+            {isExpanded ? "Less" : "More"}
           </button>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-700 mb-4 leading-relaxed">
+        <p className="text-content-inverse-muted mb-4 leading-relaxed text-sm md:text-base">
           {experience.description}
         </p>
 
-        {/* Technologies */}
-        <div className="mb-4">
-          <h5 className="text-sm font-semibold text-gray-900 mb-2">
-            Technologies Used:
+        <div className="mb-2">
+          <h5 className="font-mono-label mb-2 text-content-inverse-muted">
+            Stack
           </h5>
           <div className="flex flex-wrap gap-2">
             {experience.technologies.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors"
+                className="px-2.5 py-1 rounded-sm bg-white/5 text-content-inverse-muted text-xs font-mono border border-white/10"
               >
                 {tech}
               </span>
@@ -151,28 +152,27 @@ const ExperienceCard = ({
           </div>
         </div>
 
-        {/* Expandable achievements */}
         {isExpanded && (
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <h5 className="text-sm font-semibold text-gray-900 mb-3">
-              Key Achievements:
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <h5 className="font-mono-label mb-3 text-content-inverse-muted">
+              Highlights
             </h5>
             <ul className="space-y-3">
               {experience.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <div className="text-gray-700 text-sm leading-relaxed">
-                    <div className="font-medium mb-1">
+                <li key={index} className="flex items-start gap-3">
+                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent-cyan" />
+                  <div className="text-content-inverse-muted text-sm leading-relaxed">
+                    <div className="text-content-inverse/90 font-medium mb-1">
                       {achievement.description}
                     </div>
                     {achievement.impact && (
-                      <div className="text-gray-600 text-xs mb-1">
+                      <div className="text-xs opacity-80 mb-1">
                         Impact: {achievement.impact}
                       </div>
                     )}
                     {achievement.metrics && (
-                      <div className="text-blue-600 text-xs font-medium">
-                        📊 {achievement.metrics}
+                      <div className="text-xs text-accent-cyan/90 font-medium">
+                        {achievement.metrics}
                       </div>
                     )}
                   </div>
@@ -222,42 +222,42 @@ const EducationCard = ({
   return (
     <div
       ref={cardRef}
-      className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-700 ${
+      className={`rounded-lg border border-white/10 bg-white/[0.04] p-6 transition-all duration-700 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
       style={{ transitionDelay: `${index * 150}ms` }}
     >
       <div className="flex items-start mb-4">
-        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center text-2xl mr-4">
-          {education.logo || "🎓"}
+        <div className="w-11 h-11 rounded-md border border-white/15 bg-white/5 flex items-center justify-center font-mono text-xs text-content-inverse-muted mr-4">
+          ED
         </div>
         <div>
-          <h3 className="text-lg font-bold text-gray-900 mb-1">
+          <h3 className="text-lg font-semibold text-content-inverse mb-1 tracking-tight">
             {education.degree}
           </h3>
-          <h4 className="text-md text-green-600 font-semibold mb-2">
+          <h4 className="text-sm font-medium text-accent-lime/90 mb-2">
             {education.institution}
           </h4>
-          <div className="text-sm text-gray-600">
-            {formatDate(education.startDate)} - {formatDate(education.endDate)}
+          <div className="text-sm text-content-inverse-muted">
+            {formatDate(education.startDate)} — {formatDate(education.endDate)}
           </div>
         </div>
       </div>
 
-      <p className="text-gray-700 mb-4 text-sm leading-relaxed">
+      <p className="text-content-inverse-muted mb-4 text-sm leading-relaxed">
         {education.description}
       </p>
 
       {education.achievements && (
         <div>
-          <h5 className="text-sm font-semibold text-gray-900 mb-2">
-            Highlights:
+          <h5 className="font-mono-label mb-2 text-content-inverse-muted">
+            Highlights
           </h5>
           <ul className="space-y-1">
             {education.achievements.slice(0, 2).map((achievement, index) => (
-              <li key={index} className="flex items-start">
-                <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                <span className="text-gray-600 text-xs leading-relaxed">
+              <li key={index} className="flex items-start gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent-lime/80" />
+                <span className="text-content-inverse-muted text-xs leading-relaxed">
                   {achievement}
                 </span>
               </li>
@@ -299,38 +299,36 @@ const CertificationCard = ({
   return (
     <div
       ref={cardRef}
-      className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-700 ${
+      className={`rounded-lg border border-white/10 bg-white/[0.04] p-6 transition-all duration-700 ${
         isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-start">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center text-xl mr-3">
-            {certification.logo || "📜"}
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-md border border-white/15 bg-white/5 flex items-center justify-center font-mono text-[0.65rem] text-content-inverse-muted">
+            CR
           </div>
           <div>
-            <h3 className="text-md font-bold text-gray-900 mb-1">
+            <h3 className="text-base font-semibold text-content-inverse mb-1">
               {certification.name}
             </h3>
-            <h4 className="text-sm text-purple-600 font-semibold">
+            <h4 className="text-sm text-accent-violet/90 font-medium">
               {certification.issuer}
             </h4>
           </div>
         </div>
       </div>
 
-      <div className="text-xs text-gray-600">
-        <div className="font-mono text-xs text-gray-500">
-          ID: {certification.credentialId}
-        </div>
+      <div className="font-mono text-[0.65rem] text-content-inverse-muted">
+        ID: {certification.credentialId}
       </div>
     </div>
   );
 };
 
 const ExperienceSection = () => {
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [expandedExperience, setExpandedExperience] = useState<string | null>(
     null
   );
@@ -367,153 +365,140 @@ const ExperienceSection = () => {
   const totalYears = getTotalExperienceYears();
 
   return (
-    <section
-      ref={sectionRef}
+    <Section
       id="experience"
-      className="section-padding bg-gradient-to-br from-blue-50 to-indigo-100"
+      variant="inverse"
+      className="scroll-mt-20 border-t border-white/5"
     >
-      <div className="container-custom">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2
-            className={`section-title text-gray-900 transition-all duration-700 ${
-              isHeaderVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-          >
-            Experience & Education
-          </h2>
-          <p
-            className={`text-lg text-gray-600 max-w-3xl mx-auto text-center transition-all duration-700 delay-200 ${
-              isHeaderVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-          >
-            My professional journey, educational background, and continuous
-            learning through certifications and skill development.
-          </p>
+      <div ref={sectionRef}>
+        <Container>
+          <FadeIn>
+            <SectionHeader
+              inverse
+              align="center"
+              eyebrow="Trajectory"
+              title="Experience and credentials"
+              description="Roles shipped in production, formal training, and certifications that back the work."
+            />
+          </FadeIn>
 
-          {/* Stats */}
           <div
-            className={`flex flex-wrap justify-center gap-8 mb-8 transition-all duration-700 delay-400 ${
+            className={`flex flex-wrap justify-center gap-10 mb-12 transition-all duration-700 ${
               isHeaderVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
             }`}
           >
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-1">
+              <div className="text-3xl font-semibold text-content-inverse tabular-nums mb-1">
                 {totalYears}+
               </div>
-              <div className="text-sm text-gray-600">Years Experience</div>
+              <div className="text-xs font-mono uppercase tracking-wider text-content-inverse-muted">
+                Years
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-1">
+              <div className="text-3xl font-semibold text-content-inverse tabular-nums mb-1">
                 {EXPERIENCE_DATA.length}
               </div>
-              <div className="text-sm text-gray-600">Companies</div>
+              <div className="text-xs font-mono uppercase tracking-wider text-content-inverse-muted">
+                Roles
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-1">
+              <div className="text-3xl font-semibold text-content-inverse tabular-nums mb-1">
                 {CERTIFICATIONS_DATA.length}
               </div>
-              <div className="text-sm text-gray-600">Certifications</div>
+              <div className="text-xs font-mono uppercase tracking-wider text-content-inverse-muted">
+                Certifications
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {[
-            { key: "experience", label: "Work Experience", icon: "💼" },
-            { key: "education", label: "Education", icon: "🎓" },
-            { key: "certifications", label: "Certifications", icon: "📜" },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() =>
-                setActiveTab(
-                  tab.key as "experience" | "education" | "certifications"
-                )
-              }
-              className={`flex items-center px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                activeTab === tab.key
-                  ? "bg-blue-600 text-white shadow-lg transform scale-105"
-                  : "bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600 shadow-md hover:shadow-lg"
-              }`}
-            >
-              <span className="mr-2">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </div>
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {(
+              [
+                { key: "experience", label: "Work" },
+                { key: "education", label: "Education" },
+                { key: "certifications", label: "Credentials" },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
+                  activeTab === tab.key
+                    ? "bg-surface-elevated text-content-primary border-surface-elevated"
+                    : "border-white/15 text-content-inverse-muted hover:border-accent-cyan/40"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        {/* Content */}
-        <div className="max-w-4xl mx-auto">
-          {activeTab === "experience" && (
-            <div className="space-y-8">
-              {/* Current Experience */}
-              {currentExp && (
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                    <span className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></span>
-                    Current Position
-                  </h3>
-                  <ExperienceCard
-                    experience={currentExp}
-                    isExpanded={expandedExperience === currentExp.id}
-                    onToggle={() => handleToggleExpanded(currentExp.id)}
-                    index={0}
-                  />
-                </div>
-              )}
-
-              {/* Past Experiences */}
-              {pastExps.length > 0 && (
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6 mt-12">
-                    Previous Experience
-                  </h3>
-                  <div className="space-y-6">
-                    {pastExps.map((exp, index) => (
-                      <ExperienceCard
-                        key={exp.id}
-                        experience={exp}
-                        isExpanded={expandedExperience === exp.id}
-                        onToggle={() => handleToggleExpanded(exp.id)}
-                        index={index + 1}
-                      />
-                    ))}
+          <div className="max-w-4xl mx-auto">
+            {activeTab === "experience" && (
+              <div className="space-y-8">
+                {currentExp && (
+                  <div>
+                    <h3 className="font-mono-label mb-4 text-accent-lime">
+                      Current
+                    </h3>
+                    <ExperienceCard
+                      experience={currentExp}
+                      isExpanded={expandedExperience === currentExp.id}
+                      onToggle={() => handleToggleExpanded(currentExp.id)}
+                      index={0}
+                    />
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
 
-          {activeTab === "education" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {EDUCATION_DATA.map((edu, index) => (
-                <EducationCard key={edu.id} education={edu} index={index} />
-              ))}
-            </div>
-          )}
+                {pastExps.length > 0 && (
+                  <div>
+                    <h3 className="font-mono-label mb-4 mt-10 text-content-inverse-muted">
+                      Earlier
+                    </h3>
+                    <div className="space-y-6">
+                      {pastExps.map((exp, index) => (
+                        <ExperienceCard
+                          key={exp.id}
+                          experience={exp}
+                          isExpanded={expandedExperience === exp.id}
+                          onToggle={() => handleToggleExpanded(exp.id)}
+                          index={index + 1}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
-          {activeTab === "certifications" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {CERTIFICATIONS_DATA.map((cert, index) => (
-                <CertificationCard
-                  key={cert.id}
-                  certification={cert}
-                  index={index}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+            {activeTab === "education" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {EDUCATION_DATA.map((edu, index) => (
+                  <EducationCard key={edu.id} education={edu} index={index} />
+                ))}
+              </div>
+            )}
+
+            {activeTab === "certifications" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {CERTIFICATIONS_DATA.map((cert, index) => (
+                  <CertificationCard
+                    key={cert.id}
+                    certification={cert}
+                    index={index}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </Container>
       </div>
-    </section>
+    </Section>
   );
 };
 

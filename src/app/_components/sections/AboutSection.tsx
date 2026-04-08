@@ -1,36 +1,34 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import {
+  JING_FENG_PROFILE,
+  TECHNICAL_HIGHLIGHTS,
+} from "@/lib/data/professional-profile";
+import { Container } from "../ui/Container";
+import { Section } from "../ui/Section";
+import { SectionHeader } from "../ui/SectionHeader";
+import { FadeIn } from "../motion/FadeIn";
 
-const AboutSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+const pillars = [
+  {
+    id: "01",
+    title: "End-to-end delivery",
+    body: "Flutter and Dart on the client, Python and Node on the server, deployed on Google Cloud with CI you can trust.",
+  },
+  {
+    id: "02",
+    title: "Product + engineering",
+    body: "Clarify constraints, ship incremental value, and instrument enough to learn—without boiling the ocean.",
+  },
+  {
+    id: "03",
+    title: "Global collaboration",
+    body: "Comfortable across time zones and stakeholders, from field teams to platform owners.",
+  },
+];
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const currentSection = sectionRef.current;
-    if (currentSection) {
-      observer.observe(currentSection);
-    }
-
-    return () => {
-      if (currentSection) {
-        observer.unobserve(currentSection);
-      }
-    };
-  }, []);
-
+export default function AboutSection() {
   const handleDownloadCV = () => {
     const link = document.createElement("a");
     link.href = "/resume.pdf";
@@ -41,148 +39,115 @@ const AboutSection = () => {
   };
 
   return (
-    <section id="about" className="section-padding bg-white" ref={sectionRef}>
-      <div className="container-custom">
-        {/* Section Header */}
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          <h2 className="section-title text-gray-900">About Me</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-orange-500 mx-auto"></div>
-        </div>
+    <Section id="about" variant="default" className="scroll-mt-20">
+      <Container>
+        <FadeIn>
+          <SectionHeader
+            eyebrow="About"
+            title="Builder mindset, systems thinking"
+            description="I care about code that survives contact with real users—readable, observable, and easy to evolve."
+          />
+        </FadeIn>
 
-        {/* Main Content */}
-        <div className="max-w-6xl mx-auto mb-12 sm:mb-16">
-          {/* Photo and Content Wrapper */}
-          <div
-            className={`flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-18 transition-all duration-1000 delay-200 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            {/* Photo */}
-            <div className="relative w-52 sm:w-60 md:w-80 mx-auto md:mx-0 flex-shrink-0">
-              <div className="aspect-square rounded-2xl shadow-lg overflow-hidden">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-20">
+          <FadeIn className="lg:col-span-5">
+            <div className="relative max-w-sm mx-auto lg:mx-0">
+              <div className="aspect-square rounded-lg overflow-hidden border border-border-subtle bg-surface-subtle shadow-sm">
                 <Image
                   src="/images/placeholder-avatar.svg"
-                  alt="Professional Photo Placeholder"
-                  width={256}
-                  height={256}
+                  alt=""
+                  width={400}
+                  height={400}
                   className="w-full h-full object-cover"
                   loading="lazy"
-                  placeholder="blur"
-                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjwvZXZnPgo="
                 />
               </div>
-              {/* Decorative elements */}
-              <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-5 h-5 sm:w-6 sm:h-6 bg-amber-400 rounded-full opacity-80"></div>
-              <div className="absolute -bottom-2 -left-2 sm:-bottom-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 bg-orange-500 rounded-full opacity-60"></div>
+              <div
+                className="absolute -z-10 -bottom-3 -right-3 w-full h-full rounded-lg border border-border-subtle bg-grid-faint"
+                aria-hidden
+              />
             </div>
+          </FadeIn>
 
-            {/* Professional Summary */}
-            <div className="space-y-6 max-w-prose">
-              <div className="prose prose-lg max-w-none">
-                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-5">
-                  Hey there! I&apos;m the kind of developer who gets genuinely
-                  excited about turning coffee into code and complex problems
-                  into elegant solutions. While others see bugs, I see puzzles
-                  waiting to be solved.
-                </p>
-
-                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-5">
-                  Currently, I&apos;m making waves in the maritime industry (pun
-                  intended) by building cloud-native apps that help ships
-                  navigate the digital ocean. My superpower? Taking ideas from
-                  &ldquo;wouldn&apos;t it be cool if...&rdquo; to &ldquo;wow,
-                  this actually works!&rdquo;.
-                </p>
-
-                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-8">
-                  I&apos;m always diving deep into the latest tech trends
-                  (because staying curious is half the job, right?). I believe
-                  the best code is like a good joke, if you have to explain it,
-                  it probably needs refactoring.
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <div className="lg:col-span-7 space-y-8">
+            <FadeIn delay={0.05}>
+              <p className="text-lg text-content-secondary leading-relaxed">
+                {JING_FENG_PROFILE.summary}
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <div className="flex flex-wrap gap-3">
                 <button
+                  type="button"
                   onClick={handleDownloadCV}
-                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 sm:px-8 py-3 rounded-full font-semibold hover:from-amber-500 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 active:scale-95 touch-manipulation"
+                  className="inline-flex items-center px-5 py-3 rounded-md bg-surface-inverse text-content-inverse text-sm font-medium hover:opacity-90 transition-opacity"
                 >
-                  Download CV
+                  Download résumé
                 </button>
                 <a
                   href="#contact"
-                  className="border-2 border-gray-900 text-gray-900 px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-all duration-300 text-center active:scale-95 touch-manipulation"
+                  className="inline-flex items-center px-5 py-3 rounded-md border border-border-strong text-content-primary text-sm font-medium hover:border-accent-cyan/40 transition-colors"
                 >
-                  Get In Touch
+                  Contact
                 </a>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+
+        <FadeIn>
+          <h3 className="font-mono-label mb-8">Capabilities</h3>
+        </FadeIn>
+        <div className="grid md:grid-cols-3 gap-6 mb-20">
+          {pillars.map((p, i) => (
+            <FadeIn key={p.id} delay={i * 0.06}>
+              <div className="h-full rounded-lg border border-border-subtle bg-surface-elevated p-6 shadow-sm">
+                <p className="font-mono text-accent-cyan text-sm mb-3">{p.id}</p>
+                <h4 className="text-lg font-semibold text-content-primary mb-2">
+                  {p.title}
+                </h4>
+                <p className="text-sm text-content-secondary leading-relaxed">
+                  {p.body}
+                </p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+
+        <FadeIn>
+          <div className="rounded-lg border border-border-subtle bg-surface-subtle/60 p-8 md:p-10">
+            <h3 className="font-mono-label mb-6">Technical breadth</h3>
+            <div className="grid sm:grid-cols-2 gap-8 text-sm">
+              <div>
+                <p className="font-mono-label mb-2 text-accent-blue">Languages</p>
+                <p className="text-content-secondary">
+                  {TECHNICAL_HIGHLIGHTS.languages.join(" · ")}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono-label mb-2 text-accent-blue">
+                  Frameworks
+                </p>
+                <p className="text-content-secondary">
+                  {TECHNICAL_HIGHLIGHTS.frameworks.join(" · ")}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono-label mb-2 text-accent-blue">Cloud</p>
+                <p className="text-content-secondary">
+                  {TECHNICAL_HIGHLIGHTS.cloudInfrastructure.join(" · ")}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono-label mb-2 text-accent-blue">Data & tools</p>
+                <p className="text-content-secondary">
+                  {TECHNICAL_HIGHLIGHTS.databasesTools.join(" · ")}
+                </p>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* What I Bring Section */}
-        <div className="border-t border-gray-200 pt-16">
-          <div
-            className={`text-center mb-12 transition-all duration-1000 delay-600 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            <h3 className="text-gray-900 mb-4">What I Bring to the Table</h3>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto text-center">
-              Beyond the code, here&apos;s what makes me tick
-            </p>
-          </div>
-
-          {/* Value Propositions */}
-          <div
-            className={`grid md:grid-cols-3 gap-8 max-w-5xl mx-auto transition-all duration-1000 delay-700 ${
-              isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-            }`}
-          >
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-4">🚀</div>
-              <h4 className="font-semibold text-gray-900 mb-2">
-                Full-Stack Expertise
-              </h4>
-              <p className="text-gray-600">
-                From Flutter mobile apps to Python backends on Google Cloud, I
-                build complete solutions end-to-end
-              </p>
-            </div>
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-4">💡</div>
-              <h4 className="font-semibold text-gray-900 mb-2">
-                Problem Solver
-              </h4>
-              <p className="text-gray-600">
-                I don&apos;t just write code – I solve real business problems
-                with measurable impact (like 96% cost reduction)
-              </p>
-            </div>
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-4">🌍</div>
-              <h4 className="font-semibold text-gray-900 mb-2">
-                Global Mindset
-              </h4>
-              <p className="text-gray-600">
-                Experience working with international teams and delivering
-                products used by users worldwide
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        </FadeIn>
+      </Container>
+    </Section>
   );
-};
-
-export default AboutSection;
+}

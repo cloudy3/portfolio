@@ -18,53 +18,45 @@ const config: Config = {
         "30": "7.5rem",
       },
       fontFamily: {
-        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
-      },
-      fontWeight: {
-        light: "300",
-        normal: "400",
-        medium: "500",
-        semibold: "600",
-        bold: "700",
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       colors: {
-        primary: {
-          navy: "#0f0f23",
-          white: "#fefefe",
+        surface: {
+          page: "var(--bg-page)",
+          subtle: "var(--bg-subtle)",
+          elevated: "var(--bg-elevated)",
+          inverse: "var(--bg-inverse)",
+          "inverse-elevated": "var(--bg-inverse-elevated)",
+        },
+        content: {
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
+          inverse: "var(--text-inverse)",
+          "inverse-muted": "var(--text-inverse-muted)",
         },
         accent: {
-          gold: "#e6b800",
-          amber: "#d97706",
+          cyan: "var(--accent-cyan)",
+          blue: "var(--accent-blue)",
+          lime: "var(--accent-lime)",
+          violet: "var(--accent-violet)",
         },
-        secondary: {
-          gray: "#64748b",
-          "light-gray": "#94a3b8",
-          "dark-gray": "#334155",
+        border: {
+          subtle: "var(--border-subtle)",
+          strong: "var(--border-strong)",
         },
       },
-      animation: {
-        "fade-in": "fadeIn 0.6s ease-out forwards",
-        "slide-up": "slideUp 0.8s ease-out forwards",
-        "slide-in-left": "slideInLeft 0.8s ease-out forwards",
-        "slide-in-right": "slideInRight 0.8s ease-out forwards",
+      maxWidth: {
+        content: "var(--container-max)",
       },
-      keyframes: {
-        fadeIn: {
-          from: { opacity: "0" },
-          to: { opacity: "1" },
-        },
-        slideUp: {
-          from: { opacity: "0", transform: "translateY(30px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        slideInLeft: {
-          from: { opacity: "0", transform: "translateX(-30px)" },
-          to: { opacity: "1", transform: "translateX(0)" },
-        },
-        slideInRight: {
-          from: { opacity: "0", transform: "translateX(30px)" },
-          to: { opacity: "1", transform: "translateX(0)" },
-        },
+      borderRadius: {
+        sm: "var(--radius-sm)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+      },
+      transitionTimingFunction: {
+        out: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
     },
   },

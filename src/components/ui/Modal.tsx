@@ -86,7 +86,7 @@ export const Modal: React.FC<ModalProps> = ({
   return ReactDOM.createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-hidden"
+      className="fixed inset-0 bg-surface-inverse/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden"
       style={{ zIndex: Z_INDEX.modal }}
       onClick={onClose}
     >
@@ -94,7 +94,7 @@ export const Modal: React.FC<ModalProps> = ({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-y-auto",
+          "bg-surface-elevated border border-border-subtle rounded-lg shadow-xl w-full max-h-[90vh] overflow-y-auto",
           sizes[size],
           className
         )}
@@ -121,7 +121,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-between p-6 border-b border-gray-200",
+        "flex items-center justify-between p-6 border-b border-border-subtle",
         className
       )}
     >
@@ -129,7 +129,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
       {onClose && (
         <button
           onClick={onClose}
-          className="ml-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="ml-4 text-content-muted hover:text-content-primary transition-colors rounded-md p-1"
           aria-label="Close modal"
         >
           <svg
@@ -175,7 +175,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-end gap-3 p-6 border-t border-gray-200",
+        "flex items-center justify-end gap-3 p-6 border-t border-border-subtle",
         className
       )}
     >
