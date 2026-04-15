@@ -46,9 +46,18 @@ const FILTER_CATEGORIES: (Skill["category"] | "all")[] = [
   "frontend",
   "backend",
   "mobile",
+  "cloud",
+  "database",
   "devops",
   "design",
+  "systems",
+  "methodology",
 ];
+
+function filterButtonLabel(category: Skill["category"] | "all"): string {
+  if (category === "all") return "All";
+  return categoryLabel(category);
+}
 
 export default function SkillsSection() {
   const [activeCategory, setActiveCategory] = useState<
@@ -86,8 +95,8 @@ export default function SkillsSection() {
         <FadeIn>
           <SectionHeader
             eyebrow="Capabilities"
-            title="Stack at a glance"
-            description="Grouped by domain. Use the filters to focus the list for a role or conversation."
+            title="Tools I ship with"
+            description="From React and Next.js on the web to Flutter on mobile and GCP behind the scenes—grouped by domain. Filters help you zoom in for a role or conversation."
           />
         </FadeIn>
 
@@ -123,12 +132,7 @@ export default function SkillsSection() {
           >
             {FILTER_CATEGORIES.map((category) => {
               const active = activeCategory === category;
-              const label =
-                category === "all"
-                  ? "All"
-                  : category === "devops"
-                    ? "DevOps"
-                    : category.charAt(0).toUpperCase() + category.slice(1);
+              const label = filterButtonLabel(category);
               return (
                 <button
                   key={category}
@@ -172,7 +176,17 @@ export default function SkillsSection() {
                         key={`${category}-${skill.name}`}
                         className="border-t border-border-subtle first:border-t-0"
                       >
-                        <div className="px-4 py-2.5 transition-colors sm:px-5 hover:bg-surface-subtle/40">
+                        <div className="flex items-center gap-3 px-4 py-2.5 transition-colors sm:px-5 hover:bg-surface-subtle/40">
+                          {skill.icon ? (
+                            <span
+                              className="flex w-8 shrink-0 justify-center text-base leading-none"
+                              aria-hidden
+                            >
+                              {skill.icon}
+                            </span>
+                          ) : (
+                            <span className="w-8 shrink-0" aria-hidden />
+                          )}
                           <span className="text-sm text-content-primary">
                             {skill.name}
                           </span>
@@ -188,8 +202,9 @@ export default function SkillsSection() {
 
         <FadeIn delay={0.1}>
           <p className="mt-6 text-center text-xs text-content-muted sm:text-left">
-            Learning focus: mobile performance, cloud economics, and how teams
-            ship reliable products.
+            Current learning focus: mobile performance, cloud economics, and
+            how teams ship reliable products end to end—from UI in React or
+            Next.js through APIs and infrastructure.
           </p>
         </FadeIn>
       </Container>

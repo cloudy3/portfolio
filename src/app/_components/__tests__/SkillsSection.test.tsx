@@ -14,9 +14,15 @@ jest.mock("framer-motion", () => {
 describe("SkillsSection", () => {
   it("renders section title and filters", () => {
     render(<SkillsSection />);
-    expect(screen.getByText("Stack at a glance")).toBeInTheDocument();
+    expect(screen.getByText("Tools I ship with")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^All$/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Frontend" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cloud" })).toBeInTheDocument();
+  });
+
+  it("lists Next.js in skills", () => {
+    render(<SkillsSection />);
+    expect(screen.getByText("Next.js")).toBeInTheDocument();
   });
 
   it("shows compact stats and skill rows", () => {
@@ -31,5 +37,12 @@ describe("SkillsSection", () => {
     fireEvent.click(screen.getByRole("button", { name: "Frontend" }));
     const fe = screen.getByRole("button", { name: "Frontend" });
     expect(fe.className).toMatch(/bg-surface-inverse/);
+  });
+
+  it("Cloud filter shows only cloud skills group", () => {
+    render(<SkillsSection />);
+    fireEvent.click(screen.getByRole("button", { name: "Cloud" }));
+    expect(screen.getByRole("list", { name: "Cloud skills" })).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Frontend skills" })).not.toBeInTheDocument();
   });
 });

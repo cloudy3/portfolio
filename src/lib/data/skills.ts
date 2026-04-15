@@ -50,6 +50,11 @@ export const TECHNICAL_SKILLS: TechnicalSkills = {
         icon: "⚛️",
       },
       {
+        name: "Next.js",
+        category: "frontend",
+        icon: "▲",
+      },
+      {
         name: "Angular",
         category: "frontend",
         icon: "🅰️",
@@ -152,7 +157,7 @@ export const TECHNICAL_SKILLS: TechnicalSkills = {
       {
         name: "GetX",
         category: "mobile",
-        icon: "🎯",
+        icon: "🧩",
       },
       {
         name: "Agile/Scrum",
