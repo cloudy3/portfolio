@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
@@ -23,6 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  ),
   title: {
     default: "Jing Feng — Software Engineer",
     template: "%s | Jing Feng",
@@ -51,12 +54,17 @@ export const metadata: Metadata = {
       "Full-stack engineer — Flutter, Python, Google Cloud, and product-minded delivery.",
     type: "website",
     locale: "en_US",
+    siteName: "Jing Feng Portfolio",
+    url: "/",
   },
   twitter: {
     card: "summary_large_image",
     title: "Jing Feng — Software Engineer",
     description:
       "Full-stack engineer — Flutter, Python, Google Cloud, and product-minded delivery.",
+  },
+  alternates: {
+    canonical: "/",
   },
   robots: {
     index: true,
@@ -71,7 +79,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };

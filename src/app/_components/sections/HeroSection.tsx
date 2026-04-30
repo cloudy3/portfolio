@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
 import { fadeUp, staggerContainer, transitions } from "@/lib/motion";
-import { cn } from "@/lib/utils";
+import { cn, smoothScrollTo } from "@/lib/utils";
 
 const WaveLineVisualization = dynamic(
   () => import("../shared/WaveLineVisualization"),
@@ -19,12 +19,7 @@ const WaveLineVisualization = dynamic(
 );
 
 function scrollToSection(sectionId: string) {
-  const element = document.getElementById(sectionId);
-  if (!element) return;
-  const offset = 80;
-  const top =
-    element.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  smoothScrollTo(sectionId, 80);
 }
 
 interface HeroSectionProps {

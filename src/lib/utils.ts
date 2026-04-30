@@ -12,7 +12,7 @@ export const smoothScrollTo = (elementId: string, offset: number = 0) => {
   if (element) {
     const elementPosition =
       element.getBoundingClientRect().top + window.pageYOffset;
-    const offsetPosition = elementPosition - offset;
+    const offsetPosition = Math.max(0, elementPosition - offset);
 
     window.scrollTo({
       top: offsetPosition,
@@ -70,5 +70,5 @@ export const isInViewport = (element: HTMLElement): boolean => {
 
 // Generate unique ID
 export const generateId = (): string => {
-  return Math.random().toString(36).substr(2, 9);
+  return Math.random().toString(36).slice(2, 11);
 };

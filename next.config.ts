@@ -14,8 +14,6 @@ const nextConfig: NextConfig = {
     // Configure image sizes for responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Enable lazy loading by default
-    dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Optimize for better performance
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
@@ -25,7 +23,7 @@ const nextConfig: NextConfig = {
 
   // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ["@/components", "@/lib"],
+    optimizePackageImports: ["@/lib"],
   },
 
   // Compiler optimizations

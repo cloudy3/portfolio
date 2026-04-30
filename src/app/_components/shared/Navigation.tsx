@@ -4,19 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAVIGATION_ITEMS, Z_INDEX } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, smoothScrollTo } from "@/lib/utils";
 
 interface NavigationProps {
   className?: string;
-}
-
-function scrollToSectionId(id: string) {
-  const element = document.getElementById(id);
-  if (!element) return;
-  const headerOffset = 80;
-  const top =
-    element.getBoundingClientRect().top + window.scrollY - headerOffset;
-  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
 }
 
 export default function Navigation({ className }: NavigationProps) {
@@ -97,7 +88,7 @@ export default function Navigation({ className }: NavigationProps) {
     setIsOpen(false);
     const id = href.replace("#", "");
     if (isHome) {
-      scrollToSectionId(id);
+      smoothScrollTo(id, 80);
     }
   };
 

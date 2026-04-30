@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { detectWebGLSupport } from "./ThreeScene";
+import { detectWebGLSupport } from "@/lib/webgl";
 // Import only the specific Three.js classes we need for better tree-shaking
 import { Vector3, BufferGeometry, LineBasicMaterial, Line } from "three";
 

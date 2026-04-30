@@ -8,70 +8,14 @@ import {
   useSpring,
 } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
-const TOTAL_FRAMES = 40;
-const MAX_DPR = 2;
-const FRAME_PREFIX = "ezgif-frame";
-const FRAME_EXTENSION = "jpg";
-const FRAME_SCALE_FACTOR = 0.84;
-const DEFAULT_BACKGROUND = "#faf8f5";
-
-function frameSource(index: number): string {
-  const oneBased = index + 1;
-  const padded = String(oneBased).padStart(3, "0");
-  return `/keyboard/${FRAME_PREFIX}-${padded}.${FRAME_EXTENSION}`;
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.decoding = "async";
-    image.src = src;
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(`Failed to load ${src}`));
-  });
-}
-
-async function loadFrameWithFallback(index: number): Promise<HTMLImageElement> {
-  const source = frameSource(index);
-  return loadImage(source);
-}
-
-function rgbToHex(r: number, g: number, b: number): string {
-  return `#${[r, g, b]
-    .map((value) => Math.round(value).toString(16).padStart(2, "0"))
-    .join("")}`;
-}
-
-function sampleFrameBackgroundColor(image: HTMLImageElement): string {
-  const sampleCanvas = document.createElement("canvas");
-  const sampleContext = sampleCanvas.getContext("2d");
-  if (!sampleContext) return DEFAULT_BACKGROUND;
-
-  const sampleWidth = 120;
-  const sampleHeight = 120;
-  sampleCanvas.width = sampleWidth;
-  sampleCanvas.height = sampleHeight;
-  sampleContext.drawImage(image, 0, 0, sampleWidth, sampleHeight);
-
-  // Sample only the outermost left-edge pixels.
-  const leftEdgePixels = sampleContext.getImageData(0, 0, 1, sampleHeight).data;
-
-  let red = 0;
-  let green = 0;
-  let blue = 0;
-  let pixelCount = 0;
-
-  for (let index = 0; index < leftEdgePixels.length; index += 4) {
-    red += leftEdgePixels[index];
-    green += leftEdgePixels[index + 1];
-    blue += leftEdgePixels[index + 2];
-    pixelCount += 1;
-  }
-
-  if (pixelCount === 0) return DEFAULT_BACKGROUND;
-  return rgbToHex(red / pixelCount, green / pixelCount, blue / pixelCount);
-}
+import {
+  DEFAULT_BACKGROUND,
+  FRAME_SCALE_FACTOR,
+  MAX_DPR,
+  TOTAL_FRAMES,
+  loadFrame,
+  sampleFrameBackgroundColor,
+} from "@/lib/keyboardStory";
 
 interface CanvasDimensions {
   width: number;
@@ -194,7 +138,7 @@ export default function KeyboardScrollytellingSection() {
       try {
         const loadedFrames = await Promise.all(
           Array.from({ length: TOTAL_FRAMES }, async (_, index) => {
-            const image = await loadFrameWithFallback(index);
+            const image = await loadFrame(index);
             if (!cancelled) {
               setLoadedCount((value) => value + 1);
             }

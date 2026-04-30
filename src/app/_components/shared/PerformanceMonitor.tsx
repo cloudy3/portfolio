@@ -17,8 +17,12 @@ import {
  */
 const PerformanceMonitor = () => {
   useEffect(() => {
-    // Initialize performance monitoring
-    observePerformance();
+    const isDevelopment = process.env.NODE_ENV === "development";
+
+    // Keep noisy observer diagnostics in development only.
+    if (isDevelopment) {
+      observePerformance();
+    }
 
     // Measure Core Web Vitals
     measureCoreWebVitals();
@@ -33,7 +37,7 @@ const PerformanceMonitor = () => {
     preloadCriticalResources();
 
     // Analyze bundle size in development
-    if (process.env.NODE_ENV === "development") {
+    if (isDevelopment) {
       analyzeBundleSize();
 
       const memoryInterval = setInterval(() => {

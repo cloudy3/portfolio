@@ -4,53 +4,9 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, useRef, useMemo, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { detectWebGLSupport } from "@/lib/webgl";
 
-// WebGL capability detection utility with enhanced browser support
-export const detectWebGLSupport = (): boolean => {
-  try {
-    const canvas = document.createElement("canvas");
-
-    // Try WebGL2 first, then WebGL1, then experimental
-    const gl = (canvas.getContext("webgl2") ||
-      canvas.getContext("webgl") ||
-      canvas.getContext("experimental-webgl")) as
-      | WebGLRenderingContext
-      | WebGL2RenderingContext
-      | null;
-
-    if (!gl) return false;
-
-    // Additional capability checks for better compatibility
-    const hasFloatTextures =
-      gl.getExtension("OES_texture_float") ||
-      gl.getExtension("EXT_color_buffer_float");
-    const hasVertexArrayObject =
-      gl.getExtension("OES_vertex_array_object") ||
-      gl.getExtension("WEBGL_vertex_array_object");
-
-    // Use the extensions if needed (prevents unused variable warnings)
-    if (hasFloatTextures || hasVertexArrayObject) {
-      // Extensions are available for enhanced features
-    }
-
-    // Basic functionality test
-    const shader = gl.createShader(gl.VERTEX_SHADER);
-    if (!shader) return false;
-
-    gl.shaderSource(
-      shader,
-      "attribute vec4 position; void main() { gl_Position = position; }"
-    );
-    gl.compileShader(shader);
-
-    const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-    gl.deleteShader(shader);
-
-    return success;
-  } catch {
-    return false;
-  }
-};
+export { detectWebGLSupport };
 
 // Cloud sprite system using procedural cloud texture
 function CloudParticleSystem({ count = 400 }: { count?: number }) {

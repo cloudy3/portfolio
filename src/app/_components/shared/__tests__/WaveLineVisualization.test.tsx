@@ -63,7 +63,7 @@ jest.mock("three", () => {
 });
 
 // Mock detectWebGLSupport
-jest.mock("../ThreeScene", () => ({
+jest.mock("@/lib/webgl", () => ({
   detectWebGLSupport: jest.fn(() => true),
 }));
 

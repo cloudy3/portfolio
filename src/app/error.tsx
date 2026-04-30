@@ -14,7 +14,10 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="flex h-full flex-col items-center justify-center p-8">
+    <section
+      className="flex min-h-[60vh] flex-col items-center justify-center p-8"
+      aria-live="assertive"
+    >
       <h1 className="text-3xl font-bold mb-4">Something went wrong</h1>
       <p className="mb-6">Unexpected error: {error.message}</p>
       <button
@@ -23,6 +26,6 @@ export default function Error({
       >
         Try again
       </button>
-    </main>
+    </section>
   );
 }
