@@ -59,12 +59,12 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
 
       <div className="relative z-10 container-custom py-20 md:py-28">
         {reduce ? (
-          <div className="max-w-3xl">
+          <div className="max-w-3xl mx-auto text-center">
             <HeroCopy onScroll={scrollToSection} />
           </div>
         ) : (
           <motion.div
-            className="max-w-3xl"
+            className="max-w-3xl mx-auto text-center"
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
@@ -85,7 +85,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
             <motion.p
               variants={fadeUp}
               transition={transitions.base}
-              className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mb-4"
+              className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mx-auto mb-4"
             >
               {JING_FENG_PROFILE.name.split(" ").slice(-2).join(" ")} —{" "}
               {JING_FENG_PROFILE.title.toLowerCase()}. {JING_FENG_PROFILE.summary}
@@ -93,7 +93,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
             <motion.div
               variants={fadeUp}
               transition={transitions.base}
-              className="flex flex-col sm:flex-row gap-3 sm:items-center mt-10"
+              className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-center mt-10"
             >
               <button
                 type="button"
@@ -114,6 +114,12 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
                 className="inline-flex justify-center items-center px-2 py-3 text-sm font-medium text-accent-cyan hover:underline underline-offset-4 sm:ml-2"
               >
                 All projects →
+              </Link>
+              <Link
+                href="/keyboard-story"
+                className="inline-flex justify-center items-center px-2 py-3 text-sm font-medium text-content-secondary hover:text-accent-cyan transition-colors"
+              >
+                Bonus: Keyboard story
               </Link>
             </motion.div>
           </motion.div>
@@ -148,11 +154,11 @@ function HeroCopy({
         Calm systems,
         <span className="text-content-muted"> shipped with care.</span>
       </h1>
-      <p className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mb-4">
+      <p className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mx-auto mb-4">
         {JING_FENG_PROFILE.name.split(" ").slice(-2).join(" ")} —{" "}
         {JING_FENG_PROFILE.title.toLowerCase()}. {JING_FENG_PROFILE.summary}
       </p>
-      <div className="flex flex-col sm:flex-row gap-3 sm:items-center mt-10">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-center mt-10">
         <button
           type="button"
           onClick={() => onScroll("work")}
@@ -172,6 +178,12 @@ function HeroCopy({
           className="inline-flex justify-center items-center px-2 py-3 text-sm font-medium text-accent-cyan sm:ml-2"
         >
           All projects →
+        </Link>
+        <Link
+          href="/keyboard-story"
+          className="inline-flex justify-center items-center px-2 py-3 text-sm font-medium text-content-secondary"
+        >
+          Bonus: Keyboard story
         </Link>
       </div>
     </>

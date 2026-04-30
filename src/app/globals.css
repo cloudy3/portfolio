@@ -225,6 +225,20 @@ p {
   -webkit-tap-highlight-color: transparent;
 }
 
+.keyboard-story-canvas {
+  display: block;
+  background: var(--bg-page);
+}
+
+.keyboard-story-loader {
+  background: linear-gradient(
+    to bottom,
+    rgba(250, 248, 245, 0.62),
+    rgba(250, 248, 245, 0.86)
+  );
+  backdrop-filter: blur(4px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

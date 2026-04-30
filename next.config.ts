@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
 
   // Turbopack configuration (Next.js 16+)
   turbopack: {
+    root: process.cwd(),
     // Turbopack handles code splitting and optimizations automatically
     // Most webpack optimizations are built-in to Turbopack
   },
