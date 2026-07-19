@@ -57,15 +57,16 @@ export class ErrorBoundary extends Component<
         return this.props.fallback;
       }
 
-      // Default fallback UI
+      // Default fallback UI. The error itself is logged in
+      // componentDidCatch, never rendered — messages can carry internals.
       return (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+        <div className="absolute inset-0 bg-surface-page bg-grid-faint flex items-center justify-center">
           <div className="text-center p-6">
-            <p className="text-slate-600 text-sm">
+            <p className="text-content-secondary text-sm">
               Unable to load visualization
             </p>
-            <p className="text-slate-400 text-xs mt-2">
-              {this.state.error?.message || "An error occurred"}
+            <p className="text-content-muted text-xs mt-2">
+              The rest of the page is unaffected.
             </p>
           </div>
         </div>
