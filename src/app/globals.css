@@ -1,43 +1,55 @@
 @import "tailwindcss";
 
-:root {
+/*
+ * Design tokens. This is the single source of truth: Tailwind v4 generates the
+ * utilities (bg-surface-page, text-content-primary, border-border-subtle,
+ * accent-*, max-w-content, rounded-*) directly from these names, and the plain
+ * CSS below consumes the same variables.
+ *
+ * These previously lived in a v3-style tailwind.config.ts, which Tailwind v4
+ * never loaded — every semantic utility silently compiled to nothing.
+ */
+@theme {
   /* Surfaces */
-  --bg-page: #faf8f5;
-  --bg-subtle: #f3f1ed;
-  --bg-elevated: #ffffff;
-  --bg-inverse: #161618;
-  --bg-inverse-elevated: #1e1e22;
+  --color-surface-page: #faf8f5;
+  --color-surface-subtle: #f3f1ed;
+  --color-surface-elevated: #ffffff;
+  --color-surface-inverse: #161618;
+  --color-surface-inverse-elevated: #1e1e22;
 
   /* Text */
-  --text-primary: #1a1a1c;
-  --text-secondary: #4a4a52;
-  --text-muted: #6b6b76;
-  --text-inverse: #f4f4f5;
-  --text-inverse-muted: #a1a1aa;
+  --color-content-primary: #1a1a1c;
+  --color-content-secondary: #4a4a52;
+  --color-content-muted: #6b6b76;
+  --color-content-inverse: #f4f4f5;
+  --color-content-inverse-muted: #a1a1aa;
 
-  /* Borders & lines */
-  --border-subtle: rgba(26, 26, 28, 0.08);
-  --border-strong: rgba(26, 26, 28, 0.14);
-  --line-accent: rgba(34, 211, 238, 0.35);
+  /* Borders */
+  --color-border-subtle: rgba(26, 26, 28, 0.08);
+  --color-border-strong: rgba(26, 26, 28, 0.14);
 
   /* Accents (sparse use) */
-  --accent-cyan: #06b6d4;
-  --accent-blue: #2563eb;
-  --accent-lime: #84cc16;
-  --accent-violet: #7c3aed;
+  --color-accent-cyan: #06b6d4;
+  --color-accent-blue: #2563eb;
+  --color-accent-lime: #84cc16;
+  --color-accent-violet: #7c3aed;
 
-  /* Layout */
+  /* Layout — --container-content backs `max-w-content` */
+  --container-content: 72rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+:root {
+  /* Layout values with no utility counterpart */
   --header-height: 4rem;
   --section-padding: 5.5rem;
   --section-padding-mobile: 3rem;
   --container-padding: 1.5rem;
-  --container-max: 72rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
 
   /* Focus ring */
-  --focus-ring: var(--accent-cyan);
+  --focus-ring: var(--color-accent-cyan);
   --focus-offset: 2px;
 }
 
@@ -62,8 +74,8 @@ body {
   margin: 0;
   font-family: var(--font-sans), system-ui, sans-serif;
   line-height: 1.6;
-  background-color: var(--bg-page);
-  color: var(--text-primary);
+  background-color: var(--color-surface-page);
+  color: var(--color-content-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-size-adjust: 100%;
@@ -98,8 +110,8 @@ body {
   left: 1rem;
   z-index: 99999;
   padding: 0.5rem 1rem;
-  background: var(--bg-inverse);
-  color: var(--text-inverse);
+  background: var(--color-surface-inverse);
+  color: var(--color-content-inverse);
   font-weight: 600;
   font-size: 0.875rem;
   border-radius: var(--radius-md);
@@ -125,7 +137,7 @@ body {
 
 .container-custom {
   width: 100%;
-  max-width: var(--container-max);
+  max-width: var(--container-content);
   margin-left: auto;
   margin-right: auto;
   padding-left: var(--container-padding);
@@ -174,7 +186,7 @@ h6 {
   letter-spacing: -0.03em;
   line-height: 1.15;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--color-content-primary);
 }
 
 h1 {
@@ -196,7 +208,7 @@ h3 {
 p {
   font-size: clamp(1rem, 2vw, 1.0625rem);
   line-height: 1.7;
-  color: var(--text-secondary);
+  color: var(--color-content-secondary);
   margin: 0;
 }
 
@@ -206,16 +218,16 @@ p {
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--color-content-muted);
 }
 
 /* Grid background (subtle) */
 .bg-grid-faint {
   background-image: linear-gradient(
-      var(--border-subtle) 1px,
+      var(--color-border-subtle) 1px,
       transparent 1px
     ),
-    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+    linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -226,7 +238,7 @@ p {
 
 .keyboard-story-canvas {
   display: block;
-  background: var(--bg-page);
+  background: var(--color-surface-page);
 }
 
 .keyboard-story-loader {
@@ -261,8 +273,8 @@ p {
 
 @media (prefers-contrast: more) {
   :root {
-    --text-secondary: #2d2d33;
-    --border-strong: rgba(26, 26, 28, 0.35);
+    --color-content-secondary: #2d2d33;
+    --color-border-strong: rgba(26, 26, 28, 0.35);
   }
 }
 
