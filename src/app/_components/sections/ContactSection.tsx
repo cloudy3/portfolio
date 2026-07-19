@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { ContactForm } from "@/types";
-import { VALIDATION, SOCIAL_LINKS } from "@/lib/constants";
+import { VALIDATION, SOCIAL_LINKS, CONTACT_EMAIL } from "@/lib/constants";
 import { Container } from "../ui/Container";
 import { Section } from "../ui/Section";
 import { SectionHeader } from "../ui/SectionHeader";
@@ -20,6 +20,8 @@ interface FormState {
   isSubmitting: boolean;
   isSubmitted: boolean;
   errors: FormErrors;
+  /** Submission/transport failure — distinct from per-field validation. */
+  submitError: string | null;
 }
 
 const inputClass = (hasError: boolean) =>
@@ -41,11 +43,19 @@ export default function ContactSection() {
     isSubmitting: false,
     isSubmitted: false,
     errors: {},
+    submitError: null,
   });
 
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    },
+    []
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -131,7 +141,7 @@ export default function ContactSection() {
 
     if (!validateForm()) return;
 
-    setFormState((prev) => ({ ...prev, isSubmitting: true }));
+    setFormState((prev) => ({ ...prev, isSubmitting: true, submitError: null }));
 
     try {
       const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
@@ -149,7 +159,7 @@ export default function ContactSection() {
         from_email: formData.email,
         subject: formData.subject,
         message: formData.message,
-        to_email: "cjingfeng98@gmail.com",
+        to_email: CONTACT_EMAIL,
         reply_to: formData.email,
       };
 
@@ -163,7 +173,8 @@ export default function ContactSection() {
 
       setFormData({ name: "", email: "", subject: "", message: "" });
 
-      setTimeout(() => {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+      successTimeoutRef.current = setTimeout(() => {
         setFormState((prev) => ({ ...prev, isSubmitted: false }));
       }, 5000);
     } catch (error) {
@@ -185,7 +196,7 @@ export default function ContactSection() {
       setFormState((prev) => ({
         ...prev,
         isSubmitting: false,
-        errors: { ...prev.errors, message: errorMessage },
+        submitError: errorMessage,
       }));
     }
   };
@@ -234,10 +245,10 @@ export default function ContactSection() {
                 <div>
                   <p className="font-mono-label mb-1">Email</p>
                   <a
-                    href="mailto:cjingfeng98@gmail.com"
+                    href={`mailto:${CONTACT_EMAIL}`}
                     className="text-content-primary hover:text-accent-cyan transition-colors"
                   >
-                    cjingfeng98@gmail.com
+                    {CONTACT_EMAIL}
                   </a>
                 </div>
               </li>
@@ -306,7 +317,7 @@ export default function ContactSection() {
                 </div>
               )}
 
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label
                     htmlFor="name"
@@ -421,6 +432,19 @@ export default function ContactSection() {
                     </span>
                   </div>
                 </div>
+
+                {formState.submitError && (
+                  <div
+                    className="p-4 rounded-md border border-red-500/25 bg-red-500/5 text-sm text-content-secondary"
+                    role="alert"
+                    aria-live="assertive"
+                  >
+                    <p className="font-medium text-content-primary">
+                      Message not sent
+                    </p>
+                    <p className="mt-1">{formState.submitError}</p>
+                  </div>
+                )}
 
                 <button
                   type="submit"

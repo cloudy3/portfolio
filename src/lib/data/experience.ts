@@ -153,17 +153,53 @@ export const getPastExperiences = () => {
   );
 };
 
-export const getTotalExperienceYears = () => {
-  const totalMonths = EXPERIENCE_DATA.reduce((total, exp) => {
-    const startDate = exp.startDate;
-    const endDate = exp.endDate || new Date(); // Use current date if still employed
+/**
+ * Number of complete calendar months between two dates.
+ *
+ * Day-based approximations (`diff / 30`) drift: exactly two years came out as
+ * "2 years 1 month". Counting calendar months keeps the card and the stats row
+ * in agreement.
+ */
+export const monthsBetween = (start: Date, end: Date): number => {
+  let months =
+    (end.getFullYear() - start.getFullYear()) * 12 +
+    (end.getMonth() - start.getMonth());
 
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const months = diffTime / (1000 * 60 * 60 * 24 * 30.44); // Average days per month
+  // The final month is only complete once the day-of-month has been reached.
+  if (end.getDate() < start.getDate()) months -= 1;
 
-    return total + months;
-  }, 0);
+  return Math.max(0, months);
+};
 
-  const years = totalMonths / 12;
-  return Math.round(years * 10) / 10; // Round to 1 decimal place
+/** "5 months", "2 years", "1 year 3 months". */
+export const formatDuration = (months: number): string => {
+  if (months < 12) {
+    return `${months} month${months === 1 ? "" : "s"}`;
+  }
+
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  const yearPart = `${years} year${years === 1 ? "" : "s"}`;
+
+  if (remainingMonths === 0) return yearPart;
+
+  return `${yearPart} ${remainingMonths} month${
+    remainingMonths === 1 ? "" : "s"
+  }`;
+};
+
+/** Duration of a single role, treating an open-ended role as running to today. */
+export const getExperienceDuration = (
+  experience: Pick<Experience, "startDate" | "endDate">,
+  now: Date = new Date()
+): string =>
+  formatDuration(monthsBetween(experience.startDate, experience.endDate ?? now));
+
+export const getTotalExperienceYears = (now: Date = new Date()) => {
+  const totalMonths = EXPERIENCE_DATA.reduce(
+    (total, exp) => total + monthsBetween(exp.startDate, exp.endDate ?? now),
+    0
+  );
+
+  return Math.round((totalMonths / 12) * 10) / 10; // 1 decimal place
 };

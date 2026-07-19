@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAVIGATION_ITEMS, Z_INDEX } from "@/lib/constants";
@@ -15,13 +15,18 @@ export default function Navigation({ className }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [isScrolled, setIsScrolled] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const isHome = pathname === "/";
 
+  // Single source of truth for the active nav item. A previous
+  // IntersectionObserver ran alongside this and the two disagreed mid-scroll,
+  // which made the active underline flicker.
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 24);
-      if (!isHome) return;
+      if (!isHome) {
+        setActiveSection(pathname.startsWith("/projects") ? "work" : "");
+        return;
+      }
 
       if (window.scrollY < 80) {
         setActiveSection("hero");
@@ -45,43 +50,6 @@ export default function Navigation({ className }: NavigationProps) {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHome]);
-
-  useEffect(() => {
-    if (!isHome) {
-      if (pathname.startsWith("/projects")) setActiveSection("work");
-      return;
-    }
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        let best = "";
-        let ratio = 0;
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > ratio) {
-            const id = entry.target.id;
-            if (NAVIGATION_ITEMS.some((item) => item.id === id)) {
-              best = id;
-              ratio = entry.intersectionRatio;
-            }
-          }
-        });
-        if (best) setActiveSection(best);
-      },
-      { root: null, rootMargin: "-8% 0px -55% 0px", threshold: [0, 0.1, 0.25] }
-    );
-
-    const t = setTimeout(() => {
-      NAVIGATION_ITEMS.forEach((item) => {
-        const el = document.getElementById(item.id);
-        if (el && observerRef.current) observerRef.current.observe(el);
-      });
-    }, 300);
-
-    return () => {
-      clearTimeout(t);
-      observerRef.current?.disconnect();
-    };
   }, [isHome, pathname]);
 
   const handleNavClick = (href: string) => {

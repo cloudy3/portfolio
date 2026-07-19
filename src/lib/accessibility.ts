@@ -145,41 +145,6 @@ export const prefersHighContrast = (): boolean => {
   return window.matchMedia("(prefers-contrast: high)").matches;
 };
 
-// Skip link functionality
-export const createSkipLink = (
-  targetId: string,
-  text: string = "Skip to main content"
-) => {
-  if (typeof window === "undefined") return;
-
-  const skipLink = document.createElement("a");
-  skipLink.href = `#${targetId}`;
-  skipLink.textContent = text;
-  skipLink.className = "skip-link";
-  skipLink.style.cssText = `
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: #000;
-    color: #fff;
-    padding: 8px;
-    text-decoration: none;
-    z-index: 9999;
-    border-radius: 4px;
-    transition: top 0.3s;
-  `;
-
-  skipLink.addEventListener("focus", () => {
-    skipLink.style.top = "6px";
-  });
-
-  skipLink.addEventListener("blur", () => {
-    skipLink.style.top = "-40px";
-  });
-
-  document.body.insertBefore(skipLink, document.body.firstChild);
-};
-
 // ARIA live region manager
 export class LiveRegionManager {
   private politeRegion: HTMLElement | null = null;

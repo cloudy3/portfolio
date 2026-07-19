@@ -124,7 +124,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
       <div className="relative z-10 pb-10 flex justify-center">
         <button
           type="button"
-          onClick={() => scrollToSection("about")}
+          onClick={() => scrollToSection("work")}
           className="flex flex-col items-center gap-2 text-content-muted hover:text-accent-cyan transition-colors text-xs font-mono uppercase tracking-widest"
         >
           Scroll

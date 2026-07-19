@@ -35,15 +35,8 @@ export const metadata: Metadata = {
   keywords:
     "Jing Feng, software engineer, Flutter, Python, Google Cloud, full-stack, portfolio",
   authors: [{ name: "Cheah Jing Feng" }],
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
-  },
+  // Icons come from the app/ file conventions (favicon.ico, icon.svg,
+  // apple-icon.png) — declaring metadata.icons here would override them.
   manifest: "/site.webmanifest",
   appleWebApp: {
     title: "JF Portfolio",

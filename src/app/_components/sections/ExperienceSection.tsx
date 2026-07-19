@@ -9,6 +9,7 @@ import {
   getCurrentExperience,
   getPastExperiences,
   getTotalExperienceYears,
+  getExperienceDuration,
 } from "@/lib/data/experience";
 import { Container } from "../ui/Container";
 import { Section } from "../ui/Section";
@@ -55,28 +56,7 @@ const ExperienceCard = ({
     });
   };
 
-  const getDuration = () => {
-    const start = experience.startDate;
-    const end = experience.endDate || new Date();
-
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
-
-    if (diffMonths < 12) {
-      return `${diffMonths} month${diffMonths > 1 ? "s" : ""}`;
-    }
-
-    const years = Math.floor(diffMonths / 12);
-    const remainingMonths = diffMonths % 12;
-
-    if (remainingMonths === 0) {
-      return `${years} year${years > 1 ? "s" : ""}`;
-    }
-
-    return `${years} year${years > 1 ? "s" : ""} ${remainingMonths} month${
-      remainingMonths > 1 ? "s" : ""
-    }`;
-  };
+  const getDuration = () => getExperienceDuration(experience);
 
   return (
     <div

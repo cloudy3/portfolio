@@ -102,6 +102,9 @@ export const NAVIGATION_ITEMS = [
   { id: "contact", label: "Contact", href: "#contact" },
 ] as const;
 
+/** Single source of truth for the contact address. */
+export const CONTACT_EMAIL = "cjingfeng98@gmail.com";
+
 // Social media links
 export const SOCIAL_LINKS = [
   { name: "GitHub", url: "https://github.com/cloudy3", icon: "github" },
@@ -110,7 +113,7 @@ export const SOCIAL_LINKS = [
     url: "https://www.linkedin.com/in/jingfeng-cheah/",
     icon: "linkedin",
   },
-  { name: "Email", url: "mailto:cjingfeng98@gmail.com", icon: "email" },
+  { name: "Email", url: `mailto:${CONTACT_EMAIL}`, icon: "email" },
 ] as const;
 
 // Project categories
