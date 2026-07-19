@@ -80,6 +80,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // `overflow-x-hidden` sits on <body> rather than <html> deliberately.
+    // Because <html> keeps `overflow: visible`, the body's overflow propagates
+    // up to the viewport and the body itself is treated as `visible` — so it
+    // does not become a scroll container, and `position: sticky` descendants
+    // (the keyboard story) still stick to the viewport. Moving this to <html>
+    // would break that; if it ever needs to move, use `overflow-x: clip`,
+    // which never establishes a scroll container.
     <html lang="en" className="scroll-smooth">
       <body
         className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}

@@ -36,11 +36,13 @@ vi.mock("@react-three/fiber", () => ({
 vi.mock("three", () => {
   class MBufferGeometry {
     attributes = { position: { needsUpdate: false } };
+    dispose = vi.fn();
     setFromPoints() {
       return this;
     }
   }
   class MLineBasicMaterial {
+    dispose = vi.fn();
     constructor(public params: Record<string, unknown>) {}
   }
   class MLine {

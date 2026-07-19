@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { detectWebGLSupport } from "@/lib/webgl";
 // Import only the specific Three.js classes we need for better tree-shaking
 import { Vector3, BufferGeometry, LineBasicMaterial, Line } from "three";
@@ -155,49 +155,84 @@ function LineWaveSystem({
   isMobile,
   enableInteractivity,
 }: LineWaveSystemProps) {
-  const linesRef = useRef<Line[]>([]);
-  const lineConfigsRef = useRef<LineConfig[]>([]);
-  const baseConfigsRef = useRef<LineConfig[]>([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const targetMouseRef = useRef({ x: 0, y: 0 });
 
-  // Initialize line configurations once on component mount
-  // Each line gets unique parameters to create visual variety
-  if (lineConfigsRef.current.length === 0) {
-    for (let i = 0; i < lineCount; i++) {
+  // Live configs — mutated in place by the mouse interaction each frame.
+  const lineConfigs = useMemo<LineConfig[]>(() => {
+    return Array.from({ length: lineCount }, (_, i) => {
       // Normalize index to 0-1 range for parameter distribution
       const normalizedIndex = i / lineCount;
 
       // Reduce animation complexity on mobile for better performance
       const mobileSpeedMultiplier = isMobile ? 0.7 : 1.0;
 
-      const config = {
-        // Wave height: optimized for visual impact without overwhelming
-        // Mobile: 2.0 (increased slightly for better visibility)
-        // Desktop: 2.8 (increased for more dramatic effect)
+      return {
+        // Wave height: mobile is tuned down slightly
         amplitude: isMobile ? 2.0 : 2.8,
-        // Wave frequency: varies per line for visual diversity
-        // Range: 2.5 to 5.5 (adjusted for smoother, more elegant waves)
+        // Wave frequency: varies per line for visual diversity (2.5 - 5.5)
         frequency: 2.5 + normalizedIndex * 3,
-        // Phase offset: distributes lines evenly in wave cycle
-        // Prevents all lines from moving in sync
+        // Phase offset: distributes lines evenly through the wave cycle so
+        // they don't all move in sync
         phase: normalizedIndex * Math.PI * 2,
-        // Animation speed: varies per line for organic feel
-        // Range: 0.35 to 0.55 (slightly faster for more energy)
-        // Slower lines in front, faster in back creates depth
+        // Slower lines in front, faster behind, which reads as depth
         speed:
           (0.35 + normalizedIndex * 0.2) *
           animationSpeed *
           mobileSpeedMultiplier,
-        // Point count: fewer points on mobile for performance
+        // Fewer points on mobile for performance
         pointCount: isMobile ? 30 : 50,
       };
+    });
+  }, [lineCount, isMobile, animationSpeed]);
 
-      lineConfigsRef.current.push(config);
-      // Store base configs for resetting after mouse interaction
-      baseConfigsRef.current.push({ ...config });
-    }
-  }
+  // Pristine copy, used to clamp the mouse-driven values back to base.
+  const baseConfigs = useMemo(
+    () => lineConfigs.map((config) => ({ ...config })),
+    [lineConfigs]
+  );
+
+  // Identity of the palette contents, so an inline array prop doesn't rebuild
+  // every GPU object on each parent render.
+  const paletteKey = colorPalette.join(",");
+
+  /*
+   * Build the Three.js objects once per configuration rather than inside
+   * render(). These were previously constructed in the render map(), so any
+   * parent re-render allocated a fresh BufferGeometry / LineBasicMaterial /
+   * Line per line and leaked the old GPU-backed ones.
+   */
+  const lines = useMemo(() => {
+    return lineConfigs.map((config, index) => {
+      const geometry = new BufferGeometry().setFromPoints(
+        generateLinePoints(config, 0)
+      );
+
+      const material = new LineBasicMaterial({
+        // NOTE: `linewidth` is intentionally absent — WebGL ignores it and
+        // always draws 1px lines. Thicker lines would need Line2 / MeshLine.
+        color: colorPalette[index % colorPalette.length],
+        transparent: true,
+        opacity: LINE_OPACITY,
+      });
+
+      const line = new Line(geometry, material);
+      // 0.65 units of vertical spacing, centred on the group
+      line.position.set(0, (index - lineCount / 2) * 0.65, 0);
+      return line;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lineConfigs, lineCount, paletteKey]);
+
+  // Release GPU resources when the lines are replaced or the scene unmounts.
+  useEffect(() => {
+    return () => {
+      for (const line of lines) {
+        line.geometry.dispose();
+        (line.material as LineBasicMaterial).dispose();
+      }
+    };
+  }, [lines]);
 
   // Mouse/touch interaction handler
   useEffect(() => {
@@ -251,8 +286,8 @@ function LineWaveSystem({
 
       // Update line configs based on mouse position
       // Mouse movement influences wave amplitude and frequency for interactivity
-      lineConfigsRef.current.forEach((config, index) => {
-        const baseConfig = baseConfigsRef.current[index];
+      lineConfigs.forEach((config, index) => {
+        const baseConfig = baseConfigs[index];
 
         // Horizontal mouse position affects wave height (amplitude)
         // Multiplier 0.6 creates noticeable but elegant interaction
@@ -276,56 +311,21 @@ function LineWaveSystem({
     }
 
     // Update each line's geometry with new wave positions
-    linesRef.current.forEach((line, index) => {
-      if (line && line.geometry) {
-        const config = lineConfigsRef.current[index];
+    lines.forEach((line, index) => {
+      const config = lineConfigs[index];
+      if (!config) return;
 
-        // Generate new points based on current time and config
-        const newPoints = generateLinePoints(config, time);
-
-        // Update geometry with new points (efficient in-place update)
-        line.geometry.setFromPoints(newPoints);
-
-        // Mark position attribute for GPU update
-        // Required for Three.js to know the geometry changed
-        line.geometry.attributes.position.needsUpdate = true;
-      }
+      // In-place geometry update — no per-frame allocation of GPU objects
+      line.geometry.setFromPoints(generateLinePoints(config, time));
+      line.geometry.attributes.position.needsUpdate = true;
     });
   });
 
   return (
     <group>
-      {lineConfigsRef.current.map((config, index) => {
-        // Generate initial points for the line
-        const initialPoints = generateLinePoints(config, 0);
-        const geometry = new BufferGeometry().setFromPoints(initialPoints);
-
-        // Select color from palette (cycle through if needed)
-        const color = colorPalette[index % colorPalette.length];
-
-        // Create material with optimized thickness and opacity
-        const material = new LineBasicMaterial({
-          color: color,
-          linewidth: isMobile ? 3 : 5, // Thickness optimized for visibility
-          transparent: true,
-          opacity: LINE_OPACITY,
-        });
-
-        const line = new Line(geometry, material);
-        // Vertical spacing: 0.65 units between lines for optimal coverage
-        // Centers the group of lines vertically in the viewport
-        line.position.set(0, (index - lineCount / 2) * 0.65, 0);
-
-        return (
-          <primitive
-            key={index}
-            object={line}
-            ref={(el: Line) => {
-              if (el) linesRef.current[index] = el;
-            }}
-          />
-        );
-      })}
+      {lines.map((line, index) => (
+        <primitive key={index} object={line} />
+      ))}
     </group>
   );
 }
@@ -458,42 +458,28 @@ export default function WaveLineVisualization({
       );
     }
 
-    // Detect mobile devices
-    const checkMobile = () => {
-      const isMobileDevice =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        ) || window.innerWidth < 768;
-      setIsMobile(isMobileDevice);
-    };
+    // Viewport-based mobile detection. This drives quality settings, so what
+    // matters is the viewport, not the device. A resize listener fired on
+    // every pixel of movement and remounted the scene when crossing 768px;
+    // matchMedia only notifies on an actual crossing.
+    const mobileQuery = window.matchMedia("(max-width: 768px)");
+    const handleMobileChange = (e: MediaQueryListEvent | MediaQueryList) =>
+      setIsMobile(e.matches);
 
-    // Check reduced motion preference
-    const checkReducedMotion = () => {
-      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-      setPrefersReducedMotion(mediaQuery.matches);
-    };
+    handleMobileChange(mobileQuery);
+    mobileQuery.addEventListener("change", handleMobileChange);
 
-    checkMobile();
-    checkReducedMotion();
-
-    // Listen for window resize to update mobile detection
-    window.addEventListener("resize", checkMobile);
-
-    // Listen for motion preference changes
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handleMotionChange = (e: MediaQueryListEvent) => {
+    // Reduced motion preference
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleMotionChange = (e: MediaQueryListEvent | MediaQueryList) =>
       setPrefersReducedMotion(e.matches);
-      if (e.matches) {
-        console.info(
-          "WaveLineVisualization: Motion preference changed to reduced. Switching to static fallback."
-        );
-      }
-    };
-    mediaQuery.addEventListener("change", handleMotionChange);
+
+    handleMotionChange(motionQuery);
+    motionQuery.addEventListener("change", handleMotionChange);
 
     return () => {
-      window.removeEventListener("resize", checkMobile);
-      mediaQuery.removeEventListener("change", handleMotionChange);
+      mobileQuery.removeEventListener("change", handleMobileChange);
+      motionQuery.removeEventListener("change", handleMotionChange);
     };
   }, []);
 

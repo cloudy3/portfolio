@@ -28,6 +28,7 @@ export default function KeyboardScrollytellingSection() {
   const rafRef = useRef<number | null>(null);
   const pendingFrameRef = useRef<number>(0);
   const currentFrameRef = useRef<number>(0);
+  const hasDrawnInitialRef = useRef(false);
 
   const shouldReduceMotion = useReducedMotion();
 
@@ -51,10 +52,13 @@ export default function KeyboardScrollytellingSection() {
     mass: 0.25,
   });
 
+  // Reduced-motion visitors never scrub, so a single frame is the whole story.
+  const targetFrameCount = shouldReduceMotion ? 1 : TOTAL_FRAMES;
+
   const progressPercent = useMemo(() => {
-    if (TOTAL_FRAMES === 0) return 0;
-    return Math.round((loadedCount / TOTAL_FRAMES) * 100);
-  }, [loadedCount]);
+    if (targetFrameCount === 0) return 0;
+    return Math.round((loadedCount / targetFrameCount) * 100);
+  }, [loadedCount, targetFrameCount]);
 
   const getCanvasDimensions = useCallback(
     (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
@@ -134,11 +138,32 @@ export default function KeyboardScrollytellingSection() {
     setLoadedCount(0);
     setIsReady(false);
 
+    /*
+     * Frame 0 first, so something is on screen after a single request; the
+     * other 39 stream in behind it. Previously all 40 JPGs were requested on
+     * mount, before any scroll intent — and reduced-motion visitors paid that
+     * full download to look at one static frame.
+     */
     const loadFrames = async () => {
       try {
-        const loadedFrames = await Promise.all(
-          Array.from({ length: TOTAL_FRAMES }, async (_, index) => {
-            const image = await loadFrame(index);
+        const firstFrame = await loadFrame(0);
+        if (cancelled) return;
+
+        const firstBackground = sampleFrameBackgroundColor(firstFrame);
+        setFrames([firstFrame]);
+        setFrameBackgrounds([firstBackground]);
+        currentBackgroundRef.current = firstBackground;
+        setCurrentBackground(firstBackground);
+        setLoadedCount(1);
+
+        if (shouldReduceMotion) {
+          setIsReady(true);
+          return;
+        }
+
+        const remainingFrames = await Promise.all(
+          Array.from({ length: TOTAL_FRAMES - 1 }, async (_, offset) => {
+            const image = await loadFrame(offset + 1);
             if (!cancelled) {
               setLoadedCount((value) => value + 1);
             }
@@ -147,13 +172,10 @@ export default function KeyboardScrollytellingSection() {
         );
 
         if (cancelled) return;
-        const sampledBackgrounds = loadedFrames.map((frame) =>
-          sampleFrameBackgroundColor(frame)
-        );
-        setFrames(loadedFrames);
-        setFrameBackgrounds(sampledBackgrounds);
-        currentBackgroundRef.current = sampledBackgrounds[0] ?? DEFAULT_BACKGROUND;
-        setCurrentBackground(sampledBackgrounds[0] ?? DEFAULT_BACKGROUND);
+
+        const allFrames = [firstFrame, ...remainingFrames];
+        setFrames(allFrames);
+        setFrameBackgrounds(allFrames.map(sampleFrameBackgroundColor));
         setIsReady(true);
       } catch (error) {
         if (cancelled) return;
@@ -170,15 +192,17 @@ export default function KeyboardScrollytellingSection() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [shouldReduceMotion]);
 
+  // Paint frame 0 as soon as it exists — but only once, so the later arrival
+  // of the remaining frames doesn't yank an already-scrubbed canvas back.
   useEffect(() => {
-    if (!isReady || frames.length !== TOTAL_FRAMES) return;
-    const initialFrame = 0;
-    pendingFrameRef.current = initialFrame;
-    currentFrameRef.current = initialFrame;
-    drawFrame(initialFrame);
-  }, [drawFrame, frames, isReady]);
+    if (hasDrawnInitialRef.current || frames.length === 0) return;
+    hasDrawnInitialRef.current = true;
+    pendingFrameRef.current = 0;
+    currentFrameRef.current = 0;
+    drawFrame(0);
+  }, [drawFrame, frames]);
 
   useMotionValueEvent(smoothProgress, "change", (value) => {
     if (!isReady || shouldReduceMotion) return;
@@ -219,8 +243,24 @@ export default function KeyboardScrollytellingSection() {
       className="relative text-content-primary transition-colors duration-300"
       style={{ backgroundColor: currentBackground }}
     >
-      <div ref={containerRef} className="relative h-[400vh]">
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
+      {/*
+       * Reduced motion gets a single screen-height section rather than a 400vh
+       * scroll region: the frame never changes, so the tall container was just
+       * a long empty scroll.
+       */}
+      <div
+        ref={containerRef}
+        className={
+          shouldReduceMotion ? "relative h-screen" : "relative h-[400vh]"
+        }
+      >
+        <div
+          className={
+            shouldReduceMotion
+              ? "h-screen w-full overflow-hidden"
+              : "sticky top-0 h-screen w-full overflow-hidden"
+          }
+        >
           <canvas
             ref={canvasRef}
             className="keyboard-story-canvas h-screen w-full"
