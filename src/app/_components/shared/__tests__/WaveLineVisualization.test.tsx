@@ -1,6 +1,17 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { vi, type Mock } from "vitest";
+import { Line } from "three";
 import WaveLineVisualization from "../WaveLineVisualization";
+
+/** Shape of the mocked Line, with the disposables exposed as spies. */
+type MLineLike = {
+  geometry: { dispose: Mock };
+  material: { dispose: Mock };
+};
+
+/** Access the mock's instance registry (see the "three" mock below). */
+const lineInstances = () =>
+  (Line as unknown as { instances: MLineLike[] }).instances;
 
 interface MockCanvasProps {
   children: React.ReactNode;
@@ -46,12 +57,15 @@ vi.mock("three", () => {
     constructor(public params: Record<string, unknown>) {}
   }
   class MLine {
+    // Every constructed line, so tests can assert on disposal.
+    static instances: MLine[] = [];
     geometry: MBufferGeometry;
     material: MLineBasicMaterial;
     position = { set: vi.fn() };
     constructor(geometry: MBufferGeometry, material: MLineBasicMaterial) {
       this.geometry = geometry;
       this.material = material;
+      MLine.instances.push(this);
     }
   }
   return {
@@ -413,6 +427,31 @@ describe("WaveLineVisualization - Visual and Functional Testing", () => {
       expect(visualizationContainer).toHaveClass("my-custom-class");
       expect(visualizationContainer).toHaveClass("absolute");
       expect(visualizationContainer).toHaveClass("inset-0");
+    });
+  });
+  describe("Three.js resource lifecycle", () => {
+    it("disposes every geometry and material on unmount", () => {
+      // Earlier tests in this file also build lines; only assert on ours.
+      const before = lineInstances().length;
+
+      const { container, unmount } = render(
+        <WaveLineVisualization lineCount={4} />
+      );
+      // Sanity: the scene actually mounted before we assert on teardown.
+      expect(container.firstChild).toBeInTheDocument();
+
+      const created = lineInstances().slice(before);
+      expect(created).toHaveLength(4);
+      for (const line of created) {
+        expect(line.geometry.dispose).not.toHaveBeenCalled();
+      }
+
+      unmount();
+
+      for (const line of created) {
+        expect(line.geometry.dispose).toHaveBeenCalled();
+        expect(line.material.dispose).toHaveBeenCalled();
+      }
     });
   });
 });

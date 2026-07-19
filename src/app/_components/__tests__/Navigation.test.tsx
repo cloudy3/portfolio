@@ -55,4 +55,49 @@ describe("Navigation", () => {
     const nav = screen.getByRole("navigation");
     expect(nav.className).toMatch(/bg-surface-elevated/);
   });
+
+  it("renders exactly one skip link", () => {
+    // AccessibilityProvider used to inject a second one at runtime, so
+    // keyboard users tabbed through two in a row.
+    render(<Navigation />);
+    const skipLinks = screen.getAllByRole("link", {
+      name: /skip to (content|main content)/i,
+    });
+    expect(skipLinks).toHaveLength(1);
+    expect(skipLinks[0]).toHaveAttribute("href", "#main-content");
+  });
+
+  it("closes the mobile menu on Escape and returns focus to the trigger", () => {
+    const { container } = render(<Navigation />);
+    const btn = screen.getByRole("button", { name: /open menu/i });
+
+    fireEvent.click(btn);
+    const mobileNav = container.querySelector("#mobile-nav");
+    expect(mobileNav?.getAttribute("class") ?? "").toMatch(/max-h-\[28rem\]/);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(mobileNav?.getAttribute("class") ?? "").toMatch(/max-h-0/);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: /open menu/i })
+    );
+  });
+
+  it("ignores Escape when the mobile menu is already closed", () => {
+    const { container } = render(<Navigation />);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    const mobileNav = container.querySelector("#mobile-nav");
+    expect(mobileNav?.getAttribute("class") ?? "").toMatch(/max-h-0/);
+  });
+
+  it("marks Work active on /projects", () => {
+    mockUsePathname.mockReturnValue("/projects");
+    render(<Navigation />);
+    const workLinks = screen.getAllByRole("link", { name: /^Work$/ });
+    expect(
+      workLinks.some((link) => link.className.includes("text-accent-cyan"))
+    ).toBe(true);
+  });
 });
