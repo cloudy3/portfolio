@@ -49,15 +49,22 @@ export default function AboutSection() {
           />
         </FadeIn>
 
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-20">
-          <FadeIn className="lg:col-span-5">
-            <div className="relative max-w-sm mx-auto lg:mx-0">
-              <div className="aspect-square rounded-lg overflow-hidden border border-border-subtle bg-surface-subtle shadow-sm">
+        {/* Flex, not a 12-col grid: the portrait is a fixed width, so a grid
+            column would reserve far more space than it fills and open a gap. */}
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-14 items-start mb-20">
+          <FadeIn className="shrink-0 w-full lg:w-auto">
+            {/* 4:5 portrait at headshot scale — a full-width square read as an
+                avatar and crowded the copy alongside it. */}
+            <div className="relative w-42 sm:w-48 mx-auto lg:mx-0">
+              <div className="aspect-[4/5] rounded-lg overflow-hidden border border-border-subtle bg-surface-subtle shadow-sm">
                 <Image
-                  src="/images/placeholder-avatar.svg"
-                  alt=""
-                  width={400}
-                  height={400}
+                  src="/images/pfp.png"
+                  alt={`${JING_FENG_PROFILE.name}, ${JING_FENG_PROFILE.title}`}
+                  width={512}
+                  height={640}
+                  /* Over-requests vs. the box width on purpose: the source is
+                     square, so object-cover scales it ~1.25x to fill 4:5. */
+                  sizes="(min-width: 640px) 16rem, 14rem"
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -69,7 +76,9 @@ export default function AboutSection() {
             </div>
           </FadeIn>
 
-          <div className="lg:col-span-7 space-y-8">
+          {/* Capped so the line length stays readable now that the copy is no
+              longer bounded by a grid column. */}
+          <div className="flex-1 max-w-2xl space-y-8">
             <FadeIn delay={0.05}>
               <p className="text-lg text-content-secondary leading-relaxed">
                 {JING_FENG_PROFILE.summary}
@@ -102,7 +111,9 @@ export default function AboutSection() {
           {pillars.map((p, i) => (
             <FadeIn key={p.id} delay={i * 0.06}>
               <div className="h-full rounded-lg border border-border-subtle bg-surface-elevated p-6 shadow-sm">
-                <p className="font-mono text-accent-cyan text-sm mb-3">{p.id}</p>
+                <p className="font-mono text-accent-cyan text-sm mb-3">
+                  {p.id}
+                </p>
                 <h4 className="text-lg font-semibold text-content-primary mb-2">
                   {p.title}
                 </h4>
@@ -119,7 +130,9 @@ export default function AboutSection() {
             <h3 className="font-mono-label mb-6">Technical breadth</h3>
             <div className="grid sm:grid-cols-2 gap-8 text-sm">
               <div>
-                <p className="font-mono-label mb-2 text-accent-blue">Languages</p>
+                <p className="font-mono-label mb-2 text-accent-blue">
+                  Languages
+                </p>
                 <p className="text-content-secondary">
                   {TECHNICAL_HIGHLIGHTS.languages.join(" · ")}
                 </p>
@@ -139,7 +152,9 @@ export default function AboutSection() {
                 </p>
               </div>
               <div>
-                <p className="font-mono-label mb-2 text-accent-blue">Data & tools</p>
+                <p className="font-mono-label mb-2 text-accent-blue">
+                  Data & tools
+                </p>
                 <p className="text-content-secondary">
                   {TECHNICAL_HIGHLIGHTS.databasesTools.join(" · ")}
                 </p>
