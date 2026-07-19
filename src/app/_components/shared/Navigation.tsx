@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAVIGATION_ITEMS, Z_INDEX } from "@/lib/constants";
@@ -15,6 +15,7 @@ export default function Navigation({ className }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [isScrolled, setIsScrolled] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const isHome = pathname === "/";
 
   // Single source of truth for the active nav item. A previous
@@ -76,6 +77,21 @@ export default function Navigation({ className }: NavigationProps) {
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
+  }, [isOpen]);
+
+  // Escape closes the mobile menu and returns focus to the trigger, so
+  // keyboard users aren't stranded inside a closed menu.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setIsOpen(false);
+      menuButtonRef.current?.focus();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
   const navLinkClass = (id: string, path?: string) => {
@@ -166,7 +182,9 @@ export default function Navigation({ className }: NavigationProps) {
           <div className="md:hidden">
             <button
               id="mobile-menu-button"
+              ref={menuButtonRef}
               type="button"
+              aria-controls="mobile-nav"
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center rounded-md p-2 text-content-primary hover:bg-surface-subtle"
               aria-expanded={isOpen}

@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { MotionConfig, motion, useReducedMotion } from "framer-motion";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
 import { fadeUp, staggerContainer, transitions } from "@/lib/motion";
@@ -53,14 +53,17 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
       />
 
       <div className="relative z-10 container-custom py-20 md:py-28">
-        {reduce ? (
-          <div className="max-w-3xl mx-auto text-center">
-            <HeroCopy onScroll={scrollToSection} />
-          </div>
-        ) : (
+        {/*
+         * One copy of the hero markup for both motion modes. `initial={false}`
+         * renders reduced-motion users straight at the final state (no fade, no
+         * stuck opacity-0), and MotionConfig keeps any remaining animation
+         * honest about the user's preference. Previously this markup was
+         * duplicated and the two branches had already drifted apart.
+         */}
+        <MotionConfig reducedMotion="user">
           <motion.div
             className="max-w-3xl mx-auto text-center"
-            initial="hidden"
+            initial={reduce ? false : "hidden"}
             animate="visible"
             variants={staggerContainer}
           >
@@ -83,7 +86,8 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
               className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mx-auto mb-4"
             >
               {JING_FENG_PROFILE.name.split(" ").slice(-2).join(" ")} —{" "}
-              {JING_FENG_PROFILE.title.toLowerCase()}. {JING_FENG_PROFILE.summary}
+              {JING_FENG_PROFILE.title.toLowerCase()}.{" "}
+              {JING_FENG_PROFILE.summary}
             </motion.p>
             <motion.div
               variants={fadeUp}
@@ -118,7 +122,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
               </Link>
             </motion.div>
           </motion.div>
-        )}
+        </MotionConfig>
       </div>
 
       <div className="relative z-10 pb-10 flex justify-center">
@@ -132,55 +136,5 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         </button>
       </div>
     </section>
-  );
-}
-
-function HeroCopy({
-  onScroll,
-}: {
-  onScroll: (id: string) => void;
-}) {
-  return (
-    <>
-      <p className="font-mono-label mb-4 text-content-muted">
-        Software engineer · Full-stack
-      </p>
-      <h1 className="text-4xl sm:text-5xl md:text-[3.25rem] font-semibold tracking-tight text-content-primary leading-[1.08] mb-6">
-        Calm systems,
-        <span className="text-content-muted"> shipped with care.</span>
-      </h1>
-      <p className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mx-auto mb-4">
-        {JING_FENG_PROFILE.name.split(" ").slice(-2).join(" ")} —{" "}
-        {JING_FENG_PROFILE.title.toLowerCase()}. {JING_FENG_PROFILE.summary}
-      </p>
-      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-center mt-10">
-        <button
-          type="button"
-          onClick={() => onScroll("work")}
-          className="inline-flex justify-center items-center px-5 py-3 rounded-md bg-surface-inverse text-content-inverse text-sm font-medium"
-        >
-          View selected work
-        </button>
-        <button
-          type="button"
-          onClick={() => onScroll("contact")}
-          className="inline-flex justify-center items-center px-5 py-3 rounded-md border border-border-strong text-content-primary text-sm font-medium"
-        >
-          Contact
-        </button>
-        <Link
-          href="/projects"
-          className="inline-flex justify-center items-center px-2 py-3 text-sm font-medium text-accent-cyan sm:ml-2"
-        >
-          All projects →
-        </Link>
-        <Link
-          href="/keyboard-story"
-          className="inline-flex justify-center items-center px-2 py-3 text-sm font-medium text-content-secondary"
-        >
-          Bonus: Keyboard story
-        </Link>
-      </div>
-    </>
   );
 }

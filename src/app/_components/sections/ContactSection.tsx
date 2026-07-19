@@ -46,8 +46,6 @@ export default function ContactSection() {
     submitError: null,
   });
 
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(
@@ -56,23 +54,6 @@ export default function ContactSection() {
     },
     []
   );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setIsVisible(true);
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const el = sectionRef.current;
-    if (el) observer.observe(el);
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, []);
 
   const validateField = (name: keyof ContactForm, value: string): string => {
     switch (name) {
@@ -210,7 +191,6 @@ export default function ContactSection() {
 
   return (
     <Section id="contact" variant="subtle" className="scroll-mt-20">
-      <div ref={sectionRef}>
       <Container>
         <FadeIn>
           <SectionHeader
@@ -222,11 +202,7 @@ export default function ContactSection() {
         </FadeIn>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 max-w-6xl mx-auto">
-          <div
-            className={`space-y-8 transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"
-            }`}
-          >
+          <FadeIn direction="left" className="space-y-8">
             <div>
               <h3 className="text-lg font-semibold text-content-primary mb-3">
                 Direct lines
@@ -293,13 +269,9 @@ export default function ContactSection() {
                 ))}
               </div>
             </div>
-          </div>
+          </FadeIn>
 
-          <div
-            className={`transition-all duration-700 delay-150 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-6"
-            }`}
-          >
+          <FadeIn direction="right" delay={0.15}>
             <div className="rounded-lg border border-border-subtle bg-surface-elevated p-6 sm:p-8 shadow-sm">
               <h3 className="text-lg font-semibold text-content-primary mb-6">
                 Message
@@ -459,10 +431,9 @@ export default function ContactSection() {
                 </button>
               </form>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </Container>
-      </div>
     </Section>
   );
 }

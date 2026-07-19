@@ -43,6 +43,10 @@ const DEFAULT_COLOR_PALETTE = [
  */
 const LINE_OPACITY = 0.55;
 
+/** Page-native backdrop for the canvas and its loading/error states. */
+const BACKDROP_CLASS =
+  "bg-gradient-to-br from-surface-page via-surface-elevated to-surface-subtle";
+
 /**
  * Generates an array of THREE.Vector3 points for a parametric wave line
  *
@@ -340,7 +344,11 @@ function LineWaveSystem({
  */
 function StaticGradientFallback() {
   return (
-    <div className="absolute inset-0 bg-surface-page" aria-hidden>
+    <div
+      className="absolute inset-0 bg-surface-page"
+      data-testid="wave-static-fallback"
+      aria-hidden
+    >
       {/* Same faint grid the rest of the site uses */}
       <div className="absolute inset-0 bg-grid-faint opacity-70" />
       {/* One soft cyan glow, echoing the sparse accent language */}
@@ -361,8 +369,10 @@ function StaticGradientFallback() {
  */
 function LoadingFallback() {
   return (
-    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
-      <div className="text-slate-400 text-sm">Loading visualization...</div>
+    <div
+      className={`absolute inset-0 ${BACKDROP_CLASS} flex items-center justify-center`}
+    >
+      <div className="text-content-muted text-sm">Loading visualization…</div>
     </div>
   );
 }
@@ -521,17 +531,18 @@ export default function WaveLineVisualization({
 
   // Show static fallback if user prefers reduced motion
   if (prefersReducedMotion) {
-    console.info(
-      "WaveLineVisualization: User prefers reduced motion. Showing static fallback."
-    );
     return <StaticGradientFallback />;
   }
 
   // Show fallback if WebGL context is lost
   if (contextLost) {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
-        <div className="text-slate-400 text-sm">Restoring visualization...</div>
+      <div
+        className={`absolute inset-0 ${BACKDROP_CLASS} flex items-center justify-center`}
+      >
+        <div className="text-content-muted text-sm">
+          Restoring visualization…
+        </div>
       </div>
     );
   }
@@ -548,8 +559,11 @@ export default function WaveLineVisualization({
       aria-label="Animated background visualization"
       role="img"
     >
-      {/* Light background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 z-0"></div>
+      {/* Page-native background gradient */}
+      <div
+        className={`absolute inset-0 ${BACKDROP_CLASS} z-0`}
+        data-testid="wave-backdrop"
+      />
 
       {/* Three.js Canvas */}
       <div className="absolute inset-0 z-1 opacity-90">

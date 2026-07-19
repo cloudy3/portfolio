@@ -108,13 +108,12 @@ describe("WaveLineVisualization - Visual and Functional Testing", () => {
       expect(visualizationContainer).toHaveAttribute("role", "img");
     });
 
-    it("should render with light background gradient", () => {
-      const { container } = render(<WaveLineVisualization />);
+    it("should render the page-native background gradient", () => {
+      render(<WaveLineVisualization />);
 
-      const background = container.querySelector(
-        ".bg-gradient-to-br.from-slate-50"
-      );
+      const background = screen.getByTestId("wave-backdrop");
       expect(background).toBeInTheDocument();
+      expect(background.className).toMatch(/from-surface-page/);
     });
   });
 
@@ -210,7 +209,9 @@ describe("WaveLineVisualization - Visual and Functional Testing", () => {
         const canvas = screen.queryByTestId("r3f-canvas");
         expect(canvas).not.toBeInTheDocument();
 
-        const fallback = container.querySelector(".bg-gradient-to-br");
+        const fallback = container.querySelector(
+          '[data-testid="wave-static-fallback"]'
+        );
         expect(fallback).toBeInTheDocument();
       });
     });
@@ -230,8 +231,16 @@ describe("WaveLineVisualization - Visual and Functional Testing", () => {
       const { container } = render(<WaveLineVisualization />);
 
       await waitFor(() => {
-        const fallback = container.querySelector(".bg-gradient-to-br");
+        const fallback = container.querySelector(
+          '[data-testid="wave-static-fallback"]'
+        );
         expect(fallback).toBeInTheDocument();
+        // The reduced-motion hero must read as the same site: page surface +
+        // the shared faint grid, not a foreign gradient.
+        expect(fallback?.className).toMatch(/bg-surface-page/);
+        expect(
+          fallback?.querySelector(".bg-grid-faint")
+        ).toBeInTheDocument();
       });
     });
   });

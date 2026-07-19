@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 export default function GlobalError({
   error,
   reset,
@@ -7,6 +9,11 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Logged, never rendered — see error.tsx.
+    console.error(error);
+  }, [error]);
+
   return (
     <html lang="en">
       <body className="bg-surface-page text-content-primary">
@@ -16,7 +23,7 @@ export default function GlobalError({
             Something went wrong
           </h1>
           <p className="max-w-xl text-content-secondary mb-8">
-            {error.message || "An unexpected error occurred."}
+            An unexpected error occurred. Reloading usually resolves it.
           </p>
           <button
             type="button"

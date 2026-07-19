@@ -27,6 +27,17 @@ vi.mock("next/dynamic", () => ({
 }));
 
 vi.mock("framer-motion", () => {
+  // Motion-only props must not reach the DOM or React warns about them.
+  const MOTION_PROPS = new Set([
+    "initial",
+    "animate",
+    "exit",
+    "variants",
+    "transition",
+    "whileInView",
+    "viewport",
+  ]);
+
   const passthrough = (Tag: "div" | "h1" | "p") =>
     function MotionTag({
       children,
@@ -35,14 +46,23 @@ vi.mock("framer-motion", () => {
       children?: React.ReactNode;
       [key: string]: unknown;
     }) {
-      return React.createElement(Tag, rest, children);
+      const domProps = Object.fromEntries(
+        Object.entries(rest).filter(([key]) => !MOTION_PROPS.has(key))
+      );
+      return React.createElement(Tag, domProps, children);
     };
+
   const motion = {
     div: passthrough("div"),
     h1: passthrough("h1"),
     p: passthrough("p"),
   };
-  return { motion, useReducedMotion: () => false };
+
+  return {
+    motion,
+    useReducedMotion: () => false,
+    MotionConfig: ({ children }: { children?: React.ReactNode }) => children,
+  };
 });
 
 vi.mock("../../shared/ErrorBoundary", () => ({

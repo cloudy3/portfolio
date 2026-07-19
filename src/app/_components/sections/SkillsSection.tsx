@@ -125,9 +125,11 @@ export default function SkillsSection() {
         </FadeIn>
 
         <FadeIn delay={0.06}>
+          {/* No role="toolbar": that contract requires arrow-key roving
+              tabindex. These are plain toggle buttons — aria-pressed already
+              conveys state, and Tab reaches each one. */}
           <div
             className="mb-6 flex flex-wrap gap-1.5"
-            role="toolbar"
             aria-label="Filter skills by domain"
           >
             {FILTER_CATEGORIES.map((category) => {
