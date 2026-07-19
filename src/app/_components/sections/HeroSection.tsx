@@ -2,7 +2,8 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { MotionConfig, motion, useReducedMotion } from "framer-motion";
+import { MotionConfig, motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
 import { fadeUp, staggerContainer, transitions } from "@/lib/motion";
@@ -27,7 +28,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ className = "" }: HeroSectionProps) {
-  const reduce = useReducedMotion();
+  // See usePrefersReducedMotion: framer's equivalent can latch a stale value.
+  const reduce = usePrefersReducedMotion();
 
   return (
     <section

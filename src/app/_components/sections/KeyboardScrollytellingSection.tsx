@@ -3,10 +3,10 @@
 import {
   motion,
   useMotionValueEvent,
-  useReducedMotion,
   useScroll,
   useSpring,
 } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DEFAULT_BACKGROUND,
@@ -30,7 +30,10 @@ export default function KeyboardScrollytellingSection() {
   const currentFrameRef = useRef<number>(0);
   const hasDrawnInitialRef = useRef(false);
 
-  const shouldReduceMotion = useReducedMotion();
+  // Not framer's useReducedMotion: it caches in a useState initializer and can
+  // stay false for the component's lifetime, which left the 400vh scroll
+  // region in place for reduced-motion visitors.
+  const shouldReduceMotion = usePrefersReducedMotion();
 
   const [frames, setFrames] = useState<HTMLImageElement[]>([]);
   const [frameBackgrounds, setFrameBackgrounds] = useState<string[]>([]);

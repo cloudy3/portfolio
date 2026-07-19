@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { transitions } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 /** Direction the element travels *from* as it fades in. */
@@ -37,7 +38,8 @@ export function FadeIn({
   direction = "up",
   offset = 24,
 }: FadeInProps) {
-  const reduce = useReducedMotion();
+  // See usePrefersReducedMotion: framer's equivalent can latch a stale value.
+  const reduce = usePrefersReducedMotion();
 
   if (reduce) {
     return <div className={className}>{children}</div>;
