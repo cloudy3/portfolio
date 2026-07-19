@@ -157,8 +157,8 @@ export const sampleProjects: Project[] = [
     ],
     category: "web",
     images: ["/projects/portfolio-1.png"],
-    liveUrl: "https://portfolio.jingfeng.dev",
-    githubUrl: "https://github.com/jingfeng/portfolio-website",
+    liveUrl: "https://www.jingfeng-cheah.me/",
+    githubUrl: "https://github.com/cloudy3/portfolio",
     featured: true,
     completedAt: new Date("2024-02-28"),
   },
@@ -172,7 +172,7 @@ export const getAllProjectSlugs = (): string[] =>
 
 export const filterProjectsByCategory = (
   projects: Project[],
-  category: string
+  category: string,
 ): Project[] => {
   if (category === "all") {
     return projects;
@@ -182,31 +182,31 @@ export const filterProjectsByCategory = (
 
 export const filterProjectsByTechnology = (
   projects: Project[],
-  technology: string
+  technology: string,
 ): Project[] => {
   return projects.filter((project) =>
     project.technologies.some((tech) =>
-      tech.toLowerCase().includes(technology.toLowerCase())
-    )
+      tech.toLowerCase().includes(technology.toLowerCase()),
+    ),
   );
 };
 
 export const searchProjects = (
   projects: Project[],
-  searchTerm: string
+  searchTerm: string,
 ): Project[] => {
   const term = searchTerm.toLowerCase();
   return projects.filter(
     (project) =>
       project.title.toLowerCase().includes(term) ||
       project.description.toLowerCase().includes(term) ||
-      project.technologies.some((tech) => tech.toLowerCase().includes(term))
+      project.technologies.some((tech) => tech.toLowerCase().includes(term)),
   );
 };
 
 export const sortProjectsByDate = (
   projects: Project[],
-  ascending: boolean = false
+  ascending: boolean = false,
 ): Project[] => {
   return [...projects].sort((a, b) => {
     const dateA = new Date(a.completedAt).getTime();
@@ -230,7 +230,7 @@ export const getFeaturedProjects = (projects: Project[]): Project[] => {
 };
 
 export const getProjectCategoryCounts = (
-  projects: Project[]
+  projects: Project[],
 ): Record<string, number> => {
   const counts: Record<string, number> = {
     all: projects.length,
@@ -257,27 +257,27 @@ export const getAllTechnologies = (projects: Project[]): string[] => {
 
 export const getProjectsByTechnology = (
   projects: Project[],
-  technology: string
+  technology: string,
 ): Project[] => {
   return projects.filter((project) =>
-    project.technologies.includes(technology)
+    project.technologies.includes(technology),
   );
 };
 
 export const getRecentProjects = (
   projects: Project[],
-  months: number = 6
+  months: number = 6,
 ): Project[] => {
   const cutoffDate = new Date();
   cutoffDate.setMonth(cutoffDate.getMonth() - months);
 
   return projects.filter(
-    (project) => new Date(project.completedAt) >= cutoffDate
+    (project) => new Date(project.completedAt) >= cutoffDate,
   );
 };
 
 export const getProjectsByTechStack = (
-  projects: Project[]
+  projects: Project[],
 ): {
   flutter: Project[];
   python: Project[];
@@ -289,15 +289,15 @@ export const getProjectsByTechStack = (
       p.technologies.some(
         (tech) =>
           tech.toLowerCase().includes("flutter") ||
-          tech.toLowerCase().includes("dart")
-      )
+          tech.toLowerCase().includes("dart"),
+      ),
     ),
     python: projects.filter((p) =>
       p.technologies.some(
         (tech) =>
           tech.toLowerCase().includes("python") ||
-          tech.toLowerCase().includes("flask")
-      )
+          tech.toLowerCase().includes("flask"),
+      ),
     ),
     googleCloud: projects.filter((p) =>
       p.technologies.some(
@@ -306,8 +306,8 @@ export const getProjectsByTechStack = (
           tech.toLowerCase().includes("firebase") ||
           tech.toLowerCase().includes("firestore") ||
           tech.toLowerCase().includes("cloud run") ||
-          tech.toLowerCase().includes("compute engine")
-      )
+          tech.toLowerCase().includes("compute engine"),
+      ),
     ),
     webDevelopment: projects.filter((p) =>
       p.technologies.some(
@@ -315,8 +315,8 @@ export const getProjectsByTechStack = (
           tech.toLowerCase().includes("next.js") ||
           tech.toLowerCase().includes("react") ||
           tech.toLowerCase().includes("angular") ||
-          tech.toLowerCase().includes("typescript")
-      )
+          tech.toLowerCase().includes("typescript"),
+      ),
     ),
   };
 };

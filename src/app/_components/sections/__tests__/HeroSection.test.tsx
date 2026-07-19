@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi } from "vitest";
 import HeroSection from "../HeroSection";
 
-jest.mock("next/link", () => ({
+vi.mock("next/link", () => ({
   __esModule: true,
   default ({
     children,
@@ -16,7 +16,7 @@ jest.mock("next/link", () => ({
   },
 }));
 
-jest.mock("next/dynamic", () => ({
+vi.mock("next/dynamic", () => ({
   __esModule: true,
   default: () => {
     function MockWave() {
@@ -26,7 +26,7 @@ jest.mock("next/dynamic", () => ({
   },
 }));
 
-jest.mock("framer-motion", () => {
+vi.mock("framer-motion", () => {
   const passthrough = (Tag: "div" | "h1" | "p") =>
     function MotionTag({
       children,
@@ -45,7 +45,7 @@ jest.mock("framer-motion", () => {
   return { motion, useReducedMotion: () => false };
 });
 
-jest.mock("../../shared/ErrorBoundary", () => ({
+vi.mock("../../shared/ErrorBoundary", () => ({
   ErrorBoundary: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="error-boundary">{children}</div>
   ),
@@ -53,8 +53,8 @@ jest.mock("../../shared/ErrorBoundary", () => ({
 
 describe("HeroSection", () => {
   beforeEach(() => {
-    window.scrollTo = jest.fn();
-    document.getElementById = jest.fn((id: string) => {
+    window.scrollTo = vi.fn();
+    document.getElementById = vi.fn((id: string) => {
       if (id === "work" || id === "contact" || id === "about") {
         return document.createElement("div");
       }

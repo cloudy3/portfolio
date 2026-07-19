@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi } from "vitest";
 import ContactSection from "../sections/ContactSection";
 
-jest.mock("@emailjs/browser", () => ({
-  send: jest.fn(() => Promise.resolve({ status: 200 })),
+vi.mock("@emailjs/browser", () => ({
+  send: vi.fn(() => Promise.resolve({ status: 200 })),
 }));
 
-jest.mock("framer-motion", () => {
+vi.mock("framer-motion", () => {
   const React = require("react");
   return {
     motion: { div: ({ children, ...p }: { children?: React.ReactNode }) => <div {...p}>{children}</div> },

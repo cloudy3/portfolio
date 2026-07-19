@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi, type Mock } from "vitest";
 import WaveLineVisualization from "../WaveLineVisualization";
 
 interface MockCanvasProps {
@@ -12,7 +12,7 @@ interface MockFrameState {
 }
 
 // Mock React Three Fiber
-jest.mock("@react-three/fiber", () => ({
+vi.mock("@react-three/fiber", () => ({
   Canvas: ({ children, onCreated }: MockCanvasProps) => {
     // Simulate canvas creation
     if (onCreated) {
@@ -23,7 +23,7 @@ jest.mock("@react-three/fiber", () => ({
     }
     return <div data-testid="r3f-canvas">{children}</div>;
   },
-  useFrame: jest.fn((callback: (state: MockFrameState) => void) => {
+  useFrame: vi.fn((callback: (state: MockFrameState) => void) => {
     // Simulate a frame update
     const mockState: MockFrameState = {
       clock: { getElapsedTime: () => 0 },
@@ -33,7 +33,7 @@ jest.mock("@react-three/fiber", () => ({
 }));
 
 // Mock Three.js classes (defined inside factory to avoid TDZ)
-jest.mock("three", () => {
+vi.mock("three", () => {
   class MBufferGeometry {
     attributes = { position: { needsUpdate: false } };
     setFromPoints() {
@@ -46,7 +46,7 @@ jest.mock("three", () => {
   class MLine {
     geometry: MBufferGeometry;
     material: MLineBasicMaterial;
-    position = { set: jest.fn() };
+    position = { set: vi.fn() };
     constructor(geometry: MBufferGeometry, material: MLineBasicMaterial) {
       this.geometry = geometry;
       this.material = material;
@@ -63,26 +63,26 @@ jest.mock("three", () => {
 });
 
 // Mock detectWebGLSupport
-jest.mock("@/lib/webgl", () => ({
-  detectWebGLSupport: jest.fn(() => true),
+vi.mock("@/lib/webgl", () => ({
+  detectWebGLSupport: vi.fn(() => true),
 }));
 
 describe("WaveLineVisualization - Visual and Functional Testing", () => {
-  let matchMediaMock: jest.Mock;
+  let matchMediaMock: Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Reset window.matchMedia mock - default to NO reduced motion
-    matchMediaMock = jest.fn().mockImplementation((query) => ({
+    matchMediaMock = vi.fn().mockImplementation((query) => ({
       matches: false, // Default: no reduced motion
       media: query,
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
     }));
 
     Object.defineProperty(window, "matchMedia", {
@@ -192,15 +192,15 @@ describe("WaveLineVisualization - Visual and Functional Testing", () => {
   describe("Reduced Motion Support", () => {
     it("should respect prefers-reduced-motion preference", async () => {
       // Mock reduced motion preference
-      matchMediaMock.mockImplementation((query) => ({
+      matchMediaMock.mockImplementation((query: string) => ({
         matches: query === "(prefers-reduced-motion: reduce)",
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       }));
 
       const { container } = render(<WaveLineVisualization />);
@@ -216,15 +216,15 @@ describe("WaveLineVisualization - Visual and Functional Testing", () => {
     });
 
     it("should show static fallback for reduced motion", async () => {
-      matchMediaMock.mockImplementation((query) => ({
+      matchMediaMock.mockImplementation((query: string) => ({
         matches: query === "(prefers-reduced-motion: reduce)",
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       }));
 
       const { container } = render(<WaveLineVisualization />);

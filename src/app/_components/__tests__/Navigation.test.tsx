@@ -1,27 +1,31 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi, type Mock } from "vitest";
 import { usePathname } from "next/navigation";
 import Navigation from "../shared/Navigation";
 
-jest.mock("next/navigation", () => ({
-  usePathname: jest.fn(),
+vi.mock("next/navigation", () => ({
+  usePathname: vi.fn(),
 }));
 
-const mockUsePathname = usePathname as jest.Mock;
+const mockUsePathname = usePathname as Mock;
 
 describe("Navigation", () => {
   beforeEach(() => {
     mockUsePathname.mockReset();
     mockUsePathname.mockReturnValue("/");
-    window.scrollTo = jest.fn();
+    window.scrollTo = vi.fn();
     Object.defineProperty(window, "scrollY", { value: 0, writable: true });
-    document.getElementById = jest.fn((id: string) => {
+    const realGetElementById =
+      Document.prototype.getElementById.bind(document);
+    document.getElementById = vi.fn((id: string) => {
       if (["hero", "work", "about", "skills", "experience", "contact"].includes(id)) {
         const el = document.createElement("div");
         el.id = id;
         return el;
       }
-      return null;
+      // jsdom's querySelector("#id") delegates to getElementById, so fall
+      // back to the real lookup for everything else.
+      return realGetElementById(id);
     });
   });
 

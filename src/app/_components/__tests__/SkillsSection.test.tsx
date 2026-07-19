@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi } from "vitest";
 import SkillsSection from "../sections/SkillsSection";
 import { SKILLS_DATA } from "@/lib/data/skills";
 
-jest.mock("framer-motion", () => {
+vi.mock("framer-motion", () => {
   const React = require("react");
   return {
     motion: { div: ({ children, ...p }: { children?: React.ReactNode }) => <div {...p}>{children}</div> },

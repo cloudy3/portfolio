@@ -1,15 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi } from "vitest";
 import AboutSection from "../AboutSection";
 
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default (props: { alt: string }) {
     return <img alt={props.alt || "photo"} src="/x.png" />;
   },
 }));
 
-jest.mock("framer-motion", () => {
+vi.mock("framer-motion", () => {
   const React = require("react");
   return {
     motion: { div: ({ children, ...p }: { children?: React.ReactNode }) => <div {...p}>{children}</div> },

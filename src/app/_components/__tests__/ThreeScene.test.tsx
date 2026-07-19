@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 // Tests for ThreeScene WebGL detection functionality
 import { detectWebGLSupport } from "../shared/ThreeScene";
 
@@ -5,17 +6,17 @@ function createGlMock() {
   return {
     VERTEX_SHADER: 35633,
     COMPILE_STATUS: 35713,
-    createShader: jest.fn(() => ({})),
-    shaderSource: jest.fn(),
-    compileShader: jest.fn(),
-    getShaderParameter: jest.fn(() => true),
-    deleteShader: jest.fn(),
-    getExtension: jest.fn(() => ({})),
+    createShader: vi.fn(() => ({})),
+    shaderSource: vi.fn(),
+    compileShader: vi.fn(),
+    getShaderParameter: vi.fn(() => true),
+    deleteShader: vi.fn(),
+    getExtension: vi.fn(() => ({})),
   };
 }
 
-const mockGetContext = jest.fn();
-const mockCreateElement = jest.fn(() => ({
+const mockGetContext = vi.fn();
+const mockCreateElement = vi.fn(() => ({
   getContext: mockGetContext,
 }));
 
@@ -26,7 +27,7 @@ Object.defineProperty(document, "createElement", {
 
 describe("ThreeScene WebGL Detection", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCreateElement.mockReturnValue({
       getContext: mockGetContext,
     });
