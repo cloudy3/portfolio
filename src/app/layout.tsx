@@ -2,9 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
-import ScrollProvider from "./_components/shared/ScrollProvider";
-import BrowserCompatibility from "./_components/ui/BrowserCompatibility";
-import PerformanceMonitor from "./_components/shared/PerformanceMonitor";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
 
@@ -87,16 +84,12 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}
       >
-        <PerformanceMonitor />
         <AccessibilityAuditor />
         <AccessibilityProvider>
-          <BrowserCompatibility />
           <Navigation />
-          <ScrollProvider>
-            <main id="main-content" className="relative pt-16">
-              {children}
-            </main>
-          </ScrollProvider>
+          <main id="main-content" className="relative pt-16">
+            {children}
+          </main>
         </AccessibilityProvider>
       </body>
     </html>

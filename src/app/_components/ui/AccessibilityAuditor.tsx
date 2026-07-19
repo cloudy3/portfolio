@@ -78,14 +78,25 @@ const AccessibilityAuditor = () => {
         console.log("✅ Main landmark found");
       }
 
-      // Check color contrast (sample check)
-      const colorContrast = checkColorContrast("#1a1a2e", "#ffffff");
-      if (colorContrast < 4.5) {
-        console.warn(`Low color contrast ratio: ${colorContrast.toFixed(2)}`);
-      } else {
-        console.log(
-          `✅ Good color contrast ratio: ${colorContrast.toFixed(2)}`
-        );
+      // Check color contrast for the theme's real body-text pairs. These
+      // mirror the @theme tokens in globals.css; the previous check used
+      // #1a1a2e on #ffffff, colors the site no longer uses.
+      const CONTRAST_PAIRS: Array<[string, string, string]> = [
+        ["body text on page", "#1a1a1c", "#faf8f5"],
+        ["secondary text on page", "#4a4a52", "#faf8f5"],
+        ["muted text on page", "#6b6b76", "#faf8f5"],
+        ["inverse text on inverse surface", "#f4f4f5", "#161618"],
+      ];
+
+      for (const [label, fg, bg] of CONTRAST_PAIRS) {
+        const ratio = checkColorContrast(fg, bg);
+        if (ratio < 4.5) {
+          console.warn(
+            `Low color contrast (${label}): ${ratio.toFixed(2)} — needs 4.5`
+          );
+        } else {
+          console.log(`✅ Contrast OK (${label}): ${ratio.toFixed(2)}`);
+        }
       }
 
       // Check for keyboard navigation

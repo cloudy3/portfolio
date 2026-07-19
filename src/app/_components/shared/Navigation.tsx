@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAVIGATION_ITEMS, Z_INDEX } from "@/lib/constants";
+import { NAVIGATION_ITEMS } from "@/lib/constants";
 import { cn, smoothScrollTo } from "@/lib/utils";
 
 interface NavigationProps {
@@ -116,7 +116,6 @@ export default function Navigation({ className }: NavigationProps) {
           : "bg-transparent border-transparent",
         className
       )}
-      style={{ zIndex: Z_INDEX.fixed }}
       aria-label="Main"
     >
       <a href="#main-content" className="skip-link">

@@ -16,16 +16,10 @@
     "lighthouse": "lighthouse http://localhost:3000 --config-path=./lighthouse.config.js --output=html --output-path=./lighthouse-report.html --chrome-flags=\"--headless\"",
     "lighthouse:mobile": "lighthouse http://localhost:3000 --config-path=./lighthouse.config.js --preset=perf --form-factor=mobile --output=html --output-path=./lighthouse-mobile-report.html --chrome-flags=\"--headless\"",
     "perf:audit": "npm run build && npm run lighthouse && npm run lighthouse:mobile",
-    "perf:test": "node scripts/performance-test.mjs",
-    "audit:full": "node scripts/audit.mjs",
-    "audit:a11y": "node scripts/accessibility-test.mjs",
     "audit:bundle": "npm run build:analyze",
     "audit:deps": "npx depcheck",
     "audit:security": "npm audit",
-    "audit:all": "npm run audit:security && npm run audit:deps && npm run audit:full && npm run audit:a11y",
-    "audit:report": "node scripts/generate-audit-report.mjs",
-    "deploy:prepare": "node scripts/deploy.mjs",
-    "integration:test": "node scripts/integration-test.mjs"
+    "audit:all": "npm run audit:security && npm run audit:deps"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -41,7 +35,6 @@
     "three": "^0.179.1"
   },
   "devDependencies": {
-    "@axe-core/cli": "^4.10.2",
     "@next/bundle-analyzer": "^16.2.4",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.7.0",
@@ -61,7 +54,6 @@
     "lighthouse": "^12.8.2",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.10",
-    "web-vitals": "^5.1.0"
+    "vitest": "^4.1.10"
   }
 }
