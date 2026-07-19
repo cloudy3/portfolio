@@ -27,6 +27,23 @@ interface LineConfig {
 }
 
 /**
+ * The site's four accent tokens (--accent-cyan/blue/violet/lime), cycled across
+ * the lines. Three.js needs literal values, so these mirror globals.css.
+ */
+const DEFAULT_COLOR_PALETTE = [
+  "#06b6d4", // accent-cyan
+  "#2563eb", // accent-blue
+  "#7c3aed", // accent-violet
+  "#84cc16", // accent-lime
+];
+
+/**
+ * Line opacity. The palette is more saturated than the old pastel one, so the
+ * lines are drawn lighter to stay a background element on the cream page.
+ */
+const LINE_OPACITY = 0.55;
+
+/**
  * Generates an array of THREE.Vector3 points for a parametric wave line
  *
  * This function creates smooth, flowing wave patterns using parametric equations.
@@ -287,7 +304,7 @@ function LineWaveSystem({
           color: color,
           linewidth: isMobile ? 3 : 5, // Thickness optimized for visibility
           transparent: true,
-          opacity: 0.88, // Slightly increased for better color vibrancy
+          opacity: LINE_OPACITY,
         });
 
         const line = new Line(geometry, material);
@@ -323,13 +340,13 @@ function LineWaveSystem({
  */
 function StaticGradientFallback() {
   return (
-    <div className="absolute inset-0 bg-gradient-to-br from-pink-100 via-purple-50 to-cyan-100">
-      <div className="absolute inset-0 opacity-30">
-        {/* Static decorative elements */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-pink-200 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-cyan-200 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-200 rounded-full blur-3xl"></div>
-      </div>
+    <div className="absolute inset-0 bg-surface-page" aria-hidden>
+      {/* Same faint grid the rest of the site uses */}
+      <div className="absolute inset-0 bg-grid-faint opacity-70" />
+      {/* One soft cyan glow, echoing the sparse accent language */}
+      <div className="absolute left-1/2 top-1/2 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-cyan/10 blur-3xl" />
+      {/* Fade the grid out toward the bottom so section edges stay calm */}
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-surface-page to-transparent" />
     </div>
   );
 }
@@ -522,25 +539,8 @@ export default function WaveLineVisualization({
   // Determine line count based on device type if not explicitly provided
   const effectiveLineCount = lineCount ?? (isMobile ? 6 : 12);
 
-  // Default color palette - vibrant Japanese-inspired colors
-  // Carefully curated for visual harmony and contrast on light background
-  const defaultColorPalette = [
-    "#FF6B9D", // Vibrant Pink - primary accent
-    "#4ECDC4", // Bright Cyan - cool contrast
-    "#AA96DA", // Rich Purple - depth
-    "#F38181", // Warm Coral - energy
-    "#95E1D3", // Soft Mint - freshness
-    "#FF8FB1", // Hot Pink - vibrancy
-    "#6C5CE7", // Electric Purple - modern
-    "#FD79A8", // Rose Pink - elegance
-    "#74B9FF", // Sky Blue - calm
-    "#A29BFE", // Lavender - sophistication
-    "#FDCB6E", // Golden Yellow - warmth
-    "#55EFC4", // Turquoise - energy
-  ];
-
-  // Use provided color palette or default
-  const effectiveColorPalette = colorPalette ?? defaultColorPalette;
+  // Use provided color palette or the theme accents
+  const effectiveColorPalette = colorPalette ?? DEFAULT_COLOR_PALETTE;
 
   return (
     <div
