@@ -53,202 +53,222 @@
   --focus-offset: 2px;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/*
+ * IMPORTANT — everything below is layered on purpose.
+ *
+ * Unlayered CSS outranks every cascade layer, so plain rules here silently
+ * defeat Tailwind utilities. As unlayered CSS, the `h1-h6` colour below beat
+ * `text-accent-lime` on a heading, rendering #1a1a1c on the dark Experience
+ * section (#161618) — a 1.03:1 contrast ratio. Base rules belong in
+ * @layer base and shared classes in @layer components, which puts them below
+ * @layer utilities where Tailwind's classes live.
+ *
+ * The reduced-motion kill-switch at the bottom is intentionally left
+ * unlayered: it must win against everything.
+ */
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: var(--header-height);
-}
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-@media (prefers-reduced-motion: reduce) {
   html {
-    scroll-behavior: auto;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--header-height);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    line-height: 1.6;
+    background-color: var(--color-surface-page);
+    color: var(--color-content-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+  }
+
+  /* Focus: visible only, accent-aligned */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Typography rhythm */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0;
+    color: var(--color-content-primary);
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  }
+
+  p {
+    font-size: clamp(1rem, 2vw, 1.0625rem);
+    line-height: 1.7;
+    color: var(--color-content-secondary);
+    margin: 0;
   }
 }
 
-body {
-  margin: 0;
-  font-family: var(--font-sans), system-ui, sans-serif;
-  line-height: 1.6;
-  background-color: var(--color-surface-page);
-  color: var(--color-content-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-size-adjust: 100%;
-}
+@layer components {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
-/* Focus: visible only, accent-aligned */
-:focus {
-  outline: none;
-}
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    z-index: 99999;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface-inverse);
+    color: var(--color-content-inverse);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: top 0.2s ease;
+  }
 
-:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: var(--focus-offset);
-}
+  .skip-link:focus {
+    top: 1rem;
+  }
 
-/* Utilities */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 1rem;
-  z-index: 99999;
-  padding: 0.5rem 1rem;
-  background: var(--color-surface-inverse);
-  color: var(--color-content-inverse);
-  font-weight: 600;
-  font-size: 0.875rem;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  transition: top 0.2s ease;
-}
-
-.skip-link:focus {
-  top: 1rem;
-}
-
-.section-padding {
-  padding-top: var(--section-padding);
-  padding-bottom: var(--section-padding);
-}
-
-@media (max-width: 768px) {
   .section-padding {
-    padding-top: var(--section-padding-mobile);
-    padding-bottom: var(--section-padding-mobile);
+    padding-top: var(--section-padding);
+    padding-bottom: var(--section-padding);
   }
-}
 
-.container-custom {
-  width: 100%;
-  max-width: var(--container-content);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--container-padding);
-  padding-right: var(--container-padding);
-}
+  @media (max-width: 768px) {
+    .section-padding {
+      padding-top: var(--section-padding-mobile);
+      padding-bottom: var(--section-padding-mobile);
+    }
+  }
 
-@media (min-width: 1024px) {
   .container-custom {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    width: 100%;
+    max-width: var(--container-content);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+  }
+
+  @media (min-width: 1024px) {
+    .container-custom {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  .line-clamp-1,
+  .line-clamp-2,
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+  }
+
+  .line-clamp-1 {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  /* Mono uppercase eyebrow. A colour utility on the same element wins. */
+  .font-mono-label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-content-muted);
+  }
+
+  /* Grid background (subtle) */
+  .bg-grid-faint {
+    background-image: linear-gradient(
+        var(--color-border-subtle) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .keyboard-story-canvas {
+    display: block;
+    background: var(--color-surface-page);
+  }
+
+  .keyboard-story-loader {
+    background: linear-gradient(
+      to bottom,
+      rgba(250, 248, 245, 0.62),
+      rgba(250, 248, 245, 0.86)
+    );
+    backdrop-filter: blur(4px);
   }
 }
 
-.line-clamp-1,
-.line-clamp-2,
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-}
-
-.line-clamp-1 {
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-}
-
-.line-clamp-2 {
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-}
-
-.line-clamp-3 {
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-}
-
-/* Typography rhythm */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin: 0;
-  color: var(--color-content-primary);
-}
-
-h1 {
-  font-size: clamp(2.25rem, 5vw, 3.5rem);
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  line-height: 1.08;
-}
-
-h2 {
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-  font-weight: 600;
-}
-
-h3 {
-  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-}
-
-p {
-  font-size: clamp(1rem, 2vw, 1.0625rem);
-  line-height: 1.7;
-  color: var(--color-content-secondary);
-  margin: 0;
-}
-
-.font-mono-label {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-content-muted);
-}
-
-/* Grid background (subtle) */
-.bg-grid-faint {
-  background-image: linear-gradient(
-      var(--color-border-subtle) 1px,
-      transparent 1px
-    ),
-    linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-
-.touch-manipulation {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.keyboard-story-canvas {
-  display: block;
-  background: var(--color-surface-page);
-}
-
-.keyboard-story-loader {
-  background: linear-gradient(
-    to bottom,
-    rgba(250, 248, 245, 0.62),
-    rgba(250, 248, 245, 0.86)
-  );
-  backdrop-filter: blur(4px);
-}
+/* Unlayered from here down — these must outrank everything above. */
 
 @media (prefers-reduced-motion: reduce) {
   *,
