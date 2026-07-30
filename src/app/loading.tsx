@@ -1,45 +1,37 @@
 /**
- * Loading Component (Splash Screen)
+ * Loading interstitial.
  *
- * Matches the hero's calm cream surface: the faint site grid, a single soft
- * cyan accent, and a quiet pulse. Deliberately restrained — this is a brief
- * interstitial, not a showpiece.
+ * Deliberately restrained: a brief interstitial, not a showpiece. The three
+ * pulsing accent dots this replaces were decorative status dots, and the mono
+ * uppercase "Loading" label above the headline was the section-eyebrow tell in
+ * miniature. One accent segment on a track carries the same signal in the page's
+ * own language, and it degrades to a static rule under reduced motion.
+ *
+ * min-h-[100dvh] rather than h-screen: h-screen jumps when the mobile Safari
+ * address bar collapses.
  */
 export default function Loading() {
   return (
     <div
-      className="relative flex h-screen items-center justify-center overflow-hidden bg-surface-page"
+      className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-surface-page"
       role="status"
       aria-label="Loading"
     >
       <div className="absolute inset-0 bg-grid-faint opacity-70" aria-hidden />
-      <div
-        className="absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-cyan/10 blur-3xl"
-        aria-hidden
-      />
 
-      <div className="relative z-10 px-4 text-center">
-        <p className="font-mono-label mb-4">Loading</p>
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-content-primary mb-3">
+      <div className="relative z-10 px-4">
+        <h2 className="text-2xl text-content-primary sm:text-3xl">
           One moment
         </h2>
-        <p className="text-content-secondary text-sm sm:text-base">
+        <p className="mt-[calc(var(--rhythm)*3)] text-sm text-content-secondary sm:text-base">
           Preparing the page.
         </p>
 
-        <div className="mt-8 flex justify-center gap-2" aria-hidden>
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-accent-cyan animate-pulse"
-            style={{ animationDelay: "0ms" }}
-          />
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-accent-cyan animate-pulse"
-            style={{ animationDelay: "150ms" }}
-          />
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-accent-cyan animate-pulse"
-            style={{ animationDelay: "300ms" }}
-          />
+        <div
+          className="mt-[calc(var(--rhythm)*8)] h-px w-40 bg-border-strong"
+          aria-hidden
+        >
+          <span className="block h-px w-1/3 animate-pulse bg-accent" />
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { ContactForm } from "@/types";
 import { VALIDATION, SOCIAL_LINKS, CONTACT_EMAIL } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { Container } from "../ui/Container";
 import { Section } from "../ui/Section";
 import { SectionHeader } from "../ui/SectionHeader";
@@ -24,12 +25,40 @@ interface FormState {
   submitError: string | null;
 }
 
+/**
+ * Field styling.
+ *
+ * The error state used to be red-600 / red-500 and the success banner
+ * emerald-500: a second and third accent on a site locked to one. Errors now use
+ * the locked accent, which works out here because shu-iro IS a red, so it reads
+ * as an error without importing a new hue. Verified at 5.4:1 in light and 4.8:1
+ * in dark against the elevated surface.
+ *
+ * Success deliberately does NOT take the accent. It gets a neutral ink
+ * treatment: green would have been a fourth hue, and "Sent. Thank you" does not
+ * need colour to be understood. Colour is not the sole indicator in either state.
+ */
 const inputClass = (hasError: boolean) =>
-  `w-full px-4 py-3 border rounded-md bg-surface-elevated text-content-primary placeholder:text-content-muted transition-shadow text-sm ${
+  cn(
+    "w-full rounded-control border bg-surface-elevated px-4 py-3 text-sm text-content-primary placeholder:text-content-muted transition-colors",
     hasError
-      ? "border-red-500/80 ring-1 ring-red-500/30"
-      : "border-border-strong hover:border-accent-cyan/25 focus:ring-2 focus:ring-accent-cyan/40 focus:border-accent-cyan/40"
-  }`;
+      ? "border-accent"
+      : "border-border-strong hover:border-content-muted focus:border-accent"
+  );
+
+const labelClass = "mb-2 block text-xs font-medium text-content-secondary";
+
+/**
+ * Direct lines.
+ *
+ * These were numbered "01 / 02 / 03" under mono uppercase labels. Email,
+ * location and response time are not a sequence, so the numbering applied
+ * ordering to facts that have none.
+ */
+const DIRECT_LINES = [
+  { label: "Location", value: "Remote and APAC-friendly hours" },
+  { label: "Response", value: "Typically within 24 hours" },
+];
 
 export default function ContactSection() {
   const [formData, setFormData] = useState<ContactForm>({
@@ -122,7 +151,11 @@ export default function ContactSection() {
 
     if (!validateForm()) return;
 
-    setFormState((prev) => ({ ...prev, isSubmitting: true, submitError: null }));
+    setFormState((prev) => ({
+      ...prev,
+      isSubmitting: true,
+      submitError: null,
+    }));
 
     try {
       const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
@@ -189,6 +222,13 @@ export default function ContactSection() {
     return "Link";
   };
 
+  const fieldError = (id: keyof FormErrors, message?: string) =>
+    message ? (
+      <p id={`${id}-error`} className="mt-2 text-xs text-accent-ink">
+        {message}
+      </p>
+    ) : null;
+
   return (
     <Section id="contact" variant="subtle" className="scroll-mt-20">
       <Container>
@@ -199,236 +239,189 @@ export default function ContactSection() {
           />
         </FadeIn>
 
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 max-w-6xl mx-auto">
-          <FadeIn className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold text-content-primary mb-3">
-                Direct lines
-              </h3>
-              <p className="text-content-secondary leading-relaxed text-sm md:text-base">
-                Prefer email for anything substantive—I read everything and
-                reply within about a day.
-              </p>
-            </div>
+        {/*
+         * The one two-column split on the page, which is why it is allowed here.
+         * Contact details on lanes 1-3, form on 5-8, lane 4 left empty.
+         */}
+        <div className="lane-grid">
+          <FadeIn className="md:col-span-3 md:pr-[var(--lane-inset)]">
+            <p className="max-w-[36ch] text-content-secondary">
+              Prefer email for anything substantive. I read everything and reply
+              within about a day.
+            </p>
 
-            <ul className="space-y-6">
-              <li className="flex gap-4">
-                <span className="font-mono text-xs text-accent-cyan w-10 pt-1">
-                  01
-                </span>
-                <div>
-                  <p className="font-mono-label mb-1">Email</p>
+            <dl className="mt-[calc(var(--rhythm)*10)] space-y-[calc(var(--rhythm)*6)]">
+              <div>
+                <dt className="text-xs text-content-muted">Email</dt>
+                <dd className="mt-1">
                   <a
                     href={`mailto:${CONTACT_EMAIL}`}
-                    className="text-content-primary hover:text-accent-cyan transition-colors"
+                    className="text-sm text-accent-ink underline decoration-transparent underline-offset-4 transition-colors hover:decoration-current"
                   >
                     {CONTACT_EMAIL}
                   </a>
-                </div>
-              </li>
-              <li className="flex gap-4">
-                <span className="font-mono text-xs text-accent-cyan w-10 pt-1">
-                  02
-                </span>
-                <div>
-                  <p className="font-mono-label mb-1">Location</p>
-                  <p className="text-content-secondary text-sm">
-                    Remote-friendly · APAC-friendly hours
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-4">
-                <span className="font-mono text-xs text-accent-cyan w-10 pt-1">
-                  03
-                </span>
-                <div>
-                  <p className="font-mono-label mb-1">Response</p>
-                  <p className="text-content-secondary text-sm">
-                    Typically within 24 hours
-                  </p>
-                </div>
-              </li>
-            </ul>
-
-            <div>
-              <p className="font-mono-label mb-3">Elsewhere</p>
-              <div className="flex flex-wrap gap-2">
-                {SOCIAL_LINKS.map((social) => (
-                  <a
-                    key={social.name}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-3 py-2 rounded-md border border-border-subtle bg-surface-elevated text-sm font-medium text-content-secondary hover:border-accent-cyan/35 hover:text-content-primary transition-colors"
-                    aria-label={`${socialLabel(social.icon)} profile`}
-                  >
-                    {social.name}
-                  </a>
-                ))}
+                </dd>
               </div>
+              {DIRECT_LINES.map((line) => (
+                <div key={line.label}>
+                  <dt className="text-xs text-content-muted">{line.label}</dt>
+                  <dd className="mt-1 text-sm text-content-secondary">
+                    {line.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="mt-[calc(var(--rhythm)*10)] flex flex-wrap gap-2 border-t border-border-subtle pt-[calc(var(--rhythm)*6)]">
+              {SOCIAL_LINKS.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-control border border-border-subtle px-3 py-2 text-xs font-medium text-content-secondary transition-colors hover:border-accent hover:text-content-primary active:translate-y-px"
+                  aria-label={`${socialLabel(social.icon)} profile`}
+                >
+                  {social.name}
+                </a>
+              ))}
             </div>
           </FadeIn>
 
-          <FadeIn beat={2}>
-            <div className="rounded-lg border border-border-subtle bg-surface-elevated p-6 sm:p-8 shadow-sm">
-              <h3 className="text-lg font-semibold text-content-primary mb-6">
-                Message
-              </h3>
+          <FadeIn beat={1} className="md:col-span-4 md:col-start-5">
+            {formState.isSubmitted && (
+              <div
+                className="mb-[calc(var(--rhythm)*6)] border border-border-strong bg-surface-elevated p-4 text-sm text-content-secondary"
+                role="alert"
+                aria-live="polite"
+              >
+                <p className="font-medium text-content-primary">
+                  Sent. Thank you, I’ll reply soon.
+                </p>
+              </div>
+            )}
 
-              {formState.isSubmitted && (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="name" className={labelClass}>
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className={inputClass(!!formState.errors.name)}
+                  placeholder="Your name"
+                  aria-invalid={!!formState.errors.name}
+                  aria-describedby={
+                    formState.errors.name ? "name-error" : undefined
+                  }
+                />
+                {fieldError("name", formState.errors.name)}
+              </div>
+
+              <div>
+                <label htmlFor="email" className={labelClass}>
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className={inputClass(!!formState.errors.email)}
+                  placeholder="you@example.com"
+                  aria-invalid={!!formState.errors.email}
+                  aria-describedby={
+                    formState.errors.email ? "email-error" : undefined
+                  }
+                />
+                {fieldError("email", formState.errors.email)}
+              </div>
+
+              <div>
+                <label htmlFor="subject" className={labelClass}>
+                  Subject *
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleInputChange}
+                  className={inputClass(!!formState.errors.subject)}
+                  placeholder="Topic"
+                  aria-invalid={!!formState.errors.subject}
+                  aria-describedby={
+                    formState.errors.subject ? "subject-error" : undefined
+                  }
+                />
+                {fieldError("subject", formState.errors.subject)}
+              </div>
+
+              <div>
+                <label htmlFor="message" className={labelClass}>
+                  Message *
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={5}
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className={cn(
+                    inputClass(!!formState.errors.message),
+                    "min-h-[120px] resize-y"
+                  )}
+                  placeholder="What are we solving?"
+                  aria-invalid={!!formState.errors.message}
+                  aria-describedby={
+                    formState.errors.message ? "message-error" : undefined
+                  }
+                />
+                <div className="mt-2 flex justify-between gap-4 text-xs text-content-muted">
+                  {formState.errors.message ? (
+                    <p id="message-error" className="text-accent-ink">
+                      {formState.errors.message}
+                    </p>
+                  ) : (
+                    <span />
+                  )}
+                  <span className="num shrink-0">
+                    {formData.message.length}/{VALIDATION.maxMessageLength}
+                  </span>
+                </div>
+              </div>
+
+              {formState.submitError && (
                 <div
-                  className="mb-6 p-4 rounded-md border border-emerald-500/25 bg-emerald-500/5 text-sm text-content-secondary"
+                  className="border-l-2 border-accent bg-surface-elevated p-4 text-sm text-content-secondary"
                   role="alert"
-                  aria-live="polite"
+                  aria-live="assertive"
                 >
-                  <p className="font-medium text-content-primary">
-                    Sent. Thank you—I’ll reply soon.
+                  <p className="font-medium text-accent-ink">
+                    Message not sent
                   </p>
+                  <p className="mt-1">{formState.submitError}</p>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block font-mono-label mb-2 text-content-muted"
-                  >
-                    Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className={inputClass(!!formState.errors.name)}
-                    placeholder="Your name"
-                    aria-invalid={!!formState.errors.name}
-                    aria-describedby={
-                      formState.errors.name ? "name-error" : undefined
-                    }
-                  />
-                  {formState.errors.name && (
-                    <p id="name-error" className="mt-2 text-sm text-red-600">
-                      {formState.errors.name}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block font-mono-label mb-2 text-content-muted"
-                  >
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={inputClass(!!formState.errors.email)}
-                    placeholder="you@example.com"
-                    aria-invalid={!!formState.errors.email}
-                    aria-describedby={
-                      formState.errors.email ? "email-error" : undefined
-                    }
-                  />
-                  {formState.errors.email && (
-                    <p id="email-error" className="mt-2 text-sm text-red-600">
-                      {formState.errors.email}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="subject"
-                    className="block font-mono-label mb-2 text-content-muted"
-                  >
-                    Subject *
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    className={inputClass(!!formState.errors.subject)}
-                    placeholder="Topic"
-                    aria-invalid={!!formState.errors.subject}
-                    aria-describedby={
-                      formState.errors.subject ? "subject-error" : undefined
-                    }
-                  />
-                  {formState.errors.subject && (
-                    <p id="subject-error" className="mt-2 text-sm text-red-600">
-                      {formState.errors.subject}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block font-mono-label mb-2 text-content-muted"
-                  >
-                    Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    className={`${inputClass(!!formState.errors.message)} resize-y min-h-[120px]`}
-                    placeholder="What are we solving?"
-                    aria-invalid={!!formState.errors.message}
-                    aria-describedby={
-                      formState.errors.message ? "message-error" : undefined
-                    }
-                  />
-                  <div className="flex justify-between mt-2 text-xs text-content-muted">
-                    {formState.errors.message ? (
-                      <p id="message-error" className="text-red-600">
-                        {formState.errors.message}
-                      </p>
-                    ) : (
-                      <span />
-                    )}
-                    <span>
-                      {formData.message.length}/{VALIDATION.maxMessageLength}
-                    </span>
-                  </div>
-                </div>
-
-                {formState.submitError && (
-                  <div
-                    className="p-4 rounded-md border border-red-500/25 bg-red-500/5 text-sm text-content-secondary"
-                    role="alert"
-                    aria-live="assertive"
-                  >
-                    <p className="font-medium text-content-primary">
-                      Message not sent
-                    </p>
-                    <p className="mt-1">{formState.submitError}</p>
-                  </div>
+              <button
+                type="submit"
+                disabled={formState.isSubmitting}
+                className={cn(
+                  "w-full rounded-control px-5 py-3 text-sm font-semibold transition-opacity active:translate-y-px",
+                  formState.isSubmitting
+                    ? "cursor-not-allowed bg-content-muted text-surface-page"
+                    : "bg-surface-inverse text-content-inverse hover:opacity-90"
                 )}
-
-                <button
-                  type="submit"
-                  disabled={formState.isSubmitting}
-                  className={`w-full py-3 px-5 rounded-md text-sm font-semibold transition-opacity ${
-                    formState.isSubmitting
-                      ? "bg-content-muted text-content-inverse cursor-not-allowed"
-                      : "bg-surface-inverse text-content-inverse hover:opacity-90"
-                  }`}
-                >
-                  {formState.isSubmitting ? "Sending…" : "Send message"}
-                </button>
-              </form>
-            </div>
+              >
+                {formState.isSubmitting ? "Sending…" : "Send message"}
+              </button>
+            </form>
           </FadeIn>
         </div>
       </Container>

@@ -38,14 +38,14 @@ export default async function ProjectDetailPage({ params }: Props) {
           <nav className="text-sm text-content-muted mb-8">
             <Link
               href="/"
-              className="hover:text-accent-cyan transition-colors"
+              className="transition-colors hover:text-accent-ink"
             >
               Home
             </Link>
             <span className="mx-2 text-border-strong">/</span>
             <Link
               href="/projects"
-              className="hover:text-accent-cyan transition-colors"
+              className="transition-colors hover:text-accent-ink"
             >
               Work
             </Link>
@@ -56,14 +56,16 @@ export default async function ProjectDetailPage({ params }: Props) {
           </nav>
 
           <header className="max-w-3xl">
-            <p className="font-mono-label mb-3">
-              {project.category} ·{" "}
-              {new Date(project.completedAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-              })}
+            {/* Mono on the date only, and no middle dot as a default separator. */}
+            <p className="flex items-baseline gap-4 text-xs text-content-muted">
+              <span className="num">
+                {`${new Date(project.completedAt).getFullYear()}.${String(
+                  new Date(project.completedAt).getMonth() + 1
+                ).padStart(2, "0")}`}
+              </span>
+              <span>{project.category}</span>
             </p>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-content-primary mb-6">
+            <h1 className="mb-[calc(var(--rhythm)*6)] mt-[calc(var(--rhythm)*4)] text-content-primary">
               {project.title}
             </h1>
             <p className="text-lg text-content-secondary leading-relaxed">
@@ -75,7 +77,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 rounded-md bg-surface-inverse text-content-inverse text-sm font-medium hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"
                 >
                   Live
                 </a>
@@ -85,7 +87,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 rounded-md border border-border-strong text-content-primary text-sm font-medium hover:border-accent-cyan/50 transition-colors"
+                  className="inline-flex items-center rounded-control border border-border-strong px-6 py-3 text-sm font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
                 >
                   Source
                 </a>
@@ -102,7 +104,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               {project.images.map((src, i) => (
                 <div
                   key={src}
-                  className="relative aspect-video rounded-lg overflow-hidden border border-border-subtle bg-surface-elevated shadow-sm"
+                  className="relative aspect-video overflow-hidden border border-border-subtle bg-surface-elevated"
                 >
                   <Image
                     src={src}
@@ -125,7 +127,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             <div className="lg:col-span-7 space-y-10">
               {project.role ? (
                 <div>
-                  <h2 className="font-mono-label mb-3">Role</h2>
+                  <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">Role</h2>
                   <p className="text-content-secondary leading-relaxed">
                     {project.role}
                   </p>
@@ -133,7 +135,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               ) : null}
               {project.problem ? (
                 <div>
-                  <h2 className="font-mono-label mb-3">Context</h2>
+                  <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">Context</h2>
                   <p className="text-content-secondary leading-relaxed">
                     {project.problem}
                   </p>
@@ -141,7 +143,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               ) : null}
               {project.solution ? (
                 <div>
-                  <h2 className="font-mono-label mb-3">Approach</h2>
+                  <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">Approach</h2>
                   <p className="text-content-secondary leading-relaxed">
                     {project.solution}
                   </p>
@@ -149,23 +151,18 @@ export default async function ProjectDetailPage({ params }: Props) {
               ) : null}
               {project.outcomes && project.outcomes.length > 0 ? (
                 <div>
-                  <h2 className="font-mono-label mb-3">Outcomes</h2>
-                  <ul className="space-y-2 text-content-secondary">
+                  <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">Outcomes</h2>
+                  {/* No coloured dot per row: spacing separates them. */}
+                  <ul className="list-none space-y-[calc(var(--rhythm)*4)] text-content-secondary">
                     {project.outcomes.map((item) => (
-                      <li key={item} className="flex gap-3">
-                        <span
-                          className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-cyan"
-                          aria-hidden
-                        />
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
+                      <li key={item}>{item}</li>
                     ))}
                   </ul>
                 </div>
               ) : null}
               {project.longDescription ? (
                 <div>
-                  <h2 className="font-mono-label mb-3">Details</h2>
+                  <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">Details</h2>
                   <p className="text-content-secondary leading-relaxed whitespace-pre-line">
                     {project.longDescription}
                   </p>
@@ -173,20 +170,15 @@ export default async function ProjectDetailPage({ params }: Props) {
               ) : null}
             </div>
             <aside className="lg:col-span-5 lg:pl-8">
-              <div className="sticky top-24 rounded-lg border border-border-subtle bg-surface-elevated p-6">
-                <h2 className="font-mono-label mb-4">Stack</h2>
-                <ul className="flex flex-wrap gap-2">
+              <div className="sticky top-24 border-t border-border-strong pt-[calc(var(--rhythm)*6)]">
+                <h2 className="mb-[calc(var(--rhythm)*4)] text-sm font-medium text-content-primary">Stack</h2>
+                <ul className="flex list-none flex-wrap gap-x-4 gap-y-1 text-xs text-content-muted">
                   {project.technologies.map((tech) => (
-                    <li
-                      key={tech}
-                      className="text-xs px-2.5 py-1 rounded-sm bg-surface-subtle text-content-secondary font-mono"
-                    >
-                      {tech}
-                    </li>
+                    <li key={tech}>{tech}</li>
                   ))}
                 </ul>
-                <div className="mt-8 pt-6 border-t border-border-subtle">
-                  <h2 className="font-mono-label mb-3">More work</h2>
+                <div className="mt-[calc(var(--rhythm)*10)] border-t border-border-subtle pt-[calc(var(--rhythm)*6)]">
+                  <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">More work</h2>
                   <ul className="space-y-2 text-sm">
                     {sampleProjects
                       .filter((p) => p.id !== project.id)
@@ -195,7 +187,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                         <li key={p.id}>
                           <Link
                             href={`/projects/${p.id}`}
-                            className="text-content-secondary hover:text-accent-cyan transition-colors"
+                            className="text-content-secondary transition-colors hover:text-accent-ink"
                           >
                             {p.title}
                           </Link>

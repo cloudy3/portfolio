@@ -17,17 +17,14 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body className="bg-surface-page text-content-primary">
-        <section className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
-          <p className="font-mono-label mb-3">Application error</p>
-          <h1 className="text-3xl font-semibold tracking-tight mb-4">
-            Something went wrong
-          </h1>
-          <p className="max-w-xl text-content-secondary mb-8">
+        <section className="container-custom flex min-h-[100dvh] flex-col justify-center">
+          <h1 className="text-3xl">Something went wrong</h1>
+          <p className="mt-[calc(var(--rhythm)*4)] max-w-[50ch] text-content-secondary">
             An unexpected error occurred. Reloading usually resolves it.
           </p>
           <button
             type="button"
-            className="inline-flex items-center rounded-md bg-surface-inverse px-4 py-2 text-sm font-medium text-content-inverse hover:opacity-90 transition-opacity"
+            className="mt-[calc(var(--rhythm)*8)] inline-flex w-fit items-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"
             onClick={reset}
           >
             Try again

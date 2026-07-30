@@ -3,6 +3,23 @@ import Link from "next/link";
 import { Project } from "@/types";
 import { cn } from "@/lib/utils";
 
+/** `2024.02` — the same stamp the homepage Work section uses. */
+function stamp(date: Date): string {
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+/**
+ * Catalogue entry, used by the /projects index.
+ *
+ * Was a rounded, shadowed, bordered card with a "FEATURED" pill overlaid on the
+ * artwork, a mono uppercase "WEB · FEB 2024" meta line and four mono chips. Now:
+ * sharp hairline frame, no shadow, nothing floating on the image, mono reserved
+ * for the date, technologies separated by whitespace.
+ *
+ * The featured marker survives here (unlike on the homepage, where every item
+ * shown is featured and the badge said nothing) because this page mixes both.
+ * It sits in the meta line as plain text rather than on top of the artwork.
+ */
 export function ProjectListCard({
   project,
   className,
@@ -10,59 +27,54 @@ export function ProjectListCard({
   project: Project;
   className?: string;
 }) {
-  const href = `/projects/${project.id}`;
-
   return (
-    <Link
-      href={href}
-      className={cn(
-        "group block rounded-lg border border-border-subtle bg-surface-elevated overflow-hidden",
-        "shadow-sm transition-all duration-300 ease-out",
-        "hover:border-accent-cyan/30 hover:shadow-md",
-        className
-      )}
-    >
-      <div className="relative aspect-[16/10] bg-surface-subtle">
+    <article className={cn("group relative", className)}>
+      <div className="relative aspect-[16/10] overflow-hidden border border-border-subtle bg-surface-subtle transition-colors group-hover:border-accent">
         {project.images[0] ? (
           <Image
             src={project.images[0]}
             alt={project.title}
             fill
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.015]"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         ) : null}
+      </div>
+
+      <div className="mt-[calc(var(--rhythm)*4)] flex items-baseline gap-4">
+        <p className="num text-xs text-content-muted">
+          {stamp(new Date(project.completedAt))}
+        </p>
+        <p className="text-xs text-content-muted">{project.category}</p>
         {project.featured ? (
-          <span className="absolute top-3 right-3 font-mono-label text-[0.65rem] px-2 py-1 rounded-sm bg-surface-inverse/90 text-content-inverse">
-            Featured
-          </span>
+          <p className="text-xs text-accent-ink">Featured</p>
         ) : null}
       </div>
-      <div className="p-5 md:p-6">
-        <p className="font-mono-label mb-2 text-content-muted">
-          {project.category} ·{" "}
-          {new Date(project.completedAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-          })}
-        </p>
-        <h3 className="text-lg font-semibold text-content-primary tracking-tight mb-2 group-hover:text-accent-cyan transition-colors">
+
+      <h3 className="mt-[calc(var(--rhythm)*2)] text-lg">
+        {/*
+         * Accessible card-link pattern: only the title is a link, and the
+         * stretched span carries the hit area over the whole entry, so the
+         * accessible name stays the title rather than every string inside.
+         */}
+        <Link
+          href={`/projects/${project.id}`}
+          className="text-content-primary transition-colors group-hover:text-accent-ink"
+        >
           {project.title}
-        </h3>
-        <p className="text-sm text-content-secondary line-clamp-2 leading-relaxed">
-          {project.description}
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.technologies.slice(0, 4).map((tech) => (
-            <span
-              key={tech}
-              className="text-xs px-2 py-0.5 rounded-sm bg-surface-subtle text-content-muted font-mono"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-    </Link>
+          <span className="absolute inset-0" aria-hidden />
+        </Link>
+      </h3>
+
+      <p className="mt-[calc(var(--rhythm)*3)] line-clamp-2 text-sm text-content-secondary">
+        {project.description}
+      </p>
+
+      <p className="mt-[calc(var(--rhythm)*4)] flex flex-wrap gap-x-4 gap-y-1 text-xs text-content-muted">
+        {project.technologies.slice(0, 4).map((tech) => (
+          <span key={tech}>{tech}</span>
+        ))}
+      </p>
+    </article>
   );
 }

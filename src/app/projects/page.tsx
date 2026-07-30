@@ -18,11 +18,8 @@ export default function ProjectsPage() {
   return (
     <Section variant="default">
       <Container>
-        <nav className="text-sm text-content-muted mb-8">
-          <Link
-            href="/"
-            className="hover:text-accent-cyan transition-colors"
-          >
+        <nav className="mb-[calc(var(--rhythm)*10)] text-sm text-content-muted">
+          <Link href="/" className="transition-colors hover:text-accent-ink">
             Home
           </Link>
           <span className="mx-2 text-border-strong">/</span>
@@ -30,7 +27,7 @@ export default function ProjectsPage() {
         </nav>
         <SectionHeader
           title="Selected work"
-          description="Product-minded engineering across Flutter, Python, and Google Cloud—shipping systems that hold up in the field."
+          description="Product-minded engineering across Flutter, Python and Google Cloud, shipping systems that hold up in the field."
         />
         <ProjectsCatalog projects={ordered} />
       </Container>
