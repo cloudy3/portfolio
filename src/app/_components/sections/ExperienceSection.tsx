@@ -11,245 +11,217 @@ import {
   getTotalExperienceYears,
   getExperienceDuration,
 } from "@/lib/data/experience";
+import { cn } from "@/lib/utils";
 import { Container } from "../ui/Container";
 import { Section } from "../ui/Section";
 import { SectionHeader } from "../ui/SectionHeader";
 import { FadeIn } from "../motion/FadeIn";
 
-interface ExperienceCardProps {
-  experience: Experience;
-  isExpanded: boolean;
-  onToggle: () => void;
-  index?: number;
+/** `2024.02` — the same stamp format the Work section uses. */
+function stamp(date: Date): string {
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-const ExperienceCard = ({
+function range(start: Date, end?: Date): string {
+  return `${stamp(start)} - ${end ? stamp(end) : "now"}`;
+}
+
+/**
+ * A single lane, running the length of the section.
+ *
+ * Every entry hangs off one continuous rule with a tick where it starts. That
+ * replaces a stack of `border-white/10 bg-white/[0.04]` glass cards, each with
+ * its own inner gradient rail and its own two-letter monogram box ("DM", "ED",
+ * "CR" — the last two were not even initials, just type codes).
+ *
+ * The tick is structural, not decorative: it marks where an entry begins on the
+ * timeline. Only the current role's tick takes the accent, which is real state
+ * rather than a coloured dot on every row.
+ */
+function RailEntry({
+  children,
+  meta,
+  current = false,
+}: {
+  children: React.ReactNode;
+  meta: React.ReactNode;
+  current?: boolean;
+}) {
+  return (
+    <div className="lane-grid">
+      <div className="md:col-span-2 md:pr-[var(--lane-inset)] md:text-right">
+        {meta}
+      </div>
+      <div className="relative border-l border-border-subtle pb-[calc(var(--rhythm)*12)] pl-8 md:col-span-6">
+        <span
+          className={cn(
+            "absolute -left-[3px] top-[0.55rem] h-[5px] w-[5px]",
+            current ? "bg-accent" : "bg-border-strong"
+          )}
+          aria-hidden
+        />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Stack and highlight lists: plain text separated by space, no chips, no dots. */
+function Terms({ items, className }: { items: string[]; className?: string }) {
+  return (
+    <p
+      className={cn(
+        "flex flex-wrap gap-x-4 gap-y-1 text-xs text-content-muted",
+        className
+      )}
+    >
+      {items.map((item) => (
+        <span key={item}>{item}</span>
+      ))}
+    </p>
+  );
+}
+
+function ExperienceEntry({
   experience,
   isExpanded,
   onToggle,
-  index = 0,
-}: ExperienceCardProps) => {
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const getDuration = () => getExperienceDuration(experience);
-
-  return (
-    <FadeIn
-      beat={index}
-      className="relative rounded-lg border border-border-subtle bg-surface-elevated backdrop-blur-sm overflow-hidden"
-    >
-      <div className="absolute left-6 top-0 w-px h-full bg-border-strong" />
-      <div className="absolute left-[1.15rem] top-8 h-2.5 w-2.5 rounded-full bg-accent border-2 border-surface-page" />
-
-      <div className="pl-14 pr-6 py-7 md:pl-16 md:pr-8 md:py-8">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
-          <div className="flex items-start mb-0">
-            <div className="w-11 h-11 rounded-md border border-border-strong bg-surface-page flex items-center justify-center font-mono text-xs text-content-secondary mr-4 flex-shrink-0">
-              {experience.company.slice(0, 2).toUpperCase()}
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-content-primary tracking-tight">
-                {experience.position}
-              </h3>
-              <h4 className="text-sm font-medium text-accent-ink mt-0.5">
-                {experience.company}
-              </h4>
-              <div className="flex flex-col sm:flex-row sm:items-center text-sm text-content-secondary gap-2 mt-2">
-                <span>
-                  {formatDate(experience.startDate)} —{" "}
-                  {experience.endDate
-                    ? formatDate(experience.endDate)
-                    : "Present"}
-                </span>
-                <span className="hidden sm:inline opacity-40">·</span>
-                <span className="font-medium">{getDuration()}</span>
-                {!experience.endDate && (
-                  <>
-                    <span className="hidden sm:inline opacity-40">·</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[0.65rem] font-mono uppercase tracking-wider bg-accent/10 text-accent-ink">
-                      Current
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onToggle}
-            className="flex-shrink-0 px-4 py-2 rounded-md border border-border-strong text-content-primary text-sm font-medium hover:border-accent transition-colors"
-          >
-            {isExpanded ? "Less" : "More"}
-          </button>
-        </div>
-
-        <p className="text-content-secondary mb-4 leading-relaxed text-sm md:text-base">
-          {experience.description}
-        </p>
-
-        <div className="mb-2">
-          <h5 className="font-mono-label mb-2 text-content-secondary">
-            Stack
-          </h5>
-          <div className="flex flex-wrap gap-2">
-            {experience.technologies.map((tech) => (
-              <span
-                key={tech}
-                className="px-2.5 py-1 rounded-sm bg-surface-page text-content-secondary text-xs font-mono border border-border-subtle"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {isExpanded && (
-          <div className="mt-6 pt-6 border-t border-border-subtle">
-            <h5 className="font-mono-label mb-3 text-content-secondary">
-              Highlights
-            </h5>
-            <ul className="space-y-3">
-              {experience.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
-                  <div className="text-content-secondary text-sm leading-relaxed">
-                    <div className="text-content-primary font-medium mb-1">
-                      {achievement.description}
-                    </div>
-                    {achievement.impact && (
-                      <div className="text-xs opacity-80 mb-1">
-                        Impact: {achievement.impact}
-                      </div>
-                    )}
-                    {achievement.metrics && (
-                      <div className="text-xs text-accent-ink font-medium">
-                        {achievement.metrics}
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </FadeIn>
-  );
-};
-
-const EducationCard = ({
-  education,
-  index = 0,
+  current = false,
 }: {
-  education: Education;
-  index?: number;
-}) => {
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
-  };
-
+  experience: Experience;
+  isExpanded: boolean;
+  onToggle: () => void;
+  current?: boolean;
+}) {
   return (
-    <FadeIn
-      beat={index}
-      className="rounded-lg border border-border-subtle bg-surface-elevated p-6"
+    <RailEntry
+      current={current}
+      meta={
+        <>
+          <p className="num text-xs text-content-muted">
+            {range(experience.startDate, experience.endDate)}
+          </p>
+          <p className="mt-1 text-xs text-content-muted">
+            {getExperienceDuration(experience)}
+          </p>
+          {current ? (
+            <p className="mt-2 text-xs font-medium text-accent-ink">Current</p>
+          ) : null}
+        </>
+      }
     >
-      <div className="flex items-start mb-4">
-        <div className="w-11 h-11 rounded-md border border-border-strong bg-surface-page flex items-center justify-center font-mono text-xs text-content-secondary mr-4">
-          ED
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-content-primary mb-1 tracking-tight">
-            {education.degree}
-          </h3>
-          <h4 className="text-sm font-medium text-accent-ink mb-2">
-            {education.institution}
-          </h4>
-          <div className="text-sm text-content-secondary">
-            {formatDate(education.startDate)} — {formatDate(education.endDate)}
-          </div>
-        </div>
-      </div>
+      <h3 className="text-lg text-content-primary">{experience.position}</h3>
+      <p className="mt-1 text-sm font-medium text-content-secondary">
+        {experience.company}
+      </p>
+      <p className="mt-[calc(var(--rhythm)*4)] max-w-[62ch] text-sm text-content-secondary">
+        {experience.description}
+      </p>
+      <Terms
+        items={experience.technologies}
+        className="mt-[calc(var(--rhythm)*5)]"
+      />
 
-      <p className="text-content-secondary mb-4 text-sm leading-relaxed">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+        className="mt-[calc(var(--rhythm)*5)] rounded-control border border-border-subtle px-4 py-1.5 text-xs font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
+      >
+        {isExpanded ? "Hide highlights" : "Highlights"}
+      </button>
+
+      {isExpanded ? (
+        <div className="mt-[calc(var(--rhythm)*7)] space-y-[calc(var(--rhythm)*6)]">
+          {experience.achievements.map((achievement, index) => (
+            <div key={index} className="max-w-[62ch]">
+              <p className="text-sm text-content-primary">
+                {achievement.description}
+              </p>
+              {achievement.impact ? (
+                <p className="mt-1 text-xs text-content-muted">
+                  {achievement.impact}
+                </p>
+              ) : null}
+              {achievement.metrics ? (
+                <p className="num mt-1 text-xs text-accent-ink">
+                  {achievement.metrics}
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </RailEntry>
+  );
+}
+
+function EducationEntry({ education }: { education: Education }) {
+  return (
+    <RailEntry
+      meta={
+        <p className="num text-xs text-content-muted">
+          {range(education.startDate, education.endDate)}
+        </p>
+      }
+    >
+      <h3 className="text-lg text-content-primary">{education.degree}</h3>
+      <p className="mt-1 text-sm font-medium text-content-secondary">
+        {education.institution}
+      </p>
+      <p className="mt-[calc(var(--rhythm)*4)] max-w-[62ch] text-sm text-content-secondary">
         {education.description}
       </p>
-
-      {education.achievements && (
-        <div>
-          <h5 className="font-mono-label mb-2 text-content-secondary">
-            Highlights
-          </h5>
-          <ul className="space-y-1">
-            {education.achievements.slice(0, 2).map((achievement, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
-                <span className="text-content-secondary text-xs leading-relaxed">
-                  {achievement}
-                </span>
-              </li>
-            ))}
-          </ul>
+      {education.achievements ? (
+        <div className="mt-[calc(var(--rhythm)*4)] space-y-1">
+          {education.achievements.slice(0, 2).map((achievement) => (
+            <p key={achievement} className="text-xs text-content-muted">
+              {achievement}
+            </p>
+          ))}
         </div>
-      )}
-    </FadeIn>
+      ) : null}
+    </RailEntry>
   );
-};
+}
 
-const CertificationCard = ({
+function CertificationEntry({
   certification,
-  index = 0,
 }: {
   certification: Certification;
-  index?: number;
-}) => {
+}) {
   return (
-    <FadeIn
-      beat={index}
-      className="rounded-lg border border-border-subtle bg-surface-elevated p-6"
+    <RailEntry
+      meta={
+        <p className="num text-xs text-content-muted">
+          {certification.credentialId}
+        </p>
+      }
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-md border border-border-strong bg-surface-page flex items-center justify-center font-mono text-[0.65rem] text-content-secondary">
-            CR
-          </div>
-          <div>
-            <h3 className="text-base font-semibold text-content-primary mb-1">
-              {certification.name}
-            </h3>
-            <h4 className="text-sm text-accent-ink font-medium">
-              {certification.issuer}
-            </h4>
-          </div>
-        </div>
-      </div>
-
-      <div className="font-mono text-[0.65rem] text-content-secondary">
-        ID: {certification.credentialId}
-      </div>
-    </FadeIn>
+      <h3 className="text-base text-content-primary">{certification.name}</h3>
+      <p className="mt-1 text-sm text-content-secondary">
+        {certification.issuer}
+      </p>
+    </RailEntry>
   );
-};
+}
+
+const TABS = [
+  { key: "experience", label: "Work" },
+  { key: "education", label: "Education" },
+  { key: "certifications", label: "Credentials" },
+] as const;
 
 const ExperienceSection = () => {
   const [expandedExperience, setExpandedExperience] = useState<string | null>(
-    null,
+    null
   );
-  const [activeTab, setActiveTab] = useState<
-    "experience" | "education" | "certifications"
-  >("experience");
+  const [activeTab, setActiveTab] =
+    useState<(typeof TABS)[number]["key"]>("experience");
 
   const handleToggleExpanded = (experienceId: string) => {
     setExpandedExperience(
-      expandedExperience === experienceId ? null : experienceId,
+      expandedExperience === experienceId ? null : experienceId
     );
   };
 
@@ -257,12 +229,20 @@ const ExperienceSection = () => {
   const pastExps = getPastExperiences();
   const totalYears = getTotalExperienceYears();
 
+  const counters: [string, string][] = [
+    [`${totalYears}+`, "Years"],
+    [String(EXPERIENCE_DATA.length), "Roles"],
+    [String(CERTIFICATIONS_DATA.length), "Certifications"],
+  ];
+
   return (
-    <Section
-      id="experience"
-      variant="inverse"
-      className="scroll-mt-20 border-t border-border-subtle"
-    >
+    /*
+     * `variant="default"` and no dark inversion. This section used to be the one
+     * dark island in an otherwise light page, so scrolling About -> Experience ->
+     * Contact crossed a theme boundary twice. It also meant a whole
+     * glass-on-dark vocabulary existed for exactly one section.
+     */
+    <Section id="experience" variant="default" className="scroll-mt-20">
       <Container>
         <FadeIn>
           <SectionHeader
@@ -271,115 +251,85 @@ const ExperienceSection = () => {
           />
         </FadeIn>
 
-        <FadeIn
-          className="flex flex-wrap justify-center gap-10 mb-12"
-        >
-          <div className="text-center">
-            <div className="text-3xl font-semibold text-content-primary tabular-nums mb-1">
-              {totalYears}+
-            </div>
-            <div className="text-xs font-mono uppercase tracking-wider text-content-secondary">
-              Years
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-semibold text-content-primary tabular-nums mb-1">
-              {EXPERIENCE_DATA.length}
-            </div>
-            <div className="text-xs font-mono uppercase tracking-wider text-content-secondary">
-              Roles
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-semibold text-content-primary tabular-nums mb-1">
-              {CERTIFICATIONS_DATA.length}
-            </div>
-            <div className="text-xs font-mono uppercase tracking-wider text-content-secondary">
-              Certifications
-            </div>
+        {/* Counters, left-aligned on the lane grid rather than centred. */}
+        <FadeIn beat={1}>
+          <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
+            {counters.map(([value, label]) => (
+              <div key={label} className="flex items-baseline gap-2">
+                <span className="num text-3xl text-content-primary">
+                  {value}
+                </span>
+                <span className="text-xs text-content-muted">{label}</span>
+              </div>
+            ))}
           </div>
         </FadeIn>
 
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {(
-            [
-              { key: "experience", label: "Work" },
-              { key: "education", label: "Education" },
-              { key: "certifications", label: "Credentials" },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
-                activeTab === tab.key
-                  ? "bg-surface-inverse text-content-inverse border-surface-inverse"
-                  : "border-border-strong text-content-secondary hover:border-accent"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <FadeIn beat={2}>
+          <div className="mt-[calc(var(--rhythm)*10)] flex flex-wrap gap-2">
+            {TABS.map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                aria-pressed={activeTab === tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "rounded-control px-4 py-1.5 text-xs font-medium transition-colors active:translate-y-px",
+                  activeTab === tab.key
+                    ? "bg-surface-inverse text-content-inverse"
+                    : "border border-border-subtle text-content-secondary hover:border-accent hover:text-content-primary"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </FadeIn>
 
-        <div className="max-w-4xl mx-auto">
-          {activeTab === "experience" && (
-            <div className="space-y-8">
-              {currentExp && (
-                <div>
-                  <h3 className="font-mono-label mb-4 text-accent-ink">
-                    Current
-                  </h3>
-                  <ExperienceCard
+        <div className="mt-[calc(var(--rhythm)*14)]">
+          {activeTab === "experience" ? (
+            <div>
+              {currentExp ? (
+                <FadeIn>
+                  <ExperienceEntry
                     experience={currentExp}
+                    current
                     isExpanded={expandedExperience === currentExp.id}
                     onToggle={() => handleToggleExpanded(currentExp.id)}
-                    index={0}
                   />
-                </div>
-              )}
-
-              {pastExps.length > 0 && (
-                <div>
-                  <h3 className="font-mono-label mb-4 mt-10 text-content-secondary">
-                    Earlier
-                  </h3>
-                  <div className="space-y-6">
-                    {pastExps.map((exp, index) => (
-                      <ExperienceCard
-                        key={exp.id}
-                        experience={exp}
-                        isExpanded={expandedExperience === exp.id}
-                        onToggle={() => handleToggleExpanded(exp.id)}
-                        index={index + 1}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+                </FadeIn>
+              ) : null}
+              {pastExps.map((exp, index) => (
+                <FadeIn key={exp.id} beat={index}>
+                  <ExperienceEntry
+                    experience={exp}
+                    isExpanded={expandedExperience === exp.id}
+                    onToggle={() => handleToggleExpanded(exp.id)}
+                  />
+                </FadeIn>
+              ))}
             </div>
-          )}
+          ) : null}
 
-          {activeTab === "education" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {activeTab === "education" ? (
+            <div>
               {EDUCATION_DATA.map((edu, index) => (
-                <EducationCard key={edu.id} education={edu} index={index} />
+                <FadeIn key={edu.id} beat={index}>
+                  <EducationEntry education={edu} />
+                </FadeIn>
               ))}
             </div>
-          )}
+          ) : null}
 
-          {activeTab === "certifications" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {activeTab === "certifications" ? (
+            <div>
               {CERTIFICATIONS_DATA.map((cert, index) => (
-                <CertificationCard
-                  key={cert.id}
-                  certification={cert}
-                  index={index}
-                />
+                <FadeIn key={cert.id} beat={index}>
+                  <CertificationEntry certification={cert} />
+                </FadeIn>
               ))}
             </div>
-          )}
+          ) : null}
         </div>
       </Container>
     </Section>

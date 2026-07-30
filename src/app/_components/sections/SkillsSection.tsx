@@ -25,22 +25,6 @@ function categoryLabel(category: Skill["category"]): string {
   return labels[category] ?? String(category);
 }
 
-function categoryCode(category: Skill["category"]): string {
-  const codes: Partial<Record<Skill["category"], string>> = {
-    frontend: "FE",
-    backend: "BE",
-    mobile: "MB",
-    devops: "DO",
-    design: "UX",
-    database: "DB",
-    cloud: "CL",
-    systems: "SY",
-    methodology: "AG",
-    other: "•",
-  };
-  return codes[category] ?? "•";
-}
-
 const FILTER_CATEGORIES: (Skill["category"] | "all")[] = [
   "all",
   "frontend",
@@ -57,6 +41,67 @@ const FILTER_CATEGORIES: (Skill["category"] | "all")[] = [
 function filterButtonLabel(category: Skill["category"] | "all"): string {
   if (category === "all") return "All";
   return categoryLabel(category);
+}
+
+/**
+ * One domain, drawn as a lane.
+ *
+ * This is where the rhythm-chart idea stops being decoration and becomes the
+ * information design: each domain is a lane, each skill is a note strung along
+ * it, and the hairline is the lane itself. Notes carry the section background so
+ * they break the rule they sit on.
+ *
+ * What this replaces: one bordered panel wrapping a `divide-y` list with a
+ * `border-t` on every one of 33 rows, an emoji glyph per row, and a mono
+ * two-letter code per group ("FE", "BE", "MB"). A long list with a hairline under
+ * every item is the laziest layout available, and the codes told the reader
+ * nothing the label beside them did not.
+ *
+ * The track scrolls rather than wraps. At no more than five skills per domain it
+ * never needs to on desktop, and holding each lane to a single row is what lets
+ * one centred hairline read as a continuous lane.
+ */
+function DomainLane({
+  category,
+  skills,
+}: {
+  category: Skill["category"];
+  skills: Skill[];
+}) {
+  const label = categoryLabel(category);
+
+  return (
+    <div className="lane-grid md:items-center">
+      <div className="flex items-baseline gap-3 md:col-span-2 md:pr-[var(--lane-inset)]">
+        <span className="text-sm font-medium text-content-primary">
+          {label}
+        </span>
+        <span className="num text-xs text-content-muted">{skills.length}</span>
+      </div>
+
+      <div className="relative md:col-span-6">
+        <span
+          className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border-subtle"
+          aria-hidden
+        />
+        <ul
+          aria-label={`${label} skills`}
+          className="relative flex snap-x snap-proximity list-none gap-x-6 overflow-x-auto py-2"
+        >
+          {skills.map((skill) => (
+            <li
+              key={`${category}-${skill.name}`}
+              className="shrink-0 snap-start"
+            >
+              <span className="bg-surface-page px-2 text-sm text-content-primary">
+                {skill.name}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
 }
 
 export default function SkillsSection() {
@@ -95,31 +140,29 @@ export default function SkillsSection() {
         <FadeIn>
           <SectionHeader
             title="Tools I ship with"
-            description="From React and Next.js on the web to Flutter on mobile and GCP behind the scenes—grouped by domain. Filters help you zoom in for a role or conversation."
+            description="From React and Next.js on the web to Flutter on mobile and GCP behind the scenes, grouped by domain. Filter to zoom in for a role or a conversation."
           />
         </FadeIn>
 
+        {/*
+         * Counters, in the one place mono belongs. These were two bordered,
+         * shadowed tiles, which is dashboard furniture on a portfolio; the
+         * numbers carry themselves at display size instead.
+         */}
         <FadeIn beat={1}>
-          <div className="mb-8 flex flex-wrap gap-3 sm:gap-4 md:mb-10">
-            {(
-              [
-                ["Total", stats.total, "technologies listed"],
-                ["Areas", stats.domains, "domains"],
-              ] as const
-            ).map(([label, value, hint]) => (
-              <div
-                key={label}
-                className="flex min-w-[5.5rem] items-baseline gap-2 rounded-md border border-border-subtle bg-surface-elevated px-3 py-2 shadow-sm"
-              >
-                <span className="font-mono text-lg font-semibold tabular-nums text-content-primary">
-                  {value}
-                </span>
-                <span className="text-[0.65rem] font-mono uppercase tracking-wider text-content-muted">
-                  {label}
-                  <span className="sr-only"> — {hint}</span>
-                </span>
-              </div>
-            ))}
+          <div className="flex items-end gap-10">
+            <div className="flex items-baseline gap-2">
+              <span className="num text-3xl text-content-primary">
+                {stats.total}
+              </span>
+              <span className="text-xs text-content-muted">Total</span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="num text-3xl text-content-primary">
+                {stats.domains}
+              </span>
+              <span className="text-xs text-content-muted">Areas</span>
+            </div>
           </div>
         </FadeIn>
 
@@ -128,12 +171,11 @@ export default function SkillsSection() {
               tabindex. These are plain toggle buttons — aria-pressed already
               conveys state, and Tab reaches each one. */}
           <div
-            className="mb-6 flex flex-wrap gap-1.5"
+            className="mt-[calc(var(--rhythm)*10)] flex flex-wrap gap-2"
             aria-label="Filter skills by domain"
           >
             {FILTER_CATEGORIES.map((category) => {
               const active = activeCategory === category;
-              const label = filterButtonLabel(category);
               return (
                 <button
                   key={category}
@@ -141,71 +183,32 @@ export default function SkillsSection() {
                   aria-pressed={active}
                   onClick={() => setActiveCategory(category)}
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                    "rounded-control px-3 py-1.5 text-xs font-medium transition-colors active:translate-y-px",
                     active
                       ? "bg-surface-inverse text-content-inverse"
-                      : "bg-surface-subtle/80 text-content-secondary hover:bg-surface-subtle hover:text-content-primary"
+                      : "border border-border-subtle text-content-secondary hover:border-accent hover:text-content-primary"
                   )}
                 >
-                  {label}
+                  {filterButtonLabel(category)}
                 </button>
               );
             })}
           </div>
         </FadeIn>
 
-        <FadeIn beat={3}>
-          <div className="overflow-hidden rounded-lg border border-border-subtle bg-surface-elevated shadow-sm">
-            <div className="divide-y divide-border-subtle">
-              {grouped.map(({ category, skills }) => (
-                <div key={category}>
-                  <div className="flex items-center gap-3 bg-surface-subtle/30 px-4 py-2.5 sm:px-5">
-                    <span className="w-7 shrink-0 font-mono text-[0.7rem] text-accent-cyan">
-                      {categoryCode(category)}
-                    </span>
-                    <span className="text-xs font-semibold tracking-tight text-content-primary">
-                      {categoryLabel(category)}
-                    </span>
-                    <span className="h-px min-w-[2rem] flex-1 bg-gradient-to-r from-border-strong to-transparent" />
-                    <span className="font-mono text-[0.65rem] tabular-nums text-content-muted">
-                      {skills.length}
-                    </span>
-                  </div>
-                  <ul className="list-none" aria-label={`${categoryLabel(category)} skills`}>
-                    {skills.map((skill) => (
-                      <li
-                        key={`${category}-${skill.name}`}
-                        className="border-t border-border-subtle first:border-t-0"
-                      >
-                        <div className="flex items-center gap-3 px-4 py-2.5 transition-colors sm:px-5 hover:bg-surface-subtle/40">
-                          {skill.icon ? (
-                            <span
-                              className="flex w-8 shrink-0 justify-center text-base leading-none"
-                              aria-hidden
-                            >
-                              {skill.icon}
-                            </span>
-                          ) : (
-                            <span className="w-8 shrink-0" aria-hidden />
-                          )}
-                          <span className="text-sm text-content-primary">
-                            {skill.name}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
+        <div className="mt-[calc(var(--rhythm)*14)] space-y-[calc(var(--rhythm)*7)]">
+          {grouped.map(({ category, skills }, i) => (
+            <FadeIn key={category} beat={i}>
+              <DomainLane category={category} skills={skills} />
+            </FadeIn>
+          ))}
+        </div>
 
-        <FadeIn beat={4}>
-          <p className="mt-6 text-center text-xs text-content-muted sm:text-left">
-            Current learning focus: mobile performance, cloud economics, and
-            how teams ship reliable products end to end—from UI in React or
-            Next.js through APIs and infrastructure.
+        <FadeIn>
+          <p className="mt-[calc(var(--rhythm)*14)] max-w-[60ch] text-sm text-content-muted">
+            Current learning focus: mobile performance, cloud economics, and how
+            teams ship reliable products end to end, from UI in React or Next.js
+            through APIs and infrastructure.
           </p>
         </FadeIn>
       </Container>
