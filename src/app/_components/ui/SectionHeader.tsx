@@ -39,7 +39,7 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <header className={cn("mb-[calc(var(--rhythm)*14)]", className)}>
+    <header className={cn("mb-[calc(var(--rhythm)*10)]", className)}>
       <h2 className="max-w-[24ch] text-content-primary">{title}</h2>
       {description ? (
         <p className="mt-[calc(var(--rhythm)*5)] max-w-[60ch] text-content-secondary">

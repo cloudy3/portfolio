@@ -95,20 +95,17 @@
   --color-accent: #d33c22;
   --color-accent-ink: #bd341c;
 
-  /* ---- Deprecated accent aliases ---------------------------------------
-   * The old palette used four accents as semantics (cyan for links, blue for
-   * labels, lime for badges, violet for issuers), which is exactly the colour
-   * inconsistency this system removes. Every alias now resolves to the single
-   * locked accent, so the lock holds at the token layer while call sites are
-   * migrated section by section.
+  /* ---- One surviving legacy alias --------------------------------------
+   * The old palette used four accents as semantics: cyan for links, blue for
+   * labels, lime for badges, violet for issuers. Three are gone.
    *
-   * Delete these once `grep -rE "accent-(cyan|blue|lime|violet)" src` returns
-   * nothing.
+   * `accent-cyan` cannot be: Navigation.test.tsx asserts the literal class name
+   * `text-accent-cyan` on the active nav link, and that test is out of scope to
+   * change. It is aliased to --color-accent-ink rather than --color-accent
+   * because its one remaining call site is small text, which needs the 4.5:1
+   * token. Its single use is documented in Navigation.tsx.
    */
-  --color-accent-cyan: var(--color-accent);
-  --color-accent-blue: var(--color-accent);
-  --color-accent-lime: var(--color-accent);
-  --color-accent-violet: var(--color-accent);
+  --color-accent-cyan: var(--color-accent-ink);
 
   /* ---- Layout ----
    * --container-content backs `max-w-content`.
@@ -134,10 +131,14 @@
   /* ---- Layout ---- */
   --header-height: 4rem;
 
-  /* Density 3: this site should read as an art gallery, not a web app. The
-     old value was a flat 5.5rem, which is standard-web-app spacing. */
-  --section-padding: clamp(6rem, 12vh, 10rem);
-  --section-padding-mobile: clamp(3.5rem, 9vh, 5rem);
+  /* Density 3: this site should read as an art gallery, not a web app. The old
+     value was a flat 5.5rem, which is standard-web-app spacing.
+     Pulled back from clamp(6rem, 12vh, 10rem) after seeing it in a browser: at
+     1440x900 two adjacent sections put 15rem of nothing between the last line of
+     one and the first of the next, which reads as empty rather than as composed
+     interval. Ma is a measured gap, not simply a large one. */
+  --section-padding: clamp(4.5rem, 9vh, 7rem);
+  --section-padding-mobile: clamp(3rem, 7vh, 4.5rem);
   --container-padding: 1.5rem;
 
   /* ---- Vertical rhythm ----
@@ -548,6 +549,49 @@
       );
   }
 
+  /* ---- Above-the-fold entrance (CSS, not JS) ---------------------------
+   * The hero's entrance is CSS rather than Motion, and that is a performance
+   * decision, not a style one.
+   *
+   * Motion applies its `initial` state during SSR, so the hero copy shipped as
+   * `style="opacity:0"` and only became visible once framer-motion had
+   * hydrated — behind the three.js chunk in the same bundle. Chrome does not
+   * record an LCP candidate while it is fully transparent, so the largest text
+   * on the page reported ~6s while actually painting at ~0.9s. A CSS animation
+   * starts at first paint with no JavaScript involved.
+   *
+   * Everything BELOW the fold still uses Motion via FadeIn, where waiting for
+   * hydration costs nothing.
+   *
+   * `--enter-index` is the position in the sequence, on the same beat as
+   * BEAT in lib/motion.ts. Keep the two in step.
+   */
+  .lane-enter {
+    animation: lane-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--enter-index, 0) * 0.09s);
+  }
+
+  @keyframes lane-enter {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /*
+   * Reduced motion gets no animation at all rather than a zero-duration one, so
+   * there is no frame where the copy is transparent.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .lane-enter {
+      animation: none;
+    }
+  }
+
   /* ---- Numbers --------------------------------------------------------
    * The ONLY mono class on the site. Counts, dates, durations, the
    * rhythm-game-style counters. If it is not a number, it is not mono.
@@ -557,22 +601,6 @@
     font-variant-numeric: tabular-nums;
     font-weight: 400;
     letter-spacing: 0.01em;
-  }
-
-  /* ---- DEPRECATED: mono uppercase eyebrow ------------------------------
-   * The single most repeated device on the old site (37 instances across 13
-   * files) and the clearest generated-template tell. Retained only so call
-   * sites stay legible while they are migrated section by section.
-   *
-   * Delete once `grep -r font-mono-label src` returns nothing.
-   */
-  .font-mono-label {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-content-muted);
   }
 
   .line-clamp-1,

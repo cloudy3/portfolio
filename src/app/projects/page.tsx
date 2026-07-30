@@ -16,7 +16,7 @@ export default function ProjectsPage() {
   const ordered = sortProjectsByFeatured([...sampleProjects]);
 
   return (
-    <Section variant="default">
+    <Section variant="default" judgment={false}>
       <Container>
         <nav className="mb-[calc(var(--rhythm)*10)] text-sm text-content-muted">
           <Link href="/" className="transition-colors hover:text-accent-ink">

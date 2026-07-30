@@ -52,7 +52,7 @@ function RailEntry({
       <div className="md:col-span-2 md:pr-[var(--lane-inset)] md:text-right">
         {meta}
       </div>
-      <div className="relative border-l border-border-subtle pb-[calc(var(--rhythm)*12)] pl-8 md:col-span-6">
+      <div className="relative border-l border-border-subtle pb-[calc(var(--rhythm)*10)] pl-8 md:col-span-6">
         <span
           className={cn(
             "absolute -left-[3px] top-[0.55rem] h-[5px] w-[5px]",
@@ -286,7 +286,7 @@ const ExperienceSection = () => {
           </div>
         </FadeIn>
 
-        <div className="mt-[calc(var(--rhythm)*14)]">
+        <div className="mt-[calc(var(--rhythm)*10)]">
           {activeTab === "experience" ? (
             <div>
               {currentExp ? (

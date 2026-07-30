@@ -25,11 +25,11 @@ export function ProjectsCatalog({ projects }: { projects: Project[] }) {
             type="button"
             onClick={() => setCategory(cat)}
             className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-colors",
+              "rounded-control px-4 py-1.5 text-xs font-medium transition-colors active:translate-y-px",
               "border border-border-subtle",
               category === cat
                 ? "bg-surface-inverse text-content-inverse border-surface-inverse"
-                : "bg-surface-elevated text-content-secondary hover:border-accent-cyan/40"
+                : "bg-surface-elevated text-content-secondary hover:border-accent hover:text-content-primary"
             )}
           >
             {cat === "all" ? "All" : cat}

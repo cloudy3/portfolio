@@ -92,7 +92,7 @@ const AccessibilityAuditor = () => {
         const ratio = checkColorContrast(fg, bg);
         if (ratio < 4.5) {
           console.warn(
-            `Low color contrast (${label}): ${ratio.toFixed(2)} — needs 4.5`
+            `Low color contrast (${label}): ${ratio.toFixed(2)}, needs 4.5`
           );
         } else {
           console.log(`✅ Contrast OK (${label}): ${ratio.toFixed(2)}`);

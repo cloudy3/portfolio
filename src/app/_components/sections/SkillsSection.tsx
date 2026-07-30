@@ -168,7 +168,7 @@ export default function SkillsSection() {
 
         <FadeIn beat={2}>
           {/* No role="toolbar": that contract requires arrow-key roving
-              tabindex. These are plain toggle buttons — aria-pressed already
+              tabindex. These are plain toggle buttons; aria-pressed already
               conveys state, and Tab reaches each one. */}
           <div
             className="mt-[calc(var(--rhythm)*10)] flex flex-wrap gap-2"
@@ -196,7 +196,13 @@ export default function SkillsSection() {
           </div>
         </FadeIn>
 
-        <div className="mt-[calc(var(--rhythm)*14)] space-y-[calc(var(--rhythm)*7)]">
+        {/*
+         * Lanes sit close together on purpose. At a 3.5rem gap they read as
+         * isolated rows; a chart's lanes are parallel and adjacent, and the
+         * tight pitch is what makes the whole block scan as one instrument
+         * rather than nine separate lists.
+         */}
+        <div className="mt-[calc(var(--rhythm)*10)] space-y-[calc(var(--rhythm)*2)]">
           {grouped.map(({ category, skills }, i) => (
             <FadeIn key={category} beat={i}>
               <DomainLane category={category} skills={skills} />
@@ -205,7 +211,7 @@ export default function SkillsSection() {
         </div>
 
         <FadeIn>
-          <p className="mt-[calc(var(--rhythm)*14)] max-w-[60ch] text-sm text-content-muted">
+          <p className="mt-[calc(var(--rhythm)*10)] max-w-[60ch] text-sm text-content-muted">
             Current learning focus: mobile performance, cloud economics, and how
             teams ship reliable products end to end, from UI in React or Next.js
             through APIs and infrastructure.

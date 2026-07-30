@@ -70,7 +70,7 @@ export default function AboutSection() {
          */}
         <div className="lane-grid">
           <FadeIn className="md:col-span-2">
-            <div className="relative w-40 sm:w-48 md:w-full">
+            <div className="relative w-40 sm:w-48 md:w-full md:max-w-[12rem]">
               <div className="aspect-[4/5] overflow-hidden border border-border-subtle bg-surface-subtle">
                 <Image
                   src="/images/pfp.png"
@@ -79,7 +79,7 @@ export default function AboutSection() {
                   height={640}
                   /* Over-requests vs. the box width on purpose: the source is
                      square, so object-cover scales it ~1.25x to fill 4:5. */
-                  sizes="(min-width: 768px) 18rem, 12rem"
+                  sizes="(min-width: 768px) 12rem, 12rem"
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
@@ -110,7 +110,7 @@ export default function AboutSection() {
         </div>
 
         {/* Capabilities: title on the left lanes, body on the right. No boxes. */}
-        <div className="mt-[calc(var(--rhythm)*28)] space-y-[calc(var(--rhythm)*14)]">
+        <div className="mt-[calc(var(--rhythm)*12)] space-y-[calc(var(--rhythm)*8)]">
           {pillars.map((pillar, i) => (
             <FadeIn key={pillar.title} beat={i} className="lane-grid">
               <h3 className="text-base font-medium text-content-primary md:col-span-2 md:pr-[var(--lane-inset)]">
@@ -130,7 +130,7 @@ export default function AboutSection() {
          * sparse rules is the right shape for this content; items within a
          * cluster separate on whitespace.
          */}
-        <div className="mt-[calc(var(--rhythm)*28)]">
+        <div className="mt-[calc(var(--rhythm)*12)]">
           <FadeIn>
             <h3 className="text-base font-medium text-content-primary">
               Technical breadth
@@ -141,7 +141,7 @@ export default function AboutSection() {
               <FadeIn
                 key={group.label}
                 beat={i}
-                className="lane-grid border-t border-border-subtle py-[calc(var(--rhythm)*6)]"
+                className="lane-grid border-t border-border-subtle py-[calc(var(--rhythm)*5)]"
               >
                 <dt className="text-sm text-content-muted md:col-span-2 md:pr-[var(--lane-inset)]">
                   {group.label}

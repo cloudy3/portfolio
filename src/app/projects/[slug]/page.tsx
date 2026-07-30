@@ -33,7 +33,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <article>
-      <Section variant="default" className="pb-8 md:pb-12">
+      <Section variant="default" judgment={false} className="pb-8 md:pb-12">
         <Container>
           <nav className="text-sm text-content-muted mb-8">
             <Link
@@ -100,7 +100,18 @@ export default async function ProjectDetailPage({ params }: Props) {
       {project.images.length > 0 ? (
         <Section variant="subtle" padded className="pt-0">
           <Container>
-            <div className="grid gap-6 md:grid-cols-2">
+            {/*
+             * Column count follows the image count. A fixed md:grid-cols-2 left
+             * an empty cell beside every project that ships a single screenshot,
+             * which is most of them.
+             */}
+            <div
+              className={
+                project.images.length > 1
+                  ? "grid gap-6 md:grid-cols-2"
+                  : "grid gap-6"
+              }
+            >
               {project.images.map((src, i) => (
                 <div
                   key={src}
@@ -111,7 +122,11 @@ export default async function ProjectDetailPage({ params }: Props) {
                     alt={`${project.title} preview ${i + 1}`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes={
+                      project.images.length > 1
+                        ? "(max-width: 768px) 100vw, 50vw"
+                        : "100vw"
+                    }
                     priority={i === 0}
                   />
                 </div>

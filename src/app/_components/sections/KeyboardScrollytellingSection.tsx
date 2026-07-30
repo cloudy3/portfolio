@@ -278,12 +278,16 @@ export default function KeyboardScrollytellingSection() {
               animate={{ opacity: 1 }}
               className="keyboard-story-loader absolute inset-0 flex flex-col items-center justify-center gap-4"
             >
-              <div
-                className="h-10 w-10 rounded-full border-2 border-border-strong border-t-accent-cyan animate-spin"
-                aria-hidden
-              />
-              <p className="font-mono-label text-content-muted tracking-[0.2em]">
-                LOADING {progressPercent}%
+              {/* Determinate track: the progress is known, so a spinner would
+                  be throwing that information away. */}
+              <div className="h-px w-40 bg-border-strong" aria-hidden>
+                <span
+                  className="block h-px bg-accent transition-[width] duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <p className="text-xs text-content-muted">
+                Loading <span className="num">{progressPercent}%</span>
               </p>
             </motion.div>
           ) : null}

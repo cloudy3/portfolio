@@ -142,7 +142,6 @@ function FeatureBand({ project }: { project: Project }) {
           project={project}
           ratio="aspect-[16/10]"
           sizes="(max-width: 768px) 100vw, 60vw"
-          priority
         />
       </div>
     </article>
@@ -211,7 +210,7 @@ export function ProjectsSection({
         {rest.length > 0 ? (
           <div
             className={cn(
-              "mt-[calc(var(--rhythm)*20)] grid gap-x-[var(--lane-inset)] gap-y-[calc(var(--rhythm)*16)]",
+              "mt-[calc(var(--rhythm)*14)] grid gap-x-[var(--lane-inset)] gap-y-[calc(var(--rhythm)*12)]",
               rest.length > 1 ? "md:grid-cols-2" : "md:grid-cols-1"
             )}
           >
@@ -224,7 +223,7 @@ export function ProjectsSection({
         ) : null}
 
         <FadeIn>
-          <div className="mt-[calc(var(--rhythm)*24)] flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border-subtle pt-[calc(var(--rhythm)*8)]">
+          <div className="mt-[calc(var(--rhythm)*14)] flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border-subtle pt-[calc(var(--rhythm)*8)]">
             <Link
               href="/projects"
               className="inline-flex items-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"

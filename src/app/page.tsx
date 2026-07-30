@@ -8,14 +8,13 @@ function SectionLoader({ variant = "default" }: { variant?: LoaderVariant }) {
     variant === "inverse"
       ? "section-padding bg-surface-inverse flex items-center justify-center min-h-[200px]"
       : "section-padding bg-surface-page flex items-center justify-center min-h-[200px]";
-  const spinnerClass =
-    variant === "inverse"
-      ? "h-9 w-9 rounded-full border-2 border-content-inverse-muted border-t-accent-cyan animate-spin"
-      : "h-9 w-9 rounded-full border-2 border-border-strong border-t-accent-cyan animate-spin";
-
   return (
     <div className={containerClass}>
-      <div className={spinnerClass} aria-hidden />
+      {/* An accent segment on a track, matching loading.tsx. Circular spinners
+          were the last rounded shapes on a site whose surfaces are all sharp. */}
+      <div className="h-px w-32 bg-border-strong" aria-hidden>
+        <span className="block h-px w-1/3 animate-pulse bg-accent" />
+      </div>
     </div>
   );
 }

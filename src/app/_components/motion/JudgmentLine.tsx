@@ -20,9 +20,14 @@ import { cn } from "@/lib/utils";
  * an animation end-state, so reduced-motion users and no-JS visitors get the
  * structure with none of the flash.
  *
- * IntersectionObserver-backed via `whileInView` with a tight symmetric margin,
- * so the sweep fires as the section crosses the middle of the viewport. That is
- * the "fixed viewport line" the concept calls for, with no scroll listener.
+ * IntersectionObserver-backed via `whileInView`, so there is no scroll listener.
+ *
+ * The trigger fires when the line crosses 70% of the viewport height, which is
+ * the fixed line the concept calls for. It was originally a symmetric
+ * `-45% 0px -45% 0px` margin to put that line dead centre, but that leaves only
+ * a 10%-tall band: on a fast scroll or a short viewport the observer can miss it
+ * entirely and the sweep silently never happens. A one-sided margin always
+ * fires.
  */
 export function JudgmentLine({ className }: { className?: string }) {
   const reduce = usePrefersReducedMotion();
@@ -40,7 +45,7 @@ export function JudgmentLine({ className }: { className?: string }) {
           style={{ transformOrigin: "left center" }}
           initial={{ scaleX: 0, opacity: 1 }}
           whileInView={{ scaleX: 1, opacity: 0 }}
-          viewport={{ once: true, margin: "-45% 0px -45% 0px" }}
+          viewport={{ once: true, margin: "0px 0px -30% 0px" }}
           transition={{
             scaleX: { duration: 0.55, ease: EASE_OUT },
             opacity: { duration: 0.45, delay: 0.7, ease: "linear" },

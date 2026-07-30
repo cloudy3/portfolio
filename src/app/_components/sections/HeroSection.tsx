@@ -1,11 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { MotionConfig, motion } from "framer-motion";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
-import { laneEnter, staggerContainer, transitions } from "@/lib/motion";
 import { cn, smoothScrollTo } from "@/lib/utils";
 
 const WaveLineVisualization = dynamic(
@@ -40,9 +37,6 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ className = "" }: HeroSectionProps) {
-  // See usePrefersReducedMotion: framer's equivalent can latch a stale value.
-  const reduce = usePrefersReducedMotion();
-
   return (
     <section
       className={cn(
@@ -98,76 +92,75 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
 
       <div className="container-custom relative z-10 w-full">
         {/*
-         * One copy of the hero markup for both motion modes. `initial={false}`
-         * renders reduced-motion users straight at the final state (no fade, no
-         * stuck opacity-0), and MotionConfig keeps any remaining animation
-         * honest about the user's preference.
+         * The hero entrance is CSS (`.lane-enter` in globals.css), not Motion,
+         * and that is a measured performance decision.
+         *
+         * Motion applies its `initial` state during server rendering, so this
+         * copy used to ship as `style="opacity:0"` and stayed invisible until
+         * framer-motion hydrated, behind the three.js chunk. Chrome will not
+         * take an LCP candidate while an element is fully transparent, so the
+         * largest text on the page reported ~6s while actually painting at
+         * ~0.9s. A CSS animation starts at first paint with no JS involved.
+         *
+         * Everything below the fold still uses Motion via FadeIn, where waiting
+         * for hydration costs nothing. Reduced motion is handled in the
+         * stylesheet, so no JS branch is needed here either.
          */}
-        <MotionConfig reducedMotion="user">
-          <div className="lane-grid">
-            <motion.div
-              className="md:col-span-6 md:pr-[var(--lane-inset)]"
-              initial={reduce ? false : "hidden"}
-              animate="visible"
-              variants={staggerContainer}
+        <div className="lane-grid">
+          <div className="md:col-span-6 md:pr-[var(--lane-inset)]">
+            {/*
+             * Weight contrast carries the headline: 900 against 300, one
+             * family. The old version greyed the second clause out, which is
+             * the standard two-tone headline trick and also gave away contrast.
+             * Both clauses are full-strength ink now.
+             */}
+            <h1
+              className="lane-enter text-content-primary"
+              style={{ "--enter-index": 0 } as React.CSSProperties}
             >
-              {/*
-               * Weight contrast carries the headline: 900 against 300, one
-               * family. The old version greyed the second clause out, which is
-               * the standard two-tone headline trick and also gave away
-               * contrast. Both clauses are full-strength ink now.
-               */}
-              <motion.h1
-                variants={laneEnter}
-                transition={transitions.slow}
-                className="text-content-primary"
-              >
-                <span className="block">Calm systems,</span>
-                <span className="block font-light">shipped with care.</span>
-              </motion.h1>
+              <span className="block">Calm systems,</span>
+              <span className="block font-light">shipped with care.</span>
+            </h1>
 
-              <motion.p
-                variants={laneEnter}
-                transition={transitions.base}
-                className="mt-[calc(var(--rhythm)*6)] max-w-[44ch] text-content-secondary"
-              >
-                {SHORT_NAME}. {LEAD_SENTENCE}.
-              </motion.p>
+            <p
+              className="lane-enter mt-[calc(var(--rhythm)*6)] max-w-[44ch] text-content-secondary"
+              style={{ "--enter-index": 1 } as React.CSSProperties}
+            >
+              {SHORT_NAME}. {LEAD_SENTENCE}.
+            </p>
 
-              {/*
-               * Two CTAs, one intent each. The hero previously carried four
-               * actions in a single row: "View selected work" and "All projects"
-               * were the same portfolio intent, and "Bonus: Keyboard story" was
-               * a fourth competing link. Both now live in the Work section,
-               * where that intent belongs.
-               *
-               * No scroll cue below them. If the visitor has not scrolled yet,
-               * they are looking at the hero; the bottom of the viewport does
-               * not need a label telling them what a scrollbar is.
-               */}
-              <motion.div
-                variants={laneEnter}
-                transition={transitions.base}
-                className="mt-[calc(var(--rhythm)*10)] flex flex-col gap-3 sm:flex-row sm:items-center"
+            {/*
+             * Two CTAs, one intent each. The hero previously carried four
+             * actions in a single row: "View selected work" and "All projects"
+             * were the same portfolio intent, and "Bonus: Keyboard story" was a
+             * fourth competing link. Both now live in the Work section, where
+             * that intent belongs.
+             *
+             * No scroll cue below them. If the visitor has not scrolled yet,
+             * they are looking at the hero; the bottom of the viewport does not
+             * need a label telling them what a scrollbar is.
+             */}
+            <div
+              className="lane-enter mt-[calc(var(--rhythm)*10)] flex flex-col gap-3 sm:flex-row sm:items-center"
+              style={{ "--enter-index": 2 } as React.CSSProperties}
+            >
+              <button
+                type="button"
+                onClick={() => scrollToSection("work")}
+                className="inline-flex items-center justify-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"
               >
-                <button
-                  type="button"
-                  onClick={() => scrollToSection("work")}
-                  className="inline-flex items-center justify-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"
-                >
-                  View selected work
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollToSection("contact")}
-                  className="inline-flex items-center justify-center rounded-control border border-border-strong px-6 py-3 text-sm font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
-                >
-                  Contact
-                </button>
-              </motion.div>
-            </motion.div>
+                View selected work
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection("contact")}
+                className="inline-flex items-center justify-center rounded-control border border-border-strong px-6 py-3 text-sm font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
+              >
+                Contact
+              </button>
+            </div>
           </div>
-        </MotionConfig>
+        </div>
       </div>
     </section>
   );
