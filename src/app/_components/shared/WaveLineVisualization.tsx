@@ -27,25 +27,53 @@ interface LineConfig {
 }
 
 /**
- * The site's four accent tokens (--accent-cyan/blue/violet/lime), cycled across
- * the lines. Three.js needs literal values, so these mirror globals.css.
+ * The lane field: the one place on the site licensed to be polychrome.
+ *
+ * These are traditional Japanese pigments, mirroring the --lane-* custom
+ * properties in globals.css. Three.js cannot read custom properties, so the
+ * values are duplicated here; keep the two in step.
+ *
+ * The palette is mode-aware because a single set cannot hold on both grounds:
+ * ai indigo disappears into a #0e1014 page, and kihada yellow disappears into
+ * pale paper. Light mode gets the deeper pigments, dark mode the brighter ones.
+ *
+ * The old palette was Tailwind cyan / blue / violet / lime, which is the
+ * generic AI-tech gradient family, and it also used the same four hues that the
+ * UI chrome used for links and badges. Splitting them is what lets the chrome
+ * stay locked to one accent while the field stays colourful.
  */
-const DEFAULT_COLOR_PALETTE = [
-  "#06b6d4", // accent-cyan
-  "#2563eb", // accent-blue
-  "#7c3aed", // accent-violet
-  "#84cc16", // accent-lime
+const LANE_PALETTE_LIGHT = [
+  "#d33c22", // shu, vermilion
+  "#2b4a8b", // ai, indigo
+  "#6f8f22", // moegi, yellow-green
+  "#b8860b", // kihada, amber
+];
+
+const LANE_PALETTE_DARK = [
+  "#f0563c", // shu
+  "#5c86d8", // ai
+  "#a8bf3c", // moegi
+  "#e0b33c", // kihada
 ];
 
 /**
- * Line opacity. The palette is more saturated than the old pastel one, so the
- * lines are drawn lighter to stay a background element on the cream page.
+ * Line opacity.
+ *
+ * This was 0.55, inside a hero wrapper set to opacity-[0.35], underneath a
+ * three-stop scrim: an effective 0.19 before the scrim even applied. The most
+ * distinctive thing on the site was tuned until it was invisible. The hero no
+ * longer dims the wrapper, and the field is now the hero's primary visual.
+ *
+ * Near-opaque rather than half-transparent because WebGL ignores `linewidth`
+ * and always draws 1 device pixel: on a 2x display each line is half a CSS
+ * pixel, so transparency on top of that renders it as a grey smudge. Presence
+ * comes from opacity here, not from thickness.
  */
-const LINE_OPACITY = 0.55;
+const LINE_OPACITY = 0.95;
 
 /** Page-native backdrop for the canvas and its loading/error states. */
 const BACKDROP_CLASS =
-  "bg-gradient-to-br from-surface-page via-surface-elevated to-surface-subtle";
+  "bg-gradient-to-b from-surface-page via-surface-page to-surface-subtle";
 
 /**
  * Generates an array of THREE.Vector3 points for a parametric wave line
@@ -100,7 +128,8 @@ function generateLinePoints(config: LineConfig, time: number): Vector3[] {
  *                       Default: 12 on desktop, 6 on mobile
  *                       Higher values create denser visualizations but impact performance
  * @property colorPalette - Array of color strings (hex, rgb, or named colors)
- *                          Default: Japanese-inspired vibrant palette
+ *                          Default: the traditional pigment lane palette for
+ *                          the active colour scheme
  *                          Colors are cycled through if fewer than lineCount
  * @property animationSpeed - Animation speed multiplier
  *                            Default: 1.0
@@ -289,23 +318,23 @@ function LineWaveSystem({
       lineConfigs.forEach((config, index) => {
         const baseConfig = baseConfigs[index];
 
-        // Horizontal mouse position affects wave height (amplitude)
-        // Multiplier 0.6 creates noticeable but elegant interaction
-        const mouseInfluence = Math.abs(mousePositionRef.current.x) * 0.6;
+        // Horizontal mouse position affects wave height (amplitude).
+        // Softened from 0.6: the field should acknowledge the cursor, not
+        // react to it. Calm first.
+        const mouseInfluence = Math.abs(mousePositionRef.current.x) * 0.35;
 
-        // Vertical mouse position affects wave frequency
-        // Multiplier 0.4 creates balanced frequency changes
-        const mouseInfluenceY = Math.abs(mousePositionRef.current.y) * 0.4;
+        // Vertical mouse position affects wave frequency. Softened from 0.4.
+        const mouseInfluenceY = Math.abs(mousePositionRef.current.y) * 0.25;
 
         // Apply influences to create responsive animation
         // Clamped to prevent extreme values
         config.amplitude = Math.min(
           baseConfig.amplitude + mouseInfluence,
-          baseConfig.amplitude * 1.8
+          baseConfig.amplitude * 1.45
         );
         config.frequency = Math.min(
           baseConfig.frequency + mouseInfluenceY,
-          baseConfig.frequency * 1.5
+          baseConfig.frequency * 1.3
         );
       });
     }
@@ -351,8 +380,8 @@ function StaticGradientFallback() {
     >
       {/* Same faint grid the rest of the site uses */}
       <div className="absolute inset-0 bg-grid-faint opacity-70" />
-      {/* One soft cyan glow, echoing the sparse accent language */}
-      <div className="absolute left-1/2 top-1/2 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-cyan/10 blur-3xl" />
+      {/* One soft glow in the locked accent */}
+      <div className="absolute left-1/2 top-1/2 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl" />
       {/* Fade the grid out toward the bottom so section edges stay calm */}
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-surface-page to-transparent" />
     </div>
@@ -443,6 +472,7 @@ export default function WaveLineVisualization({
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [prefersReducedMotion, setPrefersReducedMotion] =
     useState<boolean>(false);
+  const [prefersDark, setPrefersDark] = useState<boolean>(false);
   const [contextLost, setContextLost] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -477,9 +507,23 @@ export default function WaveLineVisualization({
     handleMotionChange(motionQuery);
     motionQuery.addEventListener("change", handleMotionChange);
 
+    /*
+     * Colour scheme. The lane pigments have to swap with the theme: ai indigo
+     * vanishes into the dark page and kihada amber vanishes into pale paper, so
+     * one fixed set cannot hold on both grounds. Three.js cannot read the
+     * --lane-* custom properties, hence matchMedia rather than getComputedStyle.
+     */
+    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleDarkChange = (e: MediaQueryListEvent | MediaQueryList) =>
+      setPrefersDark(e.matches);
+
+    handleDarkChange(darkQuery);
+    darkQuery.addEventListener("change", handleDarkChange);
+
     return () => {
       mobileQuery.removeEventListener("change", handleMobileChange);
       motionQuery.removeEventListener("change", handleMotionChange);
+      darkQuery.removeEventListener("change", handleDarkChange);
     };
   }, []);
 
@@ -537,7 +581,8 @@ export default function WaveLineVisualization({
   const effectiveLineCount = lineCount ?? (isMobile ? 6 : 12);
 
   // Use provided color palette or the theme accents
-  const effectiveColorPalette = colorPalette ?? DEFAULT_COLOR_PALETTE;
+  const effectiveColorPalette =
+    colorPalette ?? (prefersDark ? LANE_PALETTE_DARK : LANE_PALETTE_LIGHT);
 
   return (
     <div

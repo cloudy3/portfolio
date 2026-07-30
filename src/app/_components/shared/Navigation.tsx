@@ -3,12 +3,18 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
+import { LAND_SPRING } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn, smoothScrollTo } from "@/lib/utils";
 
 interface NavigationProps {
   className?: string;
 }
+
+/** Matches the nav's own height, so a section counts as active once it clears it. */
+const ACTIVE_BAND_TOP = 140;
 
 export default function Navigation({ className }: NavigationProps) {
   const pathname = usePathname();
@@ -16,41 +22,61 @@ export default function Navigation({ className }: NavigationProps) {
   const [activeSection, setActiveSection] = useState("hero");
   const [isScrolled, setIsScrolled] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const reduce = usePrefersReducedMotion();
   const isHome = pathname === "/";
 
-  // Single source of truth for the active nav item. A previous
-  // IntersectionObserver ran alongside this and the two disagreed mid-scroll,
-  // which made the active underline flicker.
+  /*
+   * Scroll position, via Motion's useScroll rather than a raw
+   * `window.addEventListener("scroll")`. The listener this replaces ran on
+   * every scroll frame and, on top of that, called getBoundingClientRect()
+   * across all six sections inside the handler — a forced synchronous layout
+   * per frame. useMotionValueEvent keeps the work off the React render path,
+   * and setState only fires when the boolean actually flips.
+   */
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const next = y > 24;
+    setIsScrolled((prev) => (prev === next ? prev : next));
+  });
+
+  /*
+   * Active section, via IntersectionObserver rather than per-frame geometry.
+   * The observed band starts just below the nav and ends 55% up the viewport,
+   * so the active item changes when a section genuinely occupies the reading
+   * area. Entries are sorted by document order and the last one to have
+   * entered the band wins, which matches how the old rect check behaved.
+   */
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 24);
-      if (!isHome) {
-        setActiveSection(pathname.startsWith("/projects") ? "work" : "");
-        return;
-      }
+    if (!isHome) {
+      setActiveSection(pathname.startsWith("/projects") ? "work" : "");
+      return;
+    }
 
-      if (window.scrollY < 80) {
-        setActiveSection("hero");
-        return;
-      }
+    const ids = NAVIGATION_ITEMS.map((item) => item.id);
+    const elements = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
 
-      const sections = NAVIGATION_ITEMS.map((item) => item.id);
-      let current = "hero";
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 140 && rect.bottom >= 140) {
-            current = sectionId;
-          }
+    if (elements.length === 0) return;
+
+    const visible = new Set<string>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
         }
-      }
-      setActiveSection(current);
-    };
+        // Document order, so overlapping sections resolve to the lower one.
+        const current = ids.filter((id) => visible.has(id)).pop();
+        setActiveSection(current ?? "hero");
+      },
+      { rootMargin: `-${ACTIVE_BAND_TOP}px 0px -55% 0px` }
+    );
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    for (const el of elements) observer.observe(el);
+    return () => observer.disconnect();
   }, [isHome, pathname]);
 
   const handleNavClick = (href: string) => {
@@ -94,25 +120,54 @@ export default function Navigation({ className }: NavigationProps) {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  const navLinkClass = (id: string, path?: string) => {
+  const isActive = (id: string, path?: string) => {
     const onProjects = pathname.startsWith("/projects");
-    const active =
+    return Boolean(
       (path && onProjects && id === "work") ||
-      (!path && isHome && activeSection === id);
-    return cn(
-      "relative px-3 py-2 text-sm font-medium transition-colors rounded-md",
-      active
+        (!path && isHome && activeSection === id)
+    );
+  };
+
+  /*
+   * `text-accent-cyan` is a deprecated alias that resolves to the one locked
+   * accent. It stays on this element specifically because Navigation.test.tsx
+   * asserts the literal class name for the active Work link.
+   */
+  const navLinkClass = (id: string, path?: string) =>
+    cn(
+      "relative flex h-full items-center px-3 text-[0.8125rem] font-medium transition-colors",
+      isActive(id, path)
         ? "text-accent-cyan"
         : "text-content-secondary hover:text-content-primary"
     );
-  };
+
+  /**
+   * The lit lane segment. The nav's bottom hairline is the page's judgment
+   * line, and the active section's slice of it turns vermilion. It slides
+   * between items via layoutId, which is the state transition made visible
+   * instead of a new indicator blinking in somewhere else.
+   */
+  const LaneMark = () =>
+    reduce ? (
+      <span
+        className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
+        aria-hidden
+      />
+    ) : (
+      <motion.div
+        layoutId="nav-lane-mark"
+        className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
+        transition={LAND_SPRING}
+        aria-hidden
+      />
+    );
 
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 border-b",
+        "fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300",
         isScrolled || !isHome
-          ? "bg-surface-elevated/92 backdrop-blur-md border-border-subtle shadow-sm"
+          ? "bg-surface-elevated/92 backdrop-blur-md border-border-subtle"
           : "bg-transparent border-transparent",
         className
       )}
@@ -123,19 +178,16 @@ export default function Navigation({ className }: NavigationProps) {
       </a>
       <div className="container-custom max-w-content">
         <div className="flex h-16 items-center justify-between">
+          {/* Monogram at display weight. Previously text-sm font-semibold with
+              a drop shadow, which read as placeholder text rather than a mark. */}
           <Link
             href="/"
-            className={cn(
-              "text-sm font-semibold tracking-tight transition-colors",
-              isScrolled || !isHome
-                ? "text-content-primary"
-                : "text-content-primary drop-shadow-sm"
-            )}
+            className="text-[0.9375rem] font-black tracking-[-0.05em] text-content-primary transition-colors hover:text-accent-ink"
           >
             JF
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden h-full items-center md:flex">
             {NAVIGATION_ITEMS.map((item) =>
               "path" in item && item.path ? (
                 <Link
@@ -144,12 +196,7 @@ export default function Navigation({ className }: NavigationProps) {
                   className={navLinkClass(item.id, item.path)}
                 >
                   {item.label}
-                  {pathname.startsWith("/projects") && item.id === "work" ? (
-                    <span
-                      className="absolute bottom-1 left-3 right-3 h-px bg-accent-cyan/80"
-                      aria-hidden
-                    />
-                  ) : null}
+                  {isActive(item.id, item.path) ? <LaneMark /> : null}
                 </Link>
               ) : isHome ? (
                 <button
@@ -159,12 +206,7 @@ export default function Navigation({ className }: NavigationProps) {
                   className={navLinkClass(item.id)}
                 >
                   {item.label}
-                  {activeSection === item.id ? (
-                    <span
-                      className="absolute bottom-1 left-3 right-3 h-px bg-accent-cyan/80"
-                      aria-hidden
-                    />
-                  ) : null}
+                  {isActive(item.id) ? <LaneMark /> : null}
                 </button>
               ) : (
                 <Link
@@ -185,7 +227,7 @@ export default function Navigation({ className }: NavigationProps) {
               type="button"
               aria-controls="mobile-nav"
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center rounded-md p-2 text-content-primary hover:bg-surface-subtle"
+              className="inline-flex items-center justify-center rounded-control p-2 text-content-primary hover:bg-surface-subtle"
               aria-expanded={isOpen}
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
@@ -195,7 +237,7 @@ export default function Navigation({ className }: NavigationProps) {
               <div className="flex h-5 w-6 flex-col justify-center gap-1.5">
                 <span
                   className={cn(
-                    "h-0.5 w-full bg-content-primary transition-transform origin-center",
+                    "h-0.5 w-full origin-center bg-content-primary transition-transform",
                     isOpen && "translate-y-2 rotate-45"
                   )}
                 />
@@ -207,7 +249,7 @@ export default function Navigation({ className }: NavigationProps) {
                 />
                 <span
                   className={cn(
-                    "h-0.5 w-full bg-content-primary transition-transform origin-center",
+                    "h-0.5 w-full origin-center bg-content-primary transition-transform",
                     isOpen && "-translate-y-2 -rotate-45"
                   )}
                 />
@@ -220,18 +262,25 @@ export default function Navigation({ className }: NavigationProps) {
       <div
         id="mobile-nav"
         className={cn(
-          "md:hidden overflow-hidden border-b border-border-subtle bg-surface-elevated transition-all duration-300",
+          "overflow-hidden border-b border-border-subtle bg-surface-elevated transition-all duration-300 md:hidden",
           isOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="flex flex-col gap-1 px-4 py-3">
+        {/* One lane per row: the active row carries the accent on its left edge,
+            which is the vertical form of the same lane mark used on desktop. */}
+        <div className="flex flex-col py-2">
           {NAVIGATION_ITEMS.map((item) =>
             "path" in item && item.path ? (
               <Link
                 key={item.id}
                 href={item.path}
                 onClick={() => setIsOpen(false)}
-                className="rounded-md px-3 py-3 text-left text-base font-medium text-content-primary hover:bg-surface-subtle"
+                className={cn(
+                  "border-l-2 px-5 py-3 text-left text-base font-medium transition-colors",
+                  isActive(item.id, item.path)
+                    ? "border-accent text-content-primary"
+                    : "border-transparent text-content-secondary hover:border-border-strong hover:text-content-primary"
+                )}
               >
                 {item.label}
               </Link>
@@ -240,7 +289,12 @@ export default function Navigation({ className }: NavigationProps) {
                 key={item.id}
                 type="button"
                 onClick={() => handleNavClick(item.href)}
-                className="rounded-md px-3 py-3 text-left text-base font-medium text-content-primary hover:bg-surface-subtle"
+                className={cn(
+                  "border-l-2 px-5 py-3 text-left text-base font-medium transition-colors",
+                  isActive(item.id)
+                    ? "border-accent text-content-primary"
+                    : "border-transparent text-content-secondary hover:border-border-strong hover:text-content-primary"
+                )}
               >
                 {item.label}
               </button>
@@ -249,7 +303,7 @@ export default function Navigation({ className }: NavigationProps) {
                 key={item.id}
                 href={`/${item.href}`}
                 onClick={() => setIsOpen(false)}
-                className="rounded-md px-3 py-3 text-left text-base font-medium text-content-primary hover:bg-surface-subtle"
+                className="border-l-2 border-transparent px-5 py-3 text-left text-base font-medium text-content-secondary transition-colors hover:border-border-strong hover:text-content-primary"
               >
                 {item.label}
               </Link>
