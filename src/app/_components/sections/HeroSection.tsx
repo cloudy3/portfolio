@@ -6,7 +6,7 @@ import { MotionConfig, motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
-import { fadeUp, staggerContainer, transitions } from "@/lib/motion";
+import { laneEnter, staggerContainer, transitions } from "@/lib/motion";
 import { cn, smoothScrollTo } from "@/lib/utils";
 
 const WaveLineVisualization = dynamic(
@@ -69,13 +69,13 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
             animate="visible"
             variants={staggerContainer}
           >
-            <motion.div variants={fadeUp} transition={transitions.slow}>
+            <motion.div variants={laneEnter} transition={transitions.slow}>
               <p className="font-mono-label mb-4 text-content-muted">
                 Software engineer · Full-stack
               </p>
             </motion.div>
             <motion.h1
-              variants={fadeUp}
+              variants={laneEnter}
               transition={transitions.slow}
               className="text-4xl sm:text-5xl md:text-[3.25rem] font-semibold tracking-tight text-content-primary leading-[1.08] mb-6"
             >
@@ -83,7 +83,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
               <span className="text-content-muted"> shipped with care.</span>
             </motion.h1>
             <motion.p
-              variants={fadeUp}
+              variants={laneEnter}
               transition={transitions.base}
               className="text-lg md:text-xl text-content-secondary leading-relaxed max-w-2xl mx-auto mb-4"
             >
@@ -92,7 +92,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
               {JING_FENG_PROFILE.summary}
             </motion.p>
             <motion.div
-              variants={fadeUp}
+              variants={laneEnter}
               transition={transitions.base}
               className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-center mt-10"
             >

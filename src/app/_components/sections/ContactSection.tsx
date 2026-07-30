@@ -194,15 +194,13 @@ export default function ContactSection() {
       <Container>
         <FadeIn>
           <SectionHeader
-            align="center"
-            eyebrow="Contact"
             title="Let’s build something solid"
             description="Open to roles and collaborations that value clear communication, pragmatic architecture, and calm execution."
           />
         </FadeIn>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 max-w-6xl mx-auto">
-          <FadeIn direction="left" className="space-y-8">
+          <FadeIn className="space-y-8">
             <div>
               <h3 className="text-lg font-semibold text-content-primary mb-3">
                 Direct lines
@@ -271,7 +269,7 @@ export default function ContactSection() {
             </div>
           </FadeIn>
 
-          <FadeIn direction="right" delay={0.15}>
+          <FadeIn beat={2}>
             <div className="rounded-lg border border-border-subtle bg-surface-elevated p-6 sm:p-8 shadow-sm">
               <h3 className="text-lg font-semibold text-content-primary mb-6">
                 Message

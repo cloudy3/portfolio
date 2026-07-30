@@ -43,7 +43,6 @@ export default function AboutSection() {
       <Container>
         <FadeIn>
           <SectionHeader
-            eyebrow="About"
             title="Builder mindset, systems thinking"
             description="I care about code that survives contact with real users—readable, observable, and easy to evolve."
           />
@@ -79,12 +78,12 @@ export default function AboutSection() {
           {/* Capped so the line length stays readable now that the copy is no
               longer bounded by a grid column. */}
           <div className="flex-1 max-w-2xl space-y-8">
-            <FadeIn delay={0.05}>
+            <FadeIn beat={1}>
               <p className="text-lg text-content-secondary leading-relaxed">
                 {JING_FENG_PROFILE.summary}
               </p>
             </FadeIn>
-            <FadeIn delay={0.1}>
+            <FadeIn beat={2}>
               <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
@@ -109,7 +108,7 @@ export default function AboutSection() {
         </FadeIn>
         <div className="grid md:grid-cols-3 gap-6 mb-20">
           {pillars.map((p, i) => (
-            <FadeIn key={p.id} delay={i * 0.06}>
+            <FadeIn key={p.id} beat={i}>
               <div className="h-full rounded-lg border border-border-subtle bg-surface-elevated p-6 shadow-sm">
                 <p className="font-mono text-accent-cyan text-sm mb-3">
                   {p.id}

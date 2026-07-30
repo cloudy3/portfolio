@@ -33,14 +33,13 @@ export function ProjectsSection({
       <Container>
         <FadeIn>
           <SectionHeader
-            eyebrow="Selected work"
             title="Systems that hold up in production"
             description="A few recent builds—mobile, APIs, and real-time data—with clear ownership from design through deployment."
           />
         </FadeIn>
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
           {featured.map((project, i) => (
-            <FadeIn key={project.id} delay={i * 0.05}>
+            <FadeIn key={project.id} beat={i}>
               <ProjectListCard project={project} />
             </FadeIn>
           ))}

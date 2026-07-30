@@ -1,43 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { transitions } from "@/lib/motion";
+import { BEAT, ENTER_VIEWPORT, LANE_TRAVEL, LAND_SPRING } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
-/** Direction the element travels *from* as it fades in. */
-export type FadeInDirection = "up" | "left" | "right" | "none";
-
+/**
+ * A note arriving on its lane.
+ *
+ * One gesture, one tempo. Travel is strictly along the lane axis (vertical) and
+ * the only timing control is `beat`, a whole number of BEATs.
+ *
+ * The previous version took a free-form `delay` in seconds plus a `direction`
+ * of "up" | "left" | "right" | "none", and its 23 call sites had drifted into
+ * five different stagger values with horizontal entrances in two sections.
+ * Horizontal travel is gone by design: a note that drifts sideways has left its
+ * lane, which breaks the one structural idea the layout is built on.
+ */
 type FadeInProps = {
   children: React.ReactNode;
   className?: string;
-  delay?: number;
-  /** Defaults to "up" — the site's standard entrance. */
-  direction?: FadeInDirection;
-  /** Travel distance in px. */
-  offset?: number;
+  /**
+   * Position in the sequence, in beats. Item `i` of a group passes `i`.
+   * Fractional values are accepted but defeat the point.
+   */
+  beat?: number;
 };
 
-const hiddenOffset = (direction: FadeInDirection, offset: number) => {
-  switch (direction) {
-    case "up":
-      return { y: offset };
-    case "left":
-      return { x: -offset };
-    case "right":
-      return { x: offset };
-    case "none":
-      return {};
-  }
-};
-
-export function FadeIn({
-  children,
-  className,
-  delay = 0,
-  direction = "up",
-  offset = 24,
-}: FadeInProps) {
+export function FadeIn({ children, className, beat = 0 }: FadeInProps) {
   // See usePrefersReducedMotion: framer's equivalent can latch a stale value.
   const reduce = usePrefersReducedMotion();
 
@@ -45,19 +35,13 @@ export function FadeIn({
     return <div className={className}>{children}</div>;
   }
 
-  const variants = {
-    hidden: { opacity: 0, ...hiddenOffset(direction, offset) },
-    visible: { opacity: 1, x: 0, y: 0 },
-  };
-
   return (
     <motion.div
       className={cn(className)}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-60px" }}
-      variants={variants}
-      transition={{ ...transitions.base, delay }}
+      initial={{ opacity: 0, y: LANE_TRAVEL }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={ENTER_VIEWPORT}
+      transition={{ ...LAND_SPRING, delay: beat * BEAT }}
     >
       {children}
     </motion.div>

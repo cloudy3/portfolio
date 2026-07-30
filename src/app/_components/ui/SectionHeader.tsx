@@ -1,67 +1,48 @@
 import { cn } from "@/lib/utils";
 
+/**
+ * A section's opening. Headline, then optionally one paragraph beneath it.
+ *
+ * Four things were removed, all of them tells:
+ *
+ * - The `eyebrow` prop. Every section had one ("Selected work", "About",
+ *   "Capabilities", "Trajectory", "Contact"): six mono uppercase micro-labels on
+ *   a six-section page against a budget of two, and the single most recognisable
+ *   generated-template rhythm there is. A section's place on the page already
+ *   says what it is. There is no replacement prop, deliberately.
+ *
+ * - The decorative `from-accent-cyan/50 to-transparent` hairline that trailed
+ *   every headline. It organised nothing. The judgment line on Section is the
+ *   one piece of accent geometry a section gets.
+ *
+ * - `align="center"`. Headers sit on the lane grid, left-aligned, like
+ *   everything else. Centred section headers were the generic default.
+ *
+ * - `inverse`. There is one page theme now, so there is nothing to invert for.
+ *
+ * The description stays stacked directly beneath the headline and capped at
+ * 60ch, never floated into a right-hand column: a big headline on the left with
+ * a small explainer paragraph adrift on the right is its own tell.
+ *
+ * Type scale comes from the h2 rule in globals.css. No local font-size or weight
+ * utilities here, so every section headline is identical by construction.
+ */
 type SectionHeaderProps = {
-  eyebrow?: string;
   title: string;
   description?: string;
-  align?: "left" | "center";
   className?: string;
-  /** When section is inverse (dark) */
-  inverse?: boolean;
 };
 
 export function SectionHeader({
-  eyebrow,
   title,
   description,
-  align = "left",
   className,
-  inverse = false,
 }: SectionHeaderProps) {
   return (
-    <header
-      className={cn(
-        "mb-12 md:mb-16 max-w-3xl",
-        align === "center" && "mx-auto text-center",
-        className
-      )}
-    >
-      {eyebrow ? (
-        <p
-          className={cn(
-            "font-mono-label mb-3",
-            inverse ? "text-content-inverse-muted" : undefined
-          )}
-        >
-          {eyebrow}
-        </p>
-      ) : null}
-      <div
-        className={cn(
-          "flex items-center gap-4 mb-4",
-          align === "center" && "justify-center"
-        )}
-      >
-        <h2
-          className={cn(
-            "text-3xl md:text-4xl font-semibold tracking-tight",
-            inverse ? "text-content-inverse" : "text-content-primary"
-          )}
-        >
-          {title}
-        </h2>
-        <span
-          className="hidden sm:block h-px flex-1 max-w-[120px] bg-gradient-to-r from-accent-cyan/50 to-transparent"
-          aria-hidden
-        />
-      </div>
+    <header className={cn("mb-[calc(var(--rhythm)*14)]", className)}>
+      <h2 className="max-w-[24ch] text-content-primary">{title}</h2>
       {description ? (
-        <p
-          className={cn(
-            "text-base md:text-lg leading-relaxed",
-            inverse ? "text-content-inverse-muted" : "text-content-secondary"
-          )}
-        >
+        <p className="mt-[calc(var(--rhythm)*5)] max-w-[60ch] text-content-secondary">
           {description}
         </p>
       ) : null}

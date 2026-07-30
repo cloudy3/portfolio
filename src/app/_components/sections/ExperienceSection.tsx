@@ -40,28 +40,26 @@ const ExperienceCard = ({
 
   return (
     <FadeIn
-      direction="left"
-      offset={32}
-      delay={index * 0.2}
-      className="relative rounded-lg border border-white/10 bg-white/[0.04] backdrop-blur-sm overflow-hidden"
+      beat={index}
+      className="relative rounded-lg border border-border-subtle bg-surface-elevated backdrop-blur-sm overflow-hidden"
     >
-      <div className="absolute left-6 top-0 w-px h-full bg-gradient-to-b from-accent-cyan/50 to-accent-blue/20" />
-      <div className="absolute left-[1.15rem] top-8 h-2.5 w-2.5 rounded-full bg-accent-cyan border-2 border-surface-inverse" />
+      <div className="absolute left-6 top-0 w-px h-full bg-border-strong" />
+      <div className="absolute left-[1.15rem] top-8 h-2.5 w-2.5 rounded-full bg-accent border-2 border-surface-page" />
 
       <div className="pl-14 pr-6 py-7 md:pl-16 md:pr-8 md:py-8">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
           <div className="flex items-start mb-0">
-            <div className="w-11 h-11 rounded-md border border-white/15 bg-white/5 flex items-center justify-center font-mono text-xs text-content-inverse-muted mr-4 flex-shrink-0">
+            <div className="w-11 h-11 rounded-md border border-border-strong bg-surface-page flex items-center justify-center font-mono text-xs text-content-secondary mr-4 flex-shrink-0">
               {experience.company.slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-content-inverse tracking-tight">
+              <h3 className="text-lg font-semibold text-content-primary tracking-tight">
                 {experience.position}
               </h3>
-              <h4 className="text-sm font-medium text-accent-cyan/90 mt-0.5">
+              <h4 className="text-sm font-medium text-accent-ink mt-0.5">
                 {experience.company}
               </h4>
-              <div className="flex flex-col sm:flex-row sm:items-center text-sm text-content-inverse-muted gap-2 mt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center text-sm text-content-secondary gap-2 mt-2">
                 <span>
                   {formatDate(experience.startDate)} —{" "}
                   {experience.endDate
@@ -73,7 +71,7 @@ const ExperienceCard = ({
                 {!experience.endDate && (
                   <>
                     <span className="hidden sm:inline opacity-40">·</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[0.65rem] font-mono uppercase tracking-wider bg-accent-lime/15 text-accent-lime">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[0.65rem] font-mono uppercase tracking-wider bg-accent/10 text-accent-ink">
                       Current
                     </span>
                   </>
@@ -85,25 +83,25 @@ const ExperienceCard = ({
           <button
             type="button"
             onClick={onToggle}
-            className="flex-shrink-0 px-4 py-2 rounded-md border border-white/15 text-content-inverse text-sm font-medium hover:border-accent-cyan/40 transition-colors"
+            className="flex-shrink-0 px-4 py-2 rounded-md border border-border-strong text-content-primary text-sm font-medium hover:border-accent transition-colors"
           >
             {isExpanded ? "Less" : "More"}
           </button>
         </div>
 
-        <p className="text-content-inverse-muted mb-4 leading-relaxed text-sm md:text-base">
+        <p className="text-content-secondary mb-4 leading-relaxed text-sm md:text-base">
           {experience.description}
         </p>
 
         <div className="mb-2">
-          <h5 className="font-mono-label mb-2 text-content-inverse-muted">
+          <h5 className="font-mono-label mb-2 text-content-secondary">
             Stack
           </h5>
           <div className="flex flex-wrap gap-2">
             {experience.technologies.map((tech) => (
               <span
                 key={tech}
-                className="px-2.5 py-1 rounded-sm bg-white/5 text-content-inverse-muted text-xs font-mono border border-white/10"
+                className="px-2.5 py-1 rounded-sm bg-surface-page text-content-secondary text-xs font-mono border border-border-subtle"
               >
                 {tech}
               </span>
@@ -112,16 +110,16 @@ const ExperienceCard = ({
         </div>
 
         {isExpanded && (
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <h5 className="font-mono-label mb-3 text-content-inverse-muted">
+          <div className="mt-6 pt-6 border-t border-border-subtle">
+            <h5 className="font-mono-label mb-3 text-content-secondary">
               Highlights
             </h5>
             <ul className="space-y-3">
               {experience.achievements.map((achievement, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent-cyan" />
-                  <div className="text-content-inverse-muted text-sm leading-relaxed">
-                    <div className="text-content-inverse/90 font-medium mb-1">
+                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                  <div className="text-content-secondary text-sm leading-relaxed">
+                    <div className="text-content-primary font-medium mb-1">
                       {achievement.description}
                     </div>
                     {achievement.impact && (
@@ -130,7 +128,7 @@ const ExperienceCard = ({
                       </div>
                     )}
                     {achievement.metrics && (
-                      <div className="text-xs text-accent-cyan/90 font-medium">
+                      <div className="text-xs text-accent-ink font-medium">
                         {achievement.metrics}
                       </div>
                     )}
@@ -161,41 +159,40 @@ const EducationCard = ({
 
   return (
     <FadeIn
-      offset={16}
-      delay={index * 0.15}
-      className="rounded-lg border border-white/10 bg-white/[0.04] p-6"
+      beat={index}
+      className="rounded-lg border border-border-subtle bg-surface-elevated p-6"
     >
       <div className="flex items-start mb-4">
-        <div className="w-11 h-11 rounded-md border border-white/15 bg-white/5 flex items-center justify-center font-mono text-xs text-content-inverse-muted mr-4">
+        <div className="w-11 h-11 rounded-md border border-border-strong bg-surface-page flex items-center justify-center font-mono text-xs text-content-secondary mr-4">
           ED
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-content-inverse mb-1 tracking-tight">
+          <h3 className="text-lg font-semibold text-content-primary mb-1 tracking-tight">
             {education.degree}
           </h3>
-          <h4 className="text-sm font-medium text-accent-lime/90 mb-2">
+          <h4 className="text-sm font-medium text-accent-ink mb-2">
             {education.institution}
           </h4>
-          <div className="text-sm text-content-inverse-muted">
+          <div className="text-sm text-content-secondary">
             {formatDate(education.startDate)} — {formatDate(education.endDate)}
           </div>
         </div>
       </div>
 
-      <p className="text-content-inverse-muted mb-4 text-sm leading-relaxed">
+      <p className="text-content-secondary mb-4 text-sm leading-relaxed">
         {education.description}
       </p>
 
       {education.achievements && (
         <div>
-          <h5 className="font-mono-label mb-2 text-content-inverse-muted">
+          <h5 className="font-mono-label mb-2 text-content-secondary">
             Highlights
           </h5>
           <ul className="space-y-1">
             {education.achievements.slice(0, 2).map((achievement, index) => (
               <li key={index} className="flex items-start gap-2">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent-lime/80" />
-                <span className="text-content-inverse-muted text-xs leading-relaxed">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                <span className="text-content-secondary text-xs leading-relaxed">
                   {achievement}
                 </span>
               </li>
@@ -216,27 +213,26 @@ const CertificationCard = ({
 }) => {
   return (
     <FadeIn
-      offset={12}
-      delay={index * 0.1}
-      className="rounded-lg border border-white/10 bg-white/[0.04] p-6"
+      beat={index}
+      className="rounded-lg border border-border-subtle bg-surface-elevated p-6"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-md border border-white/15 bg-white/5 flex items-center justify-center font-mono text-[0.65rem] text-content-inverse-muted">
+          <div className="w-10 h-10 rounded-md border border-border-strong bg-surface-page flex items-center justify-center font-mono text-[0.65rem] text-content-secondary">
             CR
           </div>
           <div>
-            <h3 className="text-base font-semibold text-content-inverse mb-1">
+            <h3 className="text-base font-semibold text-content-primary mb-1">
               {certification.name}
             </h3>
-            <h4 className="text-sm text-accent-violet/90 font-medium">
+            <h4 className="text-sm text-accent-ink font-medium">
               {certification.issuer}
             </h4>
           </div>
         </div>
       </div>
 
-      <div className="font-mono text-[0.65rem] text-content-inverse-muted">
+      <div className="font-mono text-[0.65rem] text-content-secondary">
         ID: {certification.credentialId}
       </div>
     </FadeIn>
@@ -265,44 +261,40 @@ const ExperienceSection = () => {
     <Section
       id="experience"
       variant="inverse"
-      className="scroll-mt-20 border-t border-white/5"
+      className="scroll-mt-20 border-t border-border-subtle"
     >
       <Container>
         <FadeIn>
           <SectionHeader
-            inverse
-            align="center"
-            eyebrow="Trajectory"
             title="Experience and credentials"
             description="Roles shipped in production, formal training, and certifications that back the work."
           />
         </FadeIn>
 
         <FadeIn
-          offset={16}
           className="flex flex-wrap justify-center gap-10 mb-12"
         >
           <div className="text-center">
-            <div className="text-3xl font-semibold text-content-inverse tabular-nums mb-1">
+            <div className="text-3xl font-semibold text-content-primary tabular-nums mb-1">
               {totalYears}+
             </div>
-            <div className="text-xs font-mono uppercase tracking-wider text-content-inverse-muted">
+            <div className="text-xs font-mono uppercase tracking-wider text-content-secondary">
               Years
             </div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-semibold text-content-inverse tabular-nums mb-1">
+            <div className="text-3xl font-semibold text-content-primary tabular-nums mb-1">
               {EXPERIENCE_DATA.length}
             </div>
-            <div className="text-xs font-mono uppercase tracking-wider text-content-inverse-muted">
+            <div className="text-xs font-mono uppercase tracking-wider text-content-secondary">
               Roles
             </div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-semibold text-content-inverse tabular-nums mb-1">
+            <div className="text-3xl font-semibold text-content-primary tabular-nums mb-1">
               {CERTIFICATIONS_DATA.length}
             </div>
-            <div className="text-xs font-mono uppercase tracking-wider text-content-inverse-muted">
+            <div className="text-xs font-mono uppercase tracking-wider text-content-secondary">
               Certifications
             </div>
           </div>
@@ -322,8 +314,8 @@ const ExperienceSection = () => {
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
                 activeTab === tab.key
-                  ? "bg-surface-elevated text-content-primary border-surface-elevated"
-                  : "border-white/15 text-content-inverse-muted hover:border-accent-cyan/40"
+                  ? "bg-surface-inverse text-content-inverse border-surface-inverse"
+                  : "border-border-strong text-content-secondary hover:border-accent"
               }`}
             >
               {tab.label}
@@ -336,7 +328,7 @@ const ExperienceSection = () => {
             <div className="space-y-8">
               {currentExp && (
                 <div>
-                  <h3 className="font-mono-label mb-4 text-accent-lime">
+                  <h3 className="font-mono-label mb-4 text-accent-ink">
                     Current
                   </h3>
                   <ExperienceCard
@@ -350,7 +342,7 @@ const ExperienceSection = () => {
 
               {pastExps.length > 0 && (
                 <div>
-                  <h3 className="font-mono-label mb-4 mt-10 text-content-inverse-muted">
+                  <h3 className="font-mono-label mb-4 mt-10 text-content-secondary">
                     Earlier
                   </h3>
                   <div className="space-y-6">

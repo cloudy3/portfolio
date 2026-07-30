@@ -29,7 +29,6 @@ export default function ProjectsPage() {
           <span className="text-content-primary">Work</span>
         </nav>
         <SectionHeader
-          eyebrow="Portfolio"
           title="Selected work"
           description="Product-minded engineering across Flutter, Python, and Google Cloud—shipping systems that hold up in the field."
         />

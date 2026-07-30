@@ -94,13 +94,12 @@ export default function SkillsSection() {
       <Container>
         <FadeIn>
           <SectionHeader
-            eyebrow="Capabilities"
             title="Tools I ship with"
             description="From React and Next.js on the web to Flutter on mobile and GCP behind the scenes—grouped by domain. Filters help you zoom in for a role or conversation."
           />
         </FadeIn>
 
-        <FadeIn delay={0.04}>
+        <FadeIn beat={1}>
           <div className="mb-8 flex flex-wrap gap-3 sm:gap-4 md:mb-10">
             {(
               [
@@ -124,7 +123,7 @@ export default function SkillsSection() {
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.06}>
+        <FadeIn beat={2}>
           {/* No role="toolbar": that contract requires arrow-key roving
               tabindex. These are plain toggle buttons — aria-pressed already
               conveys state, and Tab reaches each one. */}
@@ -155,7 +154,7 @@ export default function SkillsSection() {
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.08}>
+        <FadeIn beat={3}>
           <div className="overflow-hidden rounded-lg border border-border-subtle bg-surface-elevated shadow-sm">
             <div className="divide-y divide-border-subtle">
               {grouped.map(({ category, skills }) => (
@@ -202,7 +201,7 @@ export default function SkillsSection() {
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.1}>
+        <FadeIn beat={4}>
           <p className="mt-6 text-center text-xs text-content-muted sm:text-left">
             Current learning focus: mobile performance, cloud economics, and
             how teams ship reliable products end to end—from UI in React or

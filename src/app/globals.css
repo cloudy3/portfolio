@@ -57,6 +57,19 @@
   --color-surface-subtle: #e3e5ea;
   --color-surface-elevated: #f7f8fa;
 
+  /* ---- Inverted pair: filled controls ---------------------------------
+   * "Inverse" means inverted RELATIVE TO THE PAGE, so unlike the old palette
+   * these flip with the mode: ink-on-paper in light, paper-on-ink in dark. That
+   * keeps `bg-surface-inverse text-content-inverse` (the primary CTA fill, 14
+   * call sites) reading as one high-contrast filled control in both themes.
+   *
+   * These are NOT a licence to invert a whole section. See the note on
+   * Section's deprecated `inverse` variant.
+   */
+  --color-surface-inverse: #16181c;
+  --color-content-inverse: #ecedf0;
+  --color-content-inverse-muted: #a7adb8;
+
   /* ---- Text ----
    * Verified against --color-surface-page: primary 14.7:1, secondary 7.1:1,
    * muted 4.8:1. Muted is the floor; do not lighten it.
@@ -187,6 +200,10 @@
     --color-surface-subtle: #16181d;
     --color-surface-elevated: #1c1f26;
 
+    --color-surface-inverse: #e8eaee;
+    --color-content-inverse: #0e1014;
+    --color-content-inverse-muted: #494d56;
+
     /* Verified against #0e1014: primary 15.8:1, secondary 8.5:1, muted 5.1:1 */
     --color-content-primary: #e8eaee;
     --color-content-secondary: #a7adb8;
@@ -215,6 +232,10 @@
   --color-surface-page: #0e1014;
   --color-surface-subtle: #16181d;
   --color-surface-elevated: #1c1f26;
+
+  --color-surface-inverse: #e8eaee;
+  --color-content-inverse: #0e1014;
+  --color-content-inverse-muted: #494d56;
 
   --color-content-primary: #e8eaee;
   --color-content-secondary: #a7adb8;
@@ -245,6 +266,10 @@
   --color-surface-page: #ecedf0;
   --color-surface-subtle: #e3e5ea;
   --color-surface-elevated: #f7f8fa;
+
+  --color-surface-inverse: #16181c;
+  --color-content-inverse: #ecedf0;
+  --color-content-inverse-muted: #a7adb8;
 
   --color-content-primary: #16181c;
   --color-content-secondary: #494d56;
