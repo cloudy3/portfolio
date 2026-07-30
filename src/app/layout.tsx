@@ -1,17 +1,54 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
+/*
+ * Zen Kaku Gothic New. One family for the whole site: hierarchy comes from
+ * weight contrast (300 against 900), not from a second face or from raw scale,
+ * so all five weights are genuinely in use and none is dead payload.
+ *
+ * SELF-HOSTED ON PURPOSE — do not move this back to next/font/google.
+ *
+ * This is a full Japanese face, and Google serves it as 121 unicode-range
+ * chunks per weight. `subsets: ["latin"]` does not reduce that (verified
+ * against the CSS API: the subset parameter is ignored for CJK families). Via
+ * next/font/google the five weights produced 606 @font-face rules, a 155 KB
+ * gzipped RENDER-BLOCKING stylesheet, and 8.6 MB of self-hosted woff2 — on a
+ * site whose mobile Lighthouse score is already 62-65. Google also distributes
+ * ASCII across several chunks mixed with kanji, so the latin coverage cannot
+ * simply be lifted out of them.
+ *
+ * The files here came from the CSS API's `text=` parameter, which returns a
+ * single pre-subset woff2 per weight. Inventory: printable ASCII, the Latin-1
+ * supplement, typographic punctuation, currency, arrows, math and 間. Total
+ * 53 KB for all five weights.
+ *
+ * If a glyph outside that inventory ever needs to render, re-run the fetch with
+ * it added rather than reverting to the Google loader. Visitor-typed text in
+ * the contact form falls back to system-ui, which is expected.
+ *
+ * `variable` deliberately reuses Tailwind's own `--font-sans` / `--font-mono`
+ * theme keys. next/font redefines them on <body>, which is why the `font-sans`
+ * and `font-mono` utilities resolve to these faces rather than to Tailwind's
+ * default stacks.
+ */
+const zenKaku = localFont({
+  src: [
+    { path: "../fonts/ZenKakuGothicNew-300.woff2", weight: "300", style: "normal" },
+    { path: "../fonts/ZenKakuGothicNew-400.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/ZenKakuGothicNew-500.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/ZenKakuGothicNew-700.woff2", weight: "700", style: "normal" },
+    { path: "../fonts/ZenKakuGothicNew-900.woff2", weight: "900", style: "normal" },
+  ],
   variable: "--font-sans",
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
+/* Numbers only. See the mono rule in globals.css. */
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
@@ -24,7 +61,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
   title: {
-    default: "Jing Feng — Software Engineer",
+    default: "Jing Feng - Software Engineer",
     template: "%s | Jing Feng",
   },
   description:
@@ -39,9 +76,9 @@ export const metadata: Metadata = {
     title: "JF Portfolio",
   },
   openGraph: {
-    title: "Jing Feng — Software Engineer",
+    title: "Jing Feng - Software Engineer",
     description:
-      "Full-stack engineer — Flutter, Python, Google Cloud, and product-minded delivery.",
+      "Full-stack engineer. Flutter, Python, Google Cloud, and product-minded delivery.",
     type: "website",
     locale: "en_US",
     siteName: "Jing Feng Portfolio",
@@ -49,9 +86,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jing Feng — Software Engineer",
+    title: "Jing Feng - Software Engineer",
     description:
-      "Full-stack engineer — Flutter, Python, Google Cloud, and product-minded delivery.",
+      "Full-stack engineer. Flutter, Python, Google Cloud, and product-minded delivery.",
   },
   alternates: {
     canonical: "/",
@@ -89,7 +126,7 @@ export default function RootLayout({
     // which never establishes a scroll container.
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}
+        className={`${zenKaku.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}
       >
         <AccessibilityAuditor />
         <AccessibilityProvider>

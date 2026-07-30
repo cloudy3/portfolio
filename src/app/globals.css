@@ -1,70 +1,281 @@
 @import "tailwindcss";
 
 /*
- * Design tokens. This is the single source of truth: Tailwind v4 generates the
+ * ============================================================================
+ * DESIGN SYSTEM: 間 (ma) + the note lane
+ * ============================================================================
+ *
+ * Two ideas, welded:
+ *
+ *   MA is the Japanese principle of interval. It governs layout: a strict
+ *   hairline lane grid, composed emptiness, content placed deliberately
+ *   off-axis, generous vertical rhythm. The calm comes from structure, not
+ *   from a soft palette.
+ *
+ *   THE NOTE LANE is the grammar of a Japanese rhythm chart: parallel lanes, a
+ *   judgment line, notes quantized to a beat, counters in mono. It is the
+ *   structural spine of the site, not hero wallpaper.
+ *
+ * Three rules are locked. Breaking any of them is a regression:
+ *
+ *   1. COLOUR LOCK. UI chrome is ink plus exactly one accent (shu-iro
+ *      vermilion). The four-colour lane field in the hero canvas is the single
+ *      licensed exception. No second accent anywhere else.
+ *   2. SHAPE LOCK. Structural surfaces are sharp (radius 0). Interactive
+ *      controls get --radius-control and nothing else. No pills, no 12px+.
+ *   3. MONO IS FOR NUMBERS. JetBrains Mono appears on counts, dates and
+ *      durations via `.num`, and nowhere else. There are no mono uppercase
+ *      eyebrow labels on this site.
+ *
+ * This @theme block is the single source of truth: Tailwind v4 generates the
  * utilities (bg-surface-page, text-content-primary, border-border-subtle,
- * accent-*, max-w-content, rounded-*) directly from these names, and the plain
- * CSS below consumes the same variables.
+ * text-accent, rounded-control, max-w-content) directly from these names, and
+ * the plain CSS below consumes the same variables.
  *
  * These previously lived in a v3-style tailwind.config.ts, which Tailwind v4
- * never loaded — every semantic utility silently compiled to nothing.
+ * never loaded — every semantic utility silently compiled to nothing. Verify
+ * changes here against the compiled chunk in .next/static/chunks/*.css, never
+ * from this source alone.
  */
-@theme {
-  /* Surfaces */
-  --color-surface-page: #faf8f5;
-  --color-surface-subtle: #f3f1ed;
-  --color-surface-elevated: #ffffff;
-  --color-surface-inverse: #161618;
-  --color-surface-inverse-elevated: #1e1e22;
 
-  /* Text */
-  --color-content-primary: #1a1a1c;
-  --color-content-secondary: #4a4a52;
-  --color-content-muted: #6b6b76;
-  --color-content-inverse: #f4f4f5;
-  --color-content-inverse-muted: #a1a1aa;
+/*
+ * `static` is load-bearing, not a style preference.
+ *
+ * A plain `@theme` block is tree-shaken: Tailwind drops any token no utility
+ * references. The dark-mode overrides below are hand-written plain CSS, so they
+ * are always emitted. Combine the two and a token that happens to have no
+ * utility call site yet (--color-accent-ink was exactly this) ends up defined
+ * in dark mode and UNDEFINED in light mode — a one-mode-only failure that
+ * reading this file could never reveal. Verified against the compiled chunk.
+ */
+@theme static {
+  /* ---- Surfaces: cool sumi ink wash, not warm paper ---------------------
+   * Light values live here; the dark set is swapped further down. Every hue
+   * sits on the same cool axis (~220) so nothing drifts warm.
+   */
+  --color-surface-page: #ecedf0;
+  --color-surface-subtle: #e3e5ea;
+  --color-surface-elevated: #f7f8fa;
 
-  /* Borders */
-  --color-border-subtle: rgba(26, 26, 28, 0.08);
-  --color-border-strong: rgba(26, 26, 28, 0.14);
+  /* ---- Text ----
+   * Verified against --color-surface-page: primary 14.7:1, secondary 7.1:1,
+   * muted 4.8:1. Muted is the floor; do not lighten it.
+   */
+  --color-content-primary: #16181c;
+  --color-content-secondary: #494d56;
+  --color-content-muted: #62666f;
 
-  /* Accents (sparse use) */
-  --color-accent-cyan: #06b6d4;
-  --color-accent-blue: #2563eb;
-  --color-accent-lime: #84cc16;
-  --color-accent-violet: #7c3aed;
+  /* ---- Borders ---- */
+  --color-border-subtle: rgba(22, 24, 28, 0.1);
+  --color-border-strong: rgba(22, 24, 28, 0.18);
 
-  /* Layout — --container-content backs `max-w-content` */
+  /* ---- The accent: 朱色 shu-iro ----------------------------------------
+   * The torii and hanko red. One accent, whole site, roughly 2% of the
+   * painted area: focus rings, links, the judgment line, active nav lane.
+   *
+   * Two tokens, one hue, split by contrast duty:
+   *   --color-accent      fills, rules and UI edges. 3.9:1 on the page, which
+   *                       clears the 3:1 floor for non-text and large text.
+   *   --color-accent-ink  text and links. 4.8:1 on the page, clearing AA for
+   *                       body copy. Never use --color-accent for small text.
+   */
+  --color-accent: #d33c22;
+  --color-accent-ink: #bd341c;
+
+  /* ---- Deprecated accent aliases ---------------------------------------
+   * The old palette used four accents as semantics (cyan for links, blue for
+   * labels, lime for badges, violet for issuers), which is exactly the colour
+   * inconsistency this system removes. Every alias now resolves to the single
+   * locked accent, so the lock holds at the token layer while call sites are
+   * migrated section by section.
+   *
+   * Delete these once `grep -rE "accent-(cyan|blue|lime|violet)" src` returns
+   * nothing.
+   */
+  --color-accent-cyan: var(--color-accent);
+  --color-accent-blue: var(--color-accent);
+  --color-accent-lime: var(--color-accent);
+  --color-accent-violet: var(--color-accent);
+
+  /* ---- Layout ----
+   * --container-content backs `max-w-content`.
+   * --radius-control is the ONLY radius token. See the shape lock above.
+   */
   --container-content: 72rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+  --radius-control: 0.375rem;
 }
 
+/*
+ * ---- Non-utility tokens (light) --------------------------------------------
+ *
+ * Values with no Tailwind utility counterpart, so they live in plain :root
+ * rather than @theme. The lane pigments deliberately avoid the `--color-`
+ * prefix: inside @theme that prefix would generate `bg-lane-shu` and friends,
+ * and a utility that paints a lane colour onto UI chrome is exactly the colour
+ * lock violation this system exists to prevent. The canvas reads these; nothing
+ * else may.
+ */
 :root {
-  /* Layout values with no utility counterpart */
+  color-scheme: light dark;
+
+  /* ---- Layout ---- */
   --header-height: 4rem;
-  --section-padding: 5.5rem;
-  --section-padding-mobile: 3rem;
+
+  /* Density 3: this site should read as an art gallery, not a web app. The
+     old value was a flat 5.5rem, which is standard-web-app spacing. */
+  --section-padding: clamp(6rem, 12vh, 10rem);
+  --section-padding-mobile: clamp(3.5rem, 9vh, 5rem);
   --container-padding: 1.5rem;
 
-  /* Focus ring */
-  --focus-ring: var(--color-accent-cyan);
+  /* ---- Vertical rhythm ----
+   * Every block-level gap in the site is a multiple of --rhythm, so content
+   * baselines agree with the lane rails instead of drifting per section.
+   */
+  --rhythm: 0.5rem;
+
+  /* ---- The lane grid ----
+   * Eight lanes across the content column. Gapless on purpose: the rails must
+   * land exactly on the grid lines, and a column-gap would offset every rail
+   * from its track by the gap width. Cells carry their own inner padding via
+   * --lane-inset.
+   */
+  --lane-count: 8;
+  --lane-inset: 1.5rem;
+
+  /* ---- The lane field (hero canvas only) ----
+   * Traditional pigment names, mirrored as literals in
+   * WaveLineVisualization.tsx because Three.js cannot read custom properties.
+   * Light mode takes the deeper pigments so they hold against pale paper; dark
+   * mode takes the brighter ones.
+   */
+  --lane-shu: #d33c22;
+  --lane-ai: #2b4a8b;
+  --lane-moegi: #6f8f22;
+  --lane-kihada: #b8860b;
+
+  /* Semi-transparent page colour, for canvas loaders and overlays. */
+  --scrim: rgba(236, 237, 240, 0.82);
+
+  /* Focus ring: the locked accent, at fill contrast. */
+  --focus-ring: var(--color-accent);
   --focus-offset: 2px;
+}
+
+/*
+ * ---- Dark mode -------------------------------------------------------------
+ *
+ * Strategy: swap the same custom properties, so every utility flips at once.
+ * There is no `dark:` variant anywhere in this codebase; one strategy only.
+ *
+ * ORDER IS LOAD-BEARING. These blocks are unlayered `:root`, the same
+ * specificity as the light block above, so the later rule wins. Every light
+ * value must be declared BEFORE this point or it silently overrides its own
+ * dark counterpart in dark mode. Do not move a light token below here.
+ *
+ * The dark values are written twice on purpose. `light-dark()` with a single
+ * shared declaration list would be tidier, but a value that fails to parse in
+ * an older engine would leave text colours unset, and this project has already
+ * shipped one silent all-or-nothing CSS failure. Duplication is the boring,
+ * robust choice. Keep the two blocks identical.
+ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --color-surface-page: #0e1014;
+    --color-surface-subtle: #16181d;
+    --color-surface-elevated: #1c1f26;
+
+    /* Verified against #0e1014: primary 15.8:1, secondary 8.5:1, muted 5.1:1 */
+    --color-content-primary: #e8eaee;
+    --color-content-secondary: #a7adb8;
+    --color-content-muted: #7e8593;
+
+    --color-border-subtle: rgba(232, 234, 238, 0.1);
+    --color-border-strong: rgba(232, 234, 238, 0.2);
+
+    /* 5.5:1 on the dark page, so one value covers both fill and text duty. */
+    --color-accent: #f0563c;
+    --color-accent-ink: #f0563c;
+
+    --lane-shu: #f0563c;
+    --lane-ai: #5c86d8;
+    --lane-moegi: #a8bf3c;
+    --lane-kihada: #e0b33c;
+
+    --scrim: rgba(14, 16, 20, 0.82);
+  }
+}
+
+/* Manual override hook. Kept in step with the media query above. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-surface-page: #0e1014;
+  --color-surface-subtle: #16181d;
+  --color-surface-elevated: #1c1f26;
+
+  --color-content-primary: #e8eaee;
+  --color-content-secondary: #a7adb8;
+  --color-content-muted: #7e8593;
+
+  --color-border-subtle: rgba(232, 234, 238, 0.1);
+  --color-border-strong: rgba(232, 234, 238, 0.2);
+
+  --color-accent: #f0563c;
+  --color-accent-ink: #f0563c;
+
+  --lane-shu: #f0563c;
+  --lane-ai: #5c86d8;
+  --lane-moegi: #a8bf3c;
+  --lane-kihada: #e0b33c;
+
+  --scrim: rgba(14, 16, 20, 0.82);
+}
+
+/*
+ * Forcing light needs the full light set restated, not just `color-scheme`:
+ * the dark media query above still matches on a dark-preference machine, and
+ * [data-theme] alone would not outrank it for the colour tokens.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-surface-page: #ecedf0;
+  --color-surface-subtle: #e3e5ea;
+  --color-surface-elevated: #f7f8fa;
+
+  --color-content-primary: #16181c;
+  --color-content-secondary: #494d56;
+  --color-content-muted: #62666f;
+
+  --color-border-subtle: rgba(22, 24, 28, 0.1);
+  --color-border-strong: rgba(22, 24, 28, 0.18);
+
+  --color-accent: #d33c22;
+  --color-accent-ink: #bd341c;
+
+  --lane-shu: #d33c22;
+  --lane-ai: #2b4a8b;
+  --lane-moegi: #6f8f22;
+  --lane-kihada: #b8860b;
+
+  --scrim: rgba(236, 237, 240, 0.82);
 }
 
 /*
  * IMPORTANT — everything below is layered on purpose.
  *
  * Unlayered CSS outranks every cascade layer, so plain rules here silently
- * defeat Tailwind utilities. As unlayered CSS, the `h1-h6` colour below beat
- * `text-accent-lime` on a heading, rendering #1a1a1c on the dark Experience
- * section (#161618) — a 1.03:1 contrast ratio. Base rules belong in
+ * defeat Tailwind utilities. As unlayered CSS, an `h1-h6` colour rule beat
+ * `text-accent-lime` on a heading and rendered near-black on the old dark
+ * Experience section — a 1.03:1 contrast ratio. Base rules belong in
  * @layer base and shared classes in @layer components, which puts them below
  * @layer utilities where Tailwind's classes live.
  *
- * The reduced-motion kill-switch at the bottom is intentionally left
- * unlayered: it must win against everything.
+ * The dark-mode blocks above and the reduced-motion kill-switch at the bottom
+ * are intentionally left unlayered: both must win against everything.
  */
 
 @layer base {
@@ -88,7 +299,11 @@
   body {
     margin: 0;
     font-family: var(--font-sans), system-ui, sans-serif;
-    line-height: 1.6;
+    font-weight: 400;
+    /* Airier than the old 1.6. Density 3 lives in the leading as much as in
+       the section padding. */
+    line-height: 1.75;
+    letter-spacing: 0.005em;
     background-color: var(--color-surface-page);
     color: var(--color-content-primary);
     -webkit-font-smoothing: antialiased;
@@ -106,7 +321,14 @@
     outline-offset: var(--focus-offset);
   }
 
-  /* Typography rhythm */
+  /*
+   * Typography rhythm.
+   *
+   * Hierarchy is carried by WEIGHT CONTRAST (300 against 900), not by raw
+   * scale. Zen Kaku Gothic New has wide, geometric Latin forms, so the tight
+   * -0.04em tracking that suited DM Sans reads cramped here; tracking is
+   * loosened across the board.
+   */
   h1,
   h2,
   h3,
@@ -114,34 +336,39 @@
   h5,
   h6 {
     font-family: var(--font-sans), system-ui, sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
     margin: 0;
     color: var(--color-content-primary);
+    text-wrap: balance;
   }
 
   h1 {
-    font-size: clamp(2.25rem, 5vw, 3.5rem);
-    font-weight: 650;
-    letter-spacing: -0.04em;
-    line-height: 1.08;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
   }
 
   h2 {
-    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-    font-weight: 600;
+    font-size: clamp(1.875rem, 4vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
   }
 
   h3 {
     font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    letter-spacing: -0.01em;
   }
 
   p {
     font-size: clamp(1rem, 2vw, 1.0625rem);
-    line-height: 1.7;
+    line-height: 1.75;
     color: var(--color-content-secondary);
     margin: 0;
+    text-wrap: pretty;
   }
 }
 
@@ -164,11 +391,11 @@
     left: 1rem;
     z-index: 99999;
     padding: 0.5rem 1rem;
-    background: var(--color-surface-inverse);
-    color: var(--color-content-inverse);
-    font-weight: 600;
+    background: var(--color-content-primary);
+    color: var(--color-surface-page);
+    font-weight: 500;
     font-size: 0.875rem;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-control);
     text-decoration: none;
     transition: top 0.2s ease;
   }
@@ -205,6 +432,124 @@
     }
   }
 
+  /* ---- The lane grid ---------------------------------------------------
+   * Eight lanes at md and up; a single column below that, so a cell with no
+   * `md:col-*` placement stacks naturally and no !important is needed to
+   * unwind desktop placement on mobile.
+   *
+   * Place children with Tailwind: `md:col-span-5`, `md:col-start-2`.
+   */
+  .lane-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: calc(var(--rhythm) * 8);
+  }
+
+  @media (min-width: 768px) {
+    .lane-grid {
+      grid-template-columns: repeat(var(--lane-count), minmax(0, 1fr));
+      column-gap: 0;
+    }
+  }
+
+  /* ---- The lane rails --------------------------------------------------
+   * Hairlines on the lane boundaries. These are permitted decoration-adjacent
+   * geometry only because they organise real content: everything on the page
+   * is placed against them.
+   *
+   * Apply to the element that IS the lane grid (or shares its box exactly),
+   * so the rails land on the grid lines rather than on the container padding.
+   *
+   * Painted via a pseudo-element rather than 8 divs, and hidden below md where
+   * the grid is a single column and rails would mean nothing.
+   */
+  .lane-rails {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .lane-rails::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-border-subtle) 0 1px,
+      transparent 1px calc(100% / var(--lane-count))
+    );
+  }
+
+  @media (max-width: 767px) {
+    .lane-rails::before {
+      display: none;
+    }
+  }
+
+  /* ---- The judgment line ----------------------------------------------
+   * The hairline a section opens on. The accent sweep across it is driven in
+   * React (see the Section primitive); this is the resting state, and it is
+   * what reduced-motion users get.
+   */
+  .judgment-line {
+    position: relative;
+    height: 1px;
+    width: 100%;
+    background: var(--color-border-subtle);
+    overflow: hidden;
+  }
+
+  /* ---- Static lane grid -----------------------------------------------
+   * The no-WebGL / reduced-motion stand-in for the hero lane field, and the
+   * backing texture behind the About portrait. Retuned from a plain 48px
+   * square grid to a lane-dominant one: the vertical rules are the lanes and
+   * read at full strength, the horizontal rules are half-strength beat
+   * markers. Same visual idea as .lane-rails, in a fixed-pitch form that works
+   * on an element of unknown width.
+   *
+   * WaveLineVisualization's fallback test asserts this class by name; keep it.
+   */
+  .bg-grid-faint {
+    background-image: repeating-linear-gradient(
+        to right,
+        var(--color-border-subtle) 0 1px,
+        transparent 1px 4rem
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--color-border-subtle) 0 1px,
+        transparent 1px 8rem
+      );
+  }
+
+  /* ---- Numbers --------------------------------------------------------
+   * The ONLY mono class on the site. Counts, dates, durations, the
+   * rhythm-game-style counters. If it is not a number, it is not mono.
+   */
+  .num {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  /* ---- DEPRECATED: mono uppercase eyebrow ------------------------------
+   * The single most repeated device on the old site (37 instances across 13
+   * files) and the clearest generated-template tell. Retained only so call
+   * sites stay legible while they are migrated section by section.
+   *
+   * Delete once `grep -r font-mono-label src` returns nothing.
+   */
+  .font-mono-label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-content-muted);
+  }
+
   .line-clamp-1,
   .line-clamp-2,
   .line-clamp-3 {
@@ -228,26 +573,6 @@
     line-clamp: 3;
   }
 
-  /* Mono uppercase eyebrow. A colour utility on the same element wins. */
-  .font-mono-label {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-content-muted);
-  }
-
-  /* Grid background (subtle) */
-  .bg-grid-faint {
-    background-image: linear-gradient(
-        var(--color-border-subtle) 1px,
-        transparent 1px
-      ),
-      linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
-    background-size: 48px 48px;
-  }
-
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -259,11 +584,7 @@
   }
 
   .keyboard-story-loader {
-    background: linear-gradient(
-      to bottom,
-      rgba(250, 248, 245, 0.62),
-      rgba(250, 248, 245, 0.86)
-    );
+    background: var(--scrim);
     backdrop-filter: blur(4px);
   }
 }
@@ -293,8 +614,17 @@
 
 @media (prefers-contrast: more) {
   :root {
-    --color-content-secondary: #2d2d33;
-    --color-border-strong: rgba(26, 26, 28, 0.35);
+    --color-content-secondary: #2a2d33;
+    --color-content-muted: #3d4149;
+    --color-border-strong: rgba(22, 24, 28, 0.4);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-content-secondary: #d4d8df;
+      --color-content-muted: #bcc2cb;
+      --color-border-strong: rgba(232, 234, 238, 0.45);
+    }
   }
 }
 
