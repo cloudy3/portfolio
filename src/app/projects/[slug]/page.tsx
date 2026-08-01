@@ -33,8 +33,14 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <article>
-      <Section variant="default" judgment={false} className="pb-8 md:pb-12">
-        <Container>
+      <Section
+        variant="default"
+        judgment={false}
+        className="pb-8 md:pb-12"
+        field="rail"
+        pigment="ai"
+      >
+        <Container keepOut>
           <nav className="text-sm text-content-muted mb-8">
             <Link
               href="/"

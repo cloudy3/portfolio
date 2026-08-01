@@ -242,8 +242,14 @@ const ExperienceSection = () => {
      * Contact crossed a theme boundary twice. It also meant a whole
      * glass-on-dark vocabulary existed for exactly one section.
      */
-    <Section id="experience" variant="default" className="scroll-mt-20">
-      <Container>
+    <Section
+      id="experience"
+      variant="default"
+      className="scroll-mt-20"
+      field="diagonal"
+      pigment="ai"
+    >
+      <Container keepOut>
         <FadeIn>
           <SectionHeader
             title="Experience and credentials"

@@ -187,8 +187,14 @@ export function ProjectsSection({
   const [lead, ...rest] = featured;
 
   return (
-    <Section id="work" variant="subtle" className="scroll-mt-20">
-      <Container>
+    <Section
+      id="work"
+      variant="subtle"
+      className="scroll-mt-20"
+      field="rail"
+      pigment="ai"
+    >
+      <Container keepOut>
         <FadeIn>
           <SectionHeader
             title="Systems that hold up in production"

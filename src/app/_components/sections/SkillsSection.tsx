@@ -135,8 +135,14 @@ export default function SkillsSection() {
   }, []);
 
   return (
-    <Section id="skills" variant="default" className="scroll-mt-20">
-      <Container>
+    <Section
+      id="skills"
+      variant="default"
+      className="scroll-mt-20"
+      field="lattice"
+      pigment="kihada"
+    >
+      <Container keepOut>
         <FadeIn>
           <SectionHeader
             title="Tools I ship with"

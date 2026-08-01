@@ -230,8 +230,14 @@ export default function ContactSection() {
     ) : null;
 
   return (
-    <Section id="contact" variant="subtle" className="scroll-mt-20">
-      <Container>
+    <Section
+      id="contact"
+      variant="subtle"
+      className="scroll-mt-20"
+      field="planes"
+      pigment="shu"
+    >
+      <Container keepOut>
         <FadeIn>
           <SectionHeader
             title="Let’s build something solid"

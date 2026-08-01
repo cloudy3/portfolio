@@ -53,8 +53,14 @@ export default function AboutSection() {
   };
 
   return (
-    <Section id="about" variant="default" className="scroll-mt-20">
-      <Container>
+    <Section
+      id="about"
+      variant="default"
+      className="scroll-mt-20"
+      field="ribbon"
+      pigment="moegi"
+    >
+      <Container keepOut>
         <FadeIn>
           <SectionHeader
             title="Builder mindset, systems thinking"

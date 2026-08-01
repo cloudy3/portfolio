@@ -1,15 +1,22 @@
 import dynamic from "next/dynamic";
 import HeroSection from "./_components/sections/HeroSection";
 
-type LoaderVariant = "default" | "inverse";
-
-function SectionLoader({ variant = "default" }: { variant?: LoaderVariant }) {
-  const containerClass =
-    variant === "inverse"
-      ? "section-padding bg-surface-inverse flex items-center justify-center min-h-[200px]"
-      : "section-padding bg-surface-page flex items-center justify-center min-h-[200px]";
+/**
+ * Placeholder while a section's chunk loads.
+ *
+ * Transparent rather than painted. Section surfaces are translucent now so the
+ * field reads through them, and an opaque placeholder would punch a hole in the
+ * composition for the length of the fetch.
+ *
+ * This also drops an `inverse` variant that Experience alone used. It painted
+ * `bg-surface-inverse`, which is the inverted-vs-page fill: in dark mode that
+ * is PAPER, so the one section using it flashed a white block while loading.
+ * Experience stopped being an inverted island in the redesign; the loader was
+ * never updated.
+ */
+function SectionLoader() {
   return (
-    <div className={containerClass}>
+    <div className="section-padding flex min-h-[200px] items-center justify-center">
       {/* An accent segment on a track, matching loading.tsx. Circular spinners
           were the last rounded shapes on a site whose surfaces are all sharp. */}
       <div className="h-px w-32 bg-border-strong" aria-hidden>
@@ -46,7 +53,7 @@ const SkillsSection = dynamic(
 const ExperienceSection = dynamic(
   () => import("./_components/sections/ExperienceSection"),
   {
-    loading: () => <SectionLoader variant="inverse" />,
+    loading: () => <SectionLoader />,
   }
 );
 

@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import { JudgmentLine } from "../motion/JudgmentLine";
+import FieldAnchor from "../shared/FieldAnchor";
 import { Container } from "./Container";
+import type { PigmentName, TreatmentName } from "@/lib/field/types";
 
 type SectionProps = {
   id?: string;
@@ -9,6 +11,13 @@ type SectionProps = {
   /**
    * Surface tint WITHIN the single page theme. Both values stay in the same
    * theme family, in both light and dark.
+   *
+   * These are now translucent rather than opaque, because the site's field is
+   * one fixed canvas behind the whole page: an opaque section surface would
+   * simply hide it. `default` is fully transparent and shows the body colour;
+   * `subtle` is a wash, so the field reads through it at reduced strength. That
+   * difference is deliberate and gives the page rhythm, alternating sections
+   * where the composition is full strength with sections where it recedes.
    *
    * `inverse` is DEPRECATED and now resolves to `subtle`. It used to flip to a
    * hardcoded dark surface mid-page, which broke the page theme lock: scrolling
@@ -29,12 +38,21 @@ type SectionProps = {
    * hero, which has no preceding section to be separated from.
    */
   judgment?: boolean;
+  /**
+   * The composition drawn behind this section, and the lane pigment it draws
+   * in. Omit both and the section simply carries no field.
+   *
+   * One pigment per section is the whole colour scheme for the field layer. UI
+   * chrome stays ink plus vermilion everywhere and is untouched by this.
+   */
+  field?: TreatmentName;
+  pigment?: PigmentName;
 };
 
 const variants = {
-  default: "bg-surface-page",
-  subtle: "bg-surface-subtle",
-  inverse: "bg-surface-subtle",
+  default: "",
+  subtle: "bg-surface-subtle/55",
+  inverse: "bg-surface-subtle/55",
 };
 
 export function Section({
@@ -44,12 +62,16 @@ export function Section({
   variant = "default",
   padded = true,
   judgment = true,
+  field,
+  pigment = "shu",
 }: SectionProps) {
   return (
     <section
       id={id}
       className={cn(variants[variant], padded && "section-padding", className)}
+      {...(field ? { "data-field": "" } : {})}
     >
+      {field ? <FieldAnchor treatment={field} pigment={pigment} /> : null}
       {judgment ? (
         /*
          * Inside the container so the line spans the content column and lands
