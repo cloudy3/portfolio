@@ -58,57 +58,96 @@ function wrap01(value: number): number {
  */
 
 // ---------------------------------------------------------------------------
-// lines: long fine strokes at two fixed angles, in all four pigments.
-// Reference frames 600, 1370, 1404, 1470.
+// lines: a braid of long wavy horizontals, in all four pigments.
+// Reference frames 137-145 (the title card the owner asked for by name).
 //
-// The hero. Four qualities carry it, and dropping any one of them is what made
-// the first attempt at a hero field read as tacky:
+// The hero. This replaced a version built from straight diagonals at two fixed
+// angles, taken from frames 600 and 1470. Those frames are real, but they are
+// the wrong card: the piece's signature image is the one where fine wavy
+// strokes stream horizontally through the type. Four qualities carry it, and
+// dropping any one is what made the diagonal version read as generic:
 //
-//   THIN. One or two CSS pixels. The reference never uses a thick diagonal.
-//   LONG. Each stroke crosses most of the frame, so the composition is made of
-//     relationships between lines rather than of isolated marks.
-//   ANGLED COHERENTLY. Two families, not a scatter. Frames 600 and 1470 both
-//     show exactly two angles crossing, and that is where the structure reads.
-//   DENSE. Frame 1404 carries roughly thirty parallel strokes at once.
+//   THIN. One CSS pixel, occasionally two. Every stroke in 137-145 is a
+//     hairline; there is not a single heavy curve in the sequence.
+//   FAINT. Most strokes sit somewhere around a quarter opacity, with two or
+//     three near-black exceptions. The band reads as a whole because almost
+//     none of it competes individually.
+//   NEARLY HORIZONTAL. Amplitude is a few percent of frame height across a
+//     full frame width. These are not waves so much as a slow lean.
+//   BRAIDED, NOT SCATTERED. The strokes share one carrier wave, so they move
+//     as a bundle and cross at a travelling waist rather than wandering apart.
 //
 // This is also the one place on the site licensed to be polychrome, so it takes
 // all four pigments rather than the section's single hue.
 // ---------------------------------------------------------------------------
-
-/** Two angle families, in radians. Shallow and steep, as in frames 600 and 1470. */
-const LINE_ANGLES = [(-28 * Math.PI) / 180, (-63 * Math.PI) / 180];
 
 /**
  * Pigment mix.
  *
  * Weighted rather than uniform: the reference's polychrome cards are never four
  * equal quarters. One hue dominates and the others read as exceptions, which is
- * what keeps a four-colour field from looking like a test pattern.
+ * what keeps a four-colour field from looking like a test pattern. Indigo leads
+ * here because 141-145 sit in the periwinkle-to-magenta range.
  */
 const LINE_PIGMENT_MIX: PigmentName[] = [
-  "shu",
-  "shu",
-  "shu",
   "ai",
   "ai",
+  "ai",
+  "shu",
+  "shu",
   "moegi",
   "kihada",
 ];
 
-const LINE_COUNT = 78;
+const LINE_COUNT = 96;
+
+/**
+ * The near-black strokes. Frames 137 and 139 carry exactly one dominant dark
+ * curve through the middle of the band, thicker and fully opaque, which is what
+ * gives the bundle a spine to read against. Three is enough to survive culling.
+ */
+const SPINE_COUNT = 3;
+
+/** Samples per stroke. Enough that a hairline curve shows no faceting. */
+const LINE_SAMPLES = 48;
+
+/** How far past each edge a stroke runs, as a fraction of width. */
+const LINE_OVERSHOOT = 0.06;
 
 interface FieldLine {
-  family: number;
-  /** Position along the perpendicular axis, 0..1, before drift. */
+  /**
+   * Signed position across the band, -1 to 1, before the waist narrows it.
+   *
+   * Biased toward the middle, so the bundle packs tight at its core and thins
+   * toward its edges the way the reference's does.
+   */
   offset: number;
   pigment: PigmentName;
+  /** True for the dark spine strokes, which draw in ink rather than pigment. */
+  spine: boolean;
   /** CSS pixels. Mostly hairlines. */
   width: number;
-  /** Fraction of the frame diagonal this stroke spans. */
-  length: number;
+  /** Per-stroke ripple on top of the carrier, as a fraction of box height. */
+  amp: number;
+  /** Cycles of that ripple across the frame width. */
+  freq: number;
+  phase: number;
+  /** Ripple travel, cycles per second. Small and signed, so the braid shears. */
+  speed: number;
+  /** Own opacity before strength and breath. */
+  alpha: number;
+  /**
+   * Where along the width this stroke starts and stops, 0 to 1.
+   *
+   * Most run the full frame, but a third stop short. Frames 137 and 139 both
+   * have strokes that simply end in open space, and without them every mark is
+   * a full-width arc, which is a much more mechanical image than the reference.
+   */
+  from: number;
+  to: number;
   /** Stable cull order. See the note on Bar.rank. */
   rank: number;
-  /** Carries a chromatic fringe, as in frame 1370. */
+  /** Carries a chromatic fringe, as in frames 141 and 143. */
   prismatic: boolean;
   /** Fringe partner, drawn one pixel off the stroke. */
   fringe: PigmentName;
@@ -117,86 +156,214 @@ interface FieldLine {
 const LINES: FieldLine[] = (() => {
   const rand = mulberry32(0x51ed270b);
 
-  return Array.from({ length: LINE_COUNT }, (_, i) => ({
-    // Alternating rather than random, so neither family ever thins out.
-    family: i % 2,
-    offset: rand(),
-    pigment: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
-    width: rand() > 0.86 ? 2 : 1,
-    length: 0.45 + rand() * 0.85,
-    rank: rand(),
-    prismatic: rand() > 0.82,
-    fringe: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
-  }));
+  return Array.from({ length: LINE_COUNT }, (_, i) => {
+    const spine = i < SPINE_COUNT;
+    const signed = rand() * 2 - 1;
+
+    // Spines always run edge to edge; they are the through-line.
+    const partial = !spine && rand() > 0.66;
+    const from = partial ? rand() * 0.45 : 0;
+    const to = partial ? Math.min(1, from + 0.35 + rand() * 0.5) : 1;
+
+    return {
+      // Raising the magnitude to a power above 1 pulls values toward zero
+      // without ever reordering them, which packs the band centre.
+      offset: spine
+        ? signed * 0.08
+        : Math.sign(signed) * Math.abs(signed) ** 2.2,
+      pigment: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
+      spine,
+      width: spine ? 2 : rand() > 0.9 ? 1.5 : 1,
+      amp: 0.012 + rand() * 0.032,
+      freq: 0.7 + rand() * 1.5,
+      phase: rand() * Math.PI * 2,
+      speed: (rand() - 0.5) * 0.09,
+      alpha: spine ? 1 : 0.16 + rand() * 0.44,
+      // Spines never cull. Losing the dark curve at the breathing trough takes
+      // the structure out of the composition, not just some of its population.
+      rank: spine ? 0 : rand(),
+      prismatic: rand() > 0.78,
+      fringe: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
+      from,
+      to,
+    };
+  });
 })();
 
-/** Drift along the perpendicular axis, in diagonals per second. Per family. */
-const LINE_DRIFT = [0.017, -0.011];
+/** Carrier wave: amplitude as a fraction of box height, and its two rates. */
+const CARRIER_AMP = 0.035;
+const CARRIER_RATE = 0.16;
+const CARRIER_RATE_SLOW = 0.11;
+
+/** Speed the waist travels across the frame, in frame widths per second. */
+const WAIST_DRIFT = 0.03;
+
+/**
+ * How tight the waist pinches. 0 would collapse the band to a single line.
+ *
+ * Held high on purpose, and this is the most sensitive number here. The pinch
+ * is a monotonic sweep across the width, so a deep one dominates every stroke's
+ * shape: at 0.45 the outer strokes swung so far that they read as straight rays
+ * diverging from a point, and the waviness that is the whole reason for this
+ * composition disappeared underneath it. Kept shallow, the band narrows and the
+ * per-stroke ripple stays legible.
+ */
+const WAIST_FLOOR = 0.62;
 
 export const lines: Treatment = ({
   ctx,
   box,
+  keepOut,
   t,
   density,
   palette,
+  ink,
   dark,
   strength,
 }) => {
-  const cx = box.width / 2;
-  const cy = box.height / 2;
-  const diagonal = Math.hypot(box.width, box.height);
   const cull = 0.3 + 0.7 * density;
 
-  ctx.lineCap = "butt";
+  /*
+   * Where the band sits, and how tall it is.
+   *
+   * The reference's braid occupies a narrow horizontal band and leaves the top
+   * and bottom thirds of the frame completely empty; that emptiness is most of
+   * why it reads as composed. So the band is tight, and sized from the type
+   * rather than from the viewport.
+   *
+   * On a wide viewport it runs straight through the type. Strokes near offset 0
+   * are clipped away by the keep-out, and that is the point: they emerge either
+   * side of the copy column and read as passing behind it, exactly as the
+   * reference's do behind its logotype.
+   *
+   * That move stops working when the copy column takes almost the full width,
+   * which is exactly what a phone does. There the band would be clipped end to
+   * end and the hero would render completely empty. So when the margins are too
+   * narrow to stream through, the band relocates to whichever horizontal gap
+   * above or below the type is roomier and runs full width there instead.
+   */
+  const hasKeepOut = keepOut.height > 0;
+  const sideRoom = hasKeepOut ? box.width - keepOut.width : box.width;
+  const crowded = hasKeepOut && sideRoom < box.width * 0.28;
+
+  let bandCentre: number;
+  let bandHalf: number;
+
+  if (!hasKeepOut) {
+    bandCentre = box.height / 2;
+    bandHalf = box.height * 0.2;
+  } else if (crowded) {
+    const above = keepOut.y;
+    const below = box.height - (keepOut.y + keepOut.height);
+    // Below by preference. The gap above a hero sits directly under the nav,
+    // and a band running through the wordmark and the menu button reads as a
+    // collision rather than as composition.
+    const useBelow = below >= above * 0.7;
+    const gap = Math.max(useBelow ? below : above, 1);
+    bandCentre = useBelow ? box.height - gap / 2 : gap / 2;
+    bandHalf = gap * 0.45;
+  } else {
+    bandCentre = keepOut.y + keepOut.height / 2;
+    bandHalf = Math.min(
+      keepOut.height * 0.5 + box.height * 0.04,
+      box.height * 0.32
+    );
+  }
+
+  const carrier = box.height * CARRIER_AMP;
+  const waist = wrap01(t * WAIST_DRIFT);
+
+  const x0 = -box.width * LINE_OVERSHOOT;
+  const span = box.width * (1 + LINE_OVERSHOOT * 2);
+  const step = span / (LINE_SAMPLES - 1);
+
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // Amplitude, not speed, is what the breath moves here: the reference's quiet
+  // frames are flatter, not slower. Population still thins via `cull`.
+  const breath = 0.55 + 0.45 * density;
 
   for (const line of LINES) {
     if (line.rank > cull) continue;
 
-    const angle = LINE_ANGLES[line.family];
-    const dx = Math.cos(angle);
-    const dy = Math.sin(angle);
-    // The perpendicular, which is the axis the stroke slides along.
-    const px = -dy;
-    const py = dx;
+    const first = Math.floor(line.from * (LINE_SAMPLES - 1));
+    const last = Math.ceil(line.to * (LINE_SAMPLES - 1));
+    const path: number[] = [];
 
-    const travel =
-      (wrap01(line.offset + t * LINE_DRIFT[line.family]) - 0.5) *
-      diagonal *
-      1.5;
-    const mx = cx + px * travel;
-    const my = cy + py * travel;
-    const half = (diagonal * line.length) / 2;
+    for (let s = first; s <= last; s += 1) {
+      const x = x0 + step * s;
+      const u = x / box.width;
 
-    const x1 = mx - dx * half;
-    const y1 = my - dy * half;
-    const x2 = mx + dx * half;
-    const y2 = my + dy * half;
+      /*
+       * The waist. Every stroke's distance from the band centre is scaled by
+       * one shared function of x, so at the point where it bottoms out the
+       * whole bundle converges to a narrow throat and fans open again either
+       * side of it. That crossing point is the single most recognisable event
+       * in frames 137 to 141, and it costs one cosine.
+       *
+       * Raised cosine rather than the more obvious `abs(sin)`: the absolute
+       * value has a cusp at its zero, and since every stroke shares this term
+       * the entire bundle kinked into one hard chevron at the node. A raised
+       * cosine has zero slope there, so the bundle narrows and reopens.
+       */
+      const pinch =
+        WAIST_FLOOR +
+        (1 - WAIST_FLOOR) *
+          (0.5 - 0.5 * Math.cos(Math.PI * 2 * (u + waist)));
 
+      // One carrier shared by every stroke, so the band leans as a unit.
+      const shared =
+        carrier *
+          Math.sin(Math.PI * 2 * 1.15 * u + t * CARRIER_RATE) *
+          breath +
+        carrier *
+          0.4 *
+          Math.sin(Math.PI * 2 * 0.6 * u - t * CARRIER_RATE_SLOW) *
+          breath;
+
+      const ripple =
+        box.height *
+        line.amp *
+        breath *
+        Math.sin(Math.PI * 2 * line.freq * u + line.phase + t * line.speed);
+
+      path.push(
+        x,
+        bandCentre + line.offset * bandHalf * pinch + shared + ripple
+      );
+    }
+
+    const points = path.length / 2;
     ctx.lineWidth = line.width;
 
     /*
-     * The chromatic fringe from frame 1370: a companion stroke one pixel off
-     * the perpendicular in a different pigment. At a hairline width the two
-     * read as a single line with a colour split along its edge rather than as
-     * two lines, which is exactly the effect in the reference.
+     * The chromatic fringe from frames 141 and 143: a companion stroke one
+     * pixel off in a different pigment. At a hairline width the two read as a
+     * single line with a colour split along its edge rather than as two lines,
+     * which is exactly the effect in the reference, where the type itself
+     * carries a cyan-and-amber split.
      */
     if (line.prismatic) {
-      ctx.globalAlpha = 0.5 * strength;
+      ctx.globalAlpha = line.alpha * 0.55 * strength;
       ctx.strokeStyle = palette[line.fringe];
       ctx.beginPath();
-      ctx.moveTo(x1 + px, y1 + py);
-      ctx.lineTo(x2 + px, y2 + py);
+      ctx.moveTo(path[0], path[1] + 1);
+      for (let s = 1; s < points; s += 1) {
+        ctx.lineTo(path[s * 2], path[s * 2 + 1] + 1);
+      }
       ctx.stroke();
     }
 
-    // Near full in both modes. These are hairlines, so alpha buys nothing but
-    // desaturation: at 0.8 the light-mode indigo and moegi read as washed
-    // pastel rather than as pigment.
-    ctx.globalAlpha = (dark ? 1 : 0.95) * strength;
-    ctx.strokeStyle = palette[line.pigment];
+    // Dark grounds need a little more, since a faint pigment hairline on
+    // near-black loses more than the same stroke on paper does.
+    ctx.globalAlpha = Math.min(1, line.alpha * (dark ? 1.15 : 1)) * strength;
+    ctx.strokeStyle = line.spine ? ink : palette[line.pigment];
     ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
+    ctx.moveTo(path[0], path[1]);
+    for (let s = 1; s < points; s += 1) {
+      ctx.lineTo(path[s * 2], path[s * 2 + 1]);
+    }
     ctx.stroke();
   }
 
