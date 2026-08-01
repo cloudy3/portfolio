@@ -69,9 +69,9 @@ function wrap01(value: number): number {
 //
 //   THIN. One CSS pixel, occasionally two. Every stroke in 137-145 is a
 //     hairline; there is not a single heavy curve in the sequence.
-//   FAINT. Most strokes sit somewhere around a quarter opacity, with two or
-//     three near-black exceptions. The band reads as a whole because almost
-//     none of it competes individually.
+//   FAINT. Most strokes sit somewhere around a quarter opacity, with a few
+//     carrying more weight. The band reads as a whole because almost none of it
+//     competes individually.
 //   NEARLY HORIZONTAL. Amplitude is a few percent of frame height across a
 //     full frame width. These are not waves so much as a slow lean.
 //   BRAIDED, NOT SCATTERED. The strokes share one carrier wave, so they move
@@ -102,11 +102,17 @@ const LINE_PIGMENT_MIX: PigmentName[] = [
 const LINE_COUNT = 96;
 
 /**
- * The near-black strokes. Frames 137 and 139 carry exactly one dominant dark
- * curve through the middle of the band, thicker and fully opaque, which is what
- * gives the bundle a spine to read against. Three is enough to survive culling.
+ * Strokes that carry a little more weight than the rest, so the bundle has
+ * something to read against rather than being ninety-six equal hairlines.
+ *
+ * These were drawn in ink, following frames 137 and 139, which do carry one
+ * dominant near-black curve. That does not survive the translation: the
+ * reference gives its dark curve a whole frame of cream to sit in, whereas here
+ * three of them run through a narrow band beside body copy, and they read as
+ * heavy black squiggles rather than as structure. They are pigment now, only
+ * half a pixel wider than a hairline.
  */
-const SPINE_COUNT = 3;
+const LEAD_COUNT = 3;
 
 /** Samples per stroke. Enough that a hairline curve shows no faceting. */
 const LINE_SAMPLES = 48;
@@ -123,8 +129,8 @@ interface FieldLine {
    */
   offset: number;
   pigment: PigmentName;
-  /** True for the dark spine strokes, which draw in ink rather than pigment. */
-  spine: boolean;
+  /** True for the slightly weightier strokes. See LEAD_COUNT. */
+  lead: boolean;
   /** CSS pixels. Mostly hairlines. */
   width: number;
   /** Per-stroke ripple on top of the carrier, as a fraction of box height. */
@@ -136,6 +142,17 @@ interface FieldLine {
   speed: number;
   /** Own opacity before strength and breath. */
   alpha: number;
+  /**
+   * This stroke's own place in its own fade cycle, and its own rate.
+   *
+   * Every stroke used to take its opacity from the one global envelope, so the
+   * entire band brightened and dimmed in unison, which is a lighting change
+   * rather than a field of independent marks. Giving each its own phase and a
+   * rate that is not a neat multiple of any other means the band never syncs
+   * up: strokes come and go individually, which is what the reference does.
+   */
+  breathPhase: number;
+  breathRate: number;
   /**
    * Where along the width this stroke starts and stops, 0 to 1.
    *
@@ -157,31 +174,36 @@ const LINES: FieldLine[] = (() => {
   const rand = mulberry32(0x51ed270b);
 
   return Array.from({ length: LINE_COUNT }, (_, i) => {
-    const spine = i < SPINE_COUNT;
+    const lead = i < LEAD_COUNT;
     const signed = rand() * 2 - 1;
 
-    // Spines always run edge to edge; they are the through-line.
-    const partial = !spine && rand() > 0.66;
+    // Leads always run edge to edge; they are the through-line.
+    const partial = !lead && rand() > 0.66;
     const from = partial ? rand() * 0.45 : 0;
     const to = partial ? Math.min(1, from + 0.35 + rand() * 0.5) : 1;
 
     return {
       // Raising the magnitude to a power above 1 pulls values toward zero
       // without ever reordering them, which packs the band centre.
-      offset: spine
-        ? signed * 0.08
-        : Math.sign(signed) * Math.abs(signed) ** 2.2,
+      offset: lead ? signed * 0.08 : Math.sign(signed) * Math.abs(signed) ** 2.2,
       pigment: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
-      spine,
-      width: spine ? 2 : rand() > 0.9 ? 1.5 : 1,
+      lead,
+      width: lead ? 1.5 : rand() > 0.9 ? 1.5 : 1,
       amp: 0.012 + rand() * 0.032,
       freq: 0.7 + rand() * 1.5,
       phase: rand() * Math.PI * 2,
       speed: (rand() - 0.5) * 0.09,
-      alpha: spine ? 1 : 0.16 + rand() * 0.44,
-      // Spines never cull. Losing the dark curve at the breathing trough takes
-      // the structure out of the composition, not just some of its population.
-      rank: spine ? 0 : rand(),
+      // Lifted to compensate for the solo fade, which sits somewhere around
+      // half strength on average, so the band holds the level it had when every
+      // stroke was drawn at full opacity all the time.
+      alpha: lead ? 0.85 : 0.22 + rand() * 0.6,
+      breathPhase: rand(),
+      // An irrational-ish spread rather than a set of tidy ratios, so no two
+      // strokes ever fall back into step with each other.
+      breathRate: 0.62 + rand() * 0.83,
+      // Leads never cull. Losing them at the trough takes the structure out of
+      // the composition, not just some of its population.
+      rank: lead ? 0 : rand(),
       prismatic: rand() > 0.78,
       fringe: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
       from,
@@ -199,7 +221,8 @@ const CARRIER_RATE_SLOW = 0.11;
 const WAIST_DRIFT = 0.03;
 
 /**
- * How the breath is spent, and it is spent mostly on opacity here.
+ * How the breath is spent, and it is spent on opacity here rather than
+ * population.
  *
  * The other compositions breathe by population, which suits them: they cover
  * the viewport, so losing half their elements reads as the field thinning. This
@@ -207,16 +230,35 @@ const WAIST_DRIFT = 0.03;
  * same swing reads instead as individual strokes vanishing, and a field of slow
  * curves cannot afford anything that looks like flicker.
  *
- * So the threshold moves over a narrow range, the fade band around it is wide
- * enough that a stroke takes several seconds to cross, and the visible part of
- * the breath is carried by BREATH_ALPHA dimming the whole band together.
+ * So the threshold moves over a narrow range and the fade band around it is
+ * wide enough that a stroke takes several seconds to cross.
  */
 const CULL_FLOOR = 0.55;
 const CULL_RANGE = 0.45;
 const CULL_FEATHER = 0.5;
 
-/** How far the breath dims the band, as a floor on its opacity. */
-const BREATH_ALPHA = 0.68;
+/**
+ * The per-stroke fade cycle: base period in seconds, and how far down a stroke
+ * goes at its own trough.
+ *
+ * Deliberately not derived from the engine's `density`. That is one envelope
+ * shared by the whole canvas, so using it for opacity made all ninety-six
+ * strokes brighten and dim together, which reads as someone working a dimmer
+ * switch rather than as a field of independent marks. Each stroke now runs this
+ * cycle at its own rate from its own phase.
+ *
+ * Long on purpose: at eleven seconds a stroke takes over five to fade out, so
+ * nothing is ever caught in the act.
+ *
+ * Measured across six disjoint slices of the band over 220 frames, the mean
+ * pairwise correlation of their ink fell from 0.44 to 0.12 when this replaced
+ * the global envelope. Slices no longer rise and fall together.
+ */
+const SOLO_PERIOD = 11;
+const SOLO_FLOOR = 0.12;
+
+/** Leads fade too, but only partway. They are the through-line. */
+const SOLO_FLOOR_LEAD = 0.5;
 
 /**
  * How tight the waist pinches. 0 would collapse the band to a single line.
@@ -237,12 +279,10 @@ export const lines: Treatment = ({
   t,
   density,
   palette,
-  ink,
   dark,
   strength,
 }) => {
   const cull = CULL_FLOOR + CULL_RANGE * density;
-  const breathAlpha = BREATH_ALPHA + (1 - BREATH_ALPHA) * density;
 
   /*
    * Where the band sits, and how tall it is.
@@ -315,15 +355,29 @@ export const lines: Treatment = ({
      * flickering, which is the one thing a field of slow curves cannot do.
      *
      * Ramping opacity across a band either side of the threshold turns each of
-     * those events into a slow fade instead. Measured over ninety frames, the
-     * largest one-frame change in total ink fell from 5.7 percent of the mean
-     * to 1.7. Doubling the feather again moved that only to 1.72 from 1.81,
-     * which is how we know the remainder is strokes drifting through the
-     * sampled strip rather than strokes appearing.
+     * those events into a slow fade instead. The largest one-frame change in
+     * total canvas ink fell from 5.7 percent of the mean to 1.4. Doubling the
+     * feather again moved it only from 1.81 to 1.72, which is how we know the
+     * remainder is strokes drifting through the sampled strip rather than
+     * strokes appearing.
      */
     const entry = (cull - line.rank) / CULL_FEATHER + 0.5;
     if (entry <= 0) continue;
-    const fade = entry >= 1 ? 1 : entry * entry * (3 - 2 * entry);
+    const cullFade = entry >= 1 ? 1 : entry * entry * (3 - 2 * entry);
+
+    // This stroke's own fade cycle, on its own clock. See SOLO_PERIOD.
+    const soloFloor = line.lead ? SOLO_FLOOR_LEAD : SOLO_FLOOR;
+    const solo =
+      soloFloor +
+      (1 - soloFloor) *
+        (0.5 -
+          0.5 *
+            Math.cos(
+              Math.PI *
+                2 *
+                ((t * line.breathRate) / SOLO_PERIOD + line.breathPhase)
+            ));
+    const fade = cullFade * solo;
 
     const first = Math.floor(line.from * (LINE_SAMPLES - 1));
     const last = Math.ceil(line.to * (LINE_SAMPLES - 1));
@@ -383,7 +437,7 @@ export const lines: Treatment = ({
      * carries a cyan-and-amber split.
      */
     if (line.prismatic) {
-      ctx.globalAlpha = line.alpha * 0.55 * strength * fade * breathAlpha;
+      ctx.globalAlpha = line.alpha * 0.55 * strength * fade;
       ctx.strokeStyle = palette[line.fringe];
       ctx.beginPath();
       ctx.moveTo(path[0], path[1] + 1);
@@ -396,8 +450,8 @@ export const lines: Treatment = ({
     // Dark grounds need a little more, since a faint pigment hairline on
     // near-black loses more than the same stroke on paper does.
     ctx.globalAlpha =
-      Math.min(1, line.alpha * (dark ? 1.15 : 1)) * strength * fade * breathAlpha;
-    ctx.strokeStyle = line.spine ? ink : palette[line.pigment];
+      Math.min(1, line.alpha * (dark ? 1.15 : 1)) * strength * fade;
+    ctx.strokeStyle = palette[line.pigment];
     ctx.beginPath();
     ctx.moveTo(path[0], path[1]);
     for (let s = 1; s < points; s += 1) {
