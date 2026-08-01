@@ -40,6 +40,15 @@ const CROSSFADE = 0.7;
  */
 const STRENGTH = 0.8;
 
+/**
+ * Breathing room around the type, in CSS pixels.
+ *
+ * Clipping flush to the text box lets strokes graze the descenders, which reads
+ * as a near miss rather than as a decision. The reference always leaves a clear
+ * margin around its credits.
+ */
+const KEEP_OUT_PAD = 28;
+
 export interface FieldOptions {
   reduced: boolean;
   dark: boolean;
@@ -169,10 +178,15 @@ export function createField(
       // Horizontal extent only, full height. The composition sits beside the
       // text rather than also wrapping above and below it, which is what stops
       // elements terminating at an invisible horizontal line in mid-frame.
-      return { x: r.left, y: 0, width: r.width, height };
+      return { x: r.left - KEEP_OUT_PAD, y: 0, width: r.width + KEEP_OUT_PAD * 2, height };
     }
 
-    return { x: r.left, y: r.top, width: r.width, height: r.height };
+    return {
+      x: r.left - KEEP_OUT_PAD,
+      y: r.top - KEEP_OUT_PAD,
+      width: r.width + KEEP_OUT_PAD * 2,
+      height: r.height + KEEP_OUT_PAD * 2,
+    };
   }
 
   function paint(composition: ActiveComposition, density: number): void {
@@ -199,6 +213,7 @@ export function createField(
       t: elapsed,
       density,
       pigment: palette.pigments[entry.pigment],
+      palette: palette.pigments,
       ink: palette.ink,
       dark,
       strength: STRENGTH,

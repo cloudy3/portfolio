@@ -1,4 +1,9 @@
-import type { DrawContext, Treatment, TreatmentName } from "./types";
+import type {
+  DrawContext,
+  PigmentName,
+  Treatment,
+  TreatmentName,
+} from "./types";
 
 /**
  * The compositions.
@@ -51,6 +56,152 @@ function wrap01(value: number): number {
  * at all, and its dark cards read primarily as flat colour; flat is the honest
  * version of this at the budget available.
  */
+
+// ---------------------------------------------------------------------------
+// lines: long fine strokes at two fixed angles, in all four pigments.
+// Reference frames 600, 1370, 1404, 1470.
+//
+// The hero. Four qualities carry it, and dropping any one of them is what made
+// the first attempt at a hero field read as tacky:
+//
+//   THIN. One or two CSS pixels. The reference never uses a thick diagonal.
+//   LONG. Each stroke crosses most of the frame, so the composition is made of
+//     relationships between lines rather than of isolated marks.
+//   ANGLED COHERENTLY. Two families, not a scatter. Frames 600 and 1470 both
+//     show exactly two angles crossing, and that is where the structure reads.
+//   DENSE. Frame 1404 carries roughly thirty parallel strokes at once.
+//
+// This is also the one place on the site licensed to be polychrome, so it takes
+// all four pigments rather than the section's single hue.
+// ---------------------------------------------------------------------------
+
+/** Two angle families, in radians. Shallow and steep, as in frames 600 and 1470. */
+const LINE_ANGLES = [(-28 * Math.PI) / 180, (-63 * Math.PI) / 180];
+
+/**
+ * Pigment mix.
+ *
+ * Weighted rather than uniform: the reference's polychrome cards are never four
+ * equal quarters. One hue dominates and the others read as exceptions, which is
+ * what keeps a four-colour field from looking like a test pattern.
+ */
+const LINE_PIGMENT_MIX: PigmentName[] = [
+  "shu",
+  "shu",
+  "shu",
+  "ai",
+  "ai",
+  "moegi",
+  "kihada",
+];
+
+const LINE_COUNT = 78;
+
+interface FieldLine {
+  family: number;
+  /** Position along the perpendicular axis, 0..1, before drift. */
+  offset: number;
+  pigment: PigmentName;
+  /** CSS pixels. Mostly hairlines. */
+  width: number;
+  /** Fraction of the frame diagonal this stroke spans. */
+  length: number;
+  /** Stable cull order. See the note on Bar.rank. */
+  rank: number;
+  /** Carries a chromatic fringe, as in frame 1370. */
+  prismatic: boolean;
+  /** Fringe partner, drawn one pixel off the stroke. */
+  fringe: PigmentName;
+}
+
+const LINES: FieldLine[] = (() => {
+  const rand = mulberry32(0x51ed270b);
+
+  return Array.from({ length: LINE_COUNT }, (_, i) => ({
+    // Alternating rather than random, so neither family ever thins out.
+    family: i % 2,
+    offset: rand(),
+    pigment: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
+    width: rand() > 0.86 ? 2 : 1,
+    length: 0.45 + rand() * 0.85,
+    rank: rand(),
+    prismatic: rand() > 0.82,
+    fringe: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
+  }));
+})();
+
+/** Drift along the perpendicular axis, in diagonals per second. Per family. */
+const LINE_DRIFT = [0.017, -0.011];
+
+export const lines: Treatment = ({
+  ctx,
+  box,
+  t,
+  density,
+  palette,
+  dark,
+  strength,
+}) => {
+  const cx = box.width / 2;
+  const cy = box.height / 2;
+  const diagonal = Math.hypot(box.width, box.height);
+  const cull = 0.3 + 0.7 * density;
+
+  ctx.lineCap = "butt";
+
+  for (const line of LINES) {
+    if (line.rank > cull) continue;
+
+    const angle = LINE_ANGLES[line.family];
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    // The perpendicular, which is the axis the stroke slides along.
+    const px = -dy;
+    const py = dx;
+
+    const travel =
+      (wrap01(line.offset + t * LINE_DRIFT[line.family]) - 0.5) *
+      diagonal *
+      1.5;
+    const mx = cx + px * travel;
+    const my = cy + py * travel;
+    const half = (diagonal * line.length) / 2;
+
+    const x1 = mx - dx * half;
+    const y1 = my - dy * half;
+    const x2 = mx + dx * half;
+    const y2 = my + dy * half;
+
+    ctx.lineWidth = line.width;
+
+    /*
+     * The chromatic fringe from frame 1370: a companion stroke one pixel off
+     * the perpendicular in a different pigment. At a hairline width the two
+     * read as a single line with a colour split along its edge rather than as
+     * two lines, which is exactly the effect in the reference.
+     */
+    if (line.prismatic) {
+      ctx.globalAlpha = 0.5 * strength;
+      ctx.strokeStyle = palette[line.fringe];
+      ctx.beginPath();
+      ctx.moveTo(x1 + px, y1 + py);
+      ctx.lineTo(x2 + px, y2 + py);
+      ctx.stroke();
+    }
+
+    // Near full in both modes. These are hairlines, so alpha buys nothing but
+    // desaturation: at 0.8 the light-mode indigo and moegi read as washed
+    // pastel rather than as pigment.
+    ctx.globalAlpha = (dark ? 1 : 0.95) * strength;
+    ctx.strokeStyle = palette[line.pigment];
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+};
 
 // ---------------------------------------------------------------------------
 // bars: vertical segments on the lane grid, drifting horizontally.
@@ -191,18 +342,19 @@ export const bars: Treatment = ({
 };
 
 export const TREATMENTS: Record<TreatmentName, Treatment> = {
+  lines,
   bars,
-  // Added in the next step. Falling back to `bars` rather than throwing keeps a
+  // Added in the next step. Falling back rather than throwing keeps a
   // half-wired section rendering something instead of a blank canvas.
-  rail: bars,
-  ribbon: bars,
-  lattice: bars,
-  diagonal: bars,
-  planes: bars,
+  rail: lines,
+  ribbon: lines,
+  lattice: lines,
+  diagonal: lines,
+  planes: lines,
 };
 
 export function getTreatment(name: TreatmentName): Treatment {
-  return TREATMENTS[name] ?? bars;
+  return TREATMENTS[name] ?? lines;
 }
 
 export type { DrawContext };

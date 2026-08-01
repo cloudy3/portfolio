@@ -53,7 +53,13 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
       id="hero"
       data-field
     >
-      <FieldAnchor treatment="bars" pigment="shu" />
+      {/*
+       * The polychrome line field. `pigment` is the dominant hue rather than
+       * the only one: `lines` is the single composition licensed to use all
+       * four lane pigments, which is the exception the colour lock in
+       * globals.css has always carried for the hero.
+       */}
+      <FieldAnchor treatment="lines" pigment="shu" />
 
       <div className="container-custom relative w-full">
         {/*
@@ -77,14 +83,16 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
            * the copy column rather than the whole container, which is what
            * leaves the right-hand lanes free for the composition.
            *
-           * "column" clips its horizontal extent for the full viewport height
-           * rather than just its own box, so the composition sits cleanly
-           * beside the copy. Clipping to the box alone left bars terminating in
-           * mid-air on the line above the headline, which read as a bug.
+           * Box mode, not column. Column was right for vertical bars, which
+           * terminated in mid-air when clipped to a box. Long diagonals are the
+           * opposite case: passing around a rectangular hole is a composition
+           * the reference uses directly (frames 350, 380, 1130), while
+           * confining them to two narrow side strips wastes their length, which
+           * is the whole point of the primitive.
            */}
           <div
             className="md:col-span-6 md:pr-[var(--lane-inset)]"
-            data-keepout="column"
+            data-keepout="box"
           >
             {/*
              * Weight contrast carries the headline: 900 against 300, one

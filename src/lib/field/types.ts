@@ -7,8 +7,16 @@
  * the composition built AROUND it rather than scrimmed behind it.
  */
 
-/** The six compositions. One per home section; sub-pages reuse `rail`. */
+/**
+ * The compositions.
+ *
+ * `lines` is the hero. `bars` is deliberately NOT on the landing page: as a
+ * hero it read as tacky, because vertical blocks are the wrong primitive at
+ * that scale. It moves to the projects catalogue, where a denser, blockier
+ * field suits a page that is already a grid.
+ */
 export type TreatmentName =
+  | "lines"
   | "bars"
   | "rail"
   | "ribbon"
@@ -57,8 +65,17 @@ export interface DrawContext {
    * beside near-empty ones.
    */
   density: number;
-  /** Resolved lane pigment, as a CSS colour. */
+  /** Resolved lane pigment, as a CSS colour. The section's own hue. */
   pigment: string;
+  /**
+   * All four resolved pigments.
+   *
+   * Only the hero uses this. The colour lock reads "chrome is ink plus one
+   * accent; the four-pigment lane field in the hero canvas is the single
+   * licensed exception", and that exception is what the polychrome line field
+   * spends. Every other section takes `pigment` alone.
+   */
+  palette: Record<PigmentName, string>;
   /** Resolved ink, for the achromatic elements in a composition. */
   ink: string;
   /** True on a dark ground. Gates bloom, which the reference only uses there. */
