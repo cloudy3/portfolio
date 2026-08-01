@@ -341,16 +341,353 @@ export const bars: Treatment = ({
   ctx.globalAlpha = 1;
 };
 
+// ---------------------------------------------------------------------------
+// rail: horizontal segments in tight stacks. Work.
+// Reference frames 120, 510, 550, and the margin stacks in 1396.
+//
+// The reference groups horizontal rules rather than spacing them evenly: three
+// to six lines pressed together at one height, then a gap, then another group.
+// Some groups taper, so the stack reads as a wedge (frame 550). Clipped to the
+// page margins this is exactly the left and right stacks of frame 1396.
+// ---------------------------------------------------------------------------
+
+interface RailGroup {
+  y: number;
+  /** Lines in this stack. */
+  count: number;
+  /** Fraction of the frame width the widest line spans. */
+  width: number;
+  /** Start of the stack across the frame, 0..1. */
+  x: number;
+  /** Each line shorter than the last, so the stack reads as a wedge. */
+  tapers: boolean;
+  rank: number;
+  usesInk: boolean;
+}
+
+const RAIL_GROUPS: RailGroup[] = (() => {
+  const rand = mulberry32(0x2545f491);
+  return Array.from({ length: 22 }, () => ({
+    y: rand(),
+    count: 3 + Math.floor(rand() * 4),
+    width: 0.12 + rand() * rand() * 0.6,
+    x: rand(),
+    tapers: rand() > 0.6,
+    rank: rand(),
+    usesInk: rand() > 0.78,
+  }));
+})();
+
+/** Pixels between the rules inside one stack. Tight on purpose. */
+const RAIL_PITCH = 7;
+
+export const rail: Treatment = ({
+  ctx,
+  box,
+  t,
+  density,
+  pigment,
+  ink,
+  strength,
+}) => {
+  const cull = 0.25 + 0.75 * density;
+
+  for (const group of RAIL_GROUPS) {
+    if (group.rank > cull) continue;
+
+    const x = wrap01(group.x + t * 0.006) * (box.width + 400) - 200;
+    const top = group.y * box.height;
+    ctx.fillStyle = group.usesInk ? ink : pigment;
+
+    for (let i = 0; i < group.count; i += 1) {
+      const shrink = group.tapers ? 1 - (i / group.count) * 0.65 : 1;
+      const width = group.width * box.width * shrink;
+      ctx.globalAlpha = (0.9 - i * 0.06) * strength;
+      ctx.fillRect(x, top + i * RAIL_PITCH, width, 1.5);
+    }
+  }
+
+  ctx.globalAlpha = 1;
+};
+
+// ---------------------------------------------------------------------------
+// ribbon: long slow curves, near empty. About.
+// Reference frames 470 and 806.
+//
+// The reference's quietest cards. Frame 806 is one second after a dense frame
+// and holds about ten faint elements; 470 is little more than a few long
+// curves and three dots. Those frames are composed, not incidental, and this
+// is where the site's ma actually lives, so About gets the calmest field on
+// the page rather than a busier one.
+// ---------------------------------------------------------------------------
+
+interface Ribbon {
+  /** Vertical anchor points, as fractions of height. */
+  y0: number;
+  y1: number;
+  y2: number;
+  amplitude: number;
+  speed: number;
+  weight: number;
+  rank: number;
+}
+
+const RIBBONS: Ribbon[] = (() => {
+  const rand = mulberry32(0x7f4a7c15);
+  return Array.from({ length: 14 }, () => ({
+    y0: rand(),
+    y1: rand(),
+    y2: rand(),
+    amplitude: 0.04 + rand() * 0.12,
+    speed: 0.05 + rand() * 0.12,
+    weight: rand() > 0.8 ? 1.5 : 0.75,
+    rank: rand(),
+  }));
+})();
+
+export const ribbon: Treatment = ({
+  ctx,
+  box,
+  t,
+  density,
+  pigment,
+  strength,
+}) => {
+  // Culls harder than any other composition: at the trough this is nearly bare.
+  const cull = 0.12 + 0.88 * density;
+
+  ctx.lineCap = "round";
+  ctx.strokeStyle = pigment;
+
+  for (const r of RIBBONS) {
+    if (r.rank > cull) continue;
+
+    // The curve breathes vertically rather than travelling, which is what keeps
+    // it reading as slow. Nothing here should look like it is going anywhere.
+    const sway = Math.sin(t * r.speed) * r.amplitude * box.height;
+
+    ctx.globalAlpha = 0.55 * strength;
+    ctx.lineWidth = r.weight;
+    ctx.beginPath();
+    ctx.moveTo(-40, r.y0 * box.height + sway);
+    ctx.bezierCurveTo(
+      box.width * 0.3,
+      r.y1 * box.height - sway,
+      box.width * 0.7,
+      r.y2 * box.height + sway,
+      box.width + 40,
+      r.y0 * box.height - sway
+    );
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.lineCap = "butt";
+};
+
+// ---------------------------------------------------------------------------
+// lattice: a dot matrix on a regular pitch. Skills.
+// Reference frames 350, 380, 1130.
+//
+// The most literal port in the set, and the one the keep-out was made for:
+// frames 380 and 1130 both mirror a lattice either side of the credits with the
+// centre left bare, which is precisely what a content column does to this.
+//
+// Cells light in a travelling wave rather than at random. In frame 350 the lit
+// cells form a legible front moving across the grid, and that is the difference
+// between a matrix and static.
+// ---------------------------------------------------------------------------
+
+/** Cell pitch in CSS pixels. */
+const LATTICE_PITCH = 68;
+const LATTICE_RADIUS = 3.5;
+
+export const lattice: Treatment = ({
+  ctx,
+  box,
+  t,
+  density,
+  pigment,
+  strength,
+}) => {
+  const columns = Math.ceil(box.width / LATTICE_PITCH) + 1;
+  const rows = Math.ceil(box.height / LATTICE_PITCH) + 1;
+  const rand = mulberry32(0x1b873593);
+
+  // The rank table has to be regenerated per frame because the grid size
+  // depends on the viewport, but the PRNG is re-seeded identically each time,
+  // so the pattern is stable. Regenerating 300 floats per frame is far cheaper
+  // than the alternative of invalidating a cache on every resize.
+  ctx.fillStyle = pigment;
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < columns; col += 1) {
+      const occupancy = rand();
+      const phase = rand();
+      if (occupancy > 0.55) continue;
+
+      const x = col * LATTICE_PITCH + LATTICE_PITCH / 2;
+      const y = row * LATTICE_PITCH + LATTICE_PITCH / 2;
+
+      // A front travelling on the diagonal, so the wave reads as directional
+      // rather than as every cell throbbing in place.
+      const wave =
+        0.5 +
+        0.5 *
+          Math.sin(
+            t * 1.1 - (col / columns) * 5 - (row / rows) * 2.5 + phase * 6.28
+          );
+
+      if (wave < 1 - density) continue;
+
+      ctx.globalAlpha = (0.25 + 0.7 * wave) * strength;
+      ctx.beginPath();
+      ctx.arc(x, y, LATTICE_RADIUS * (0.6 + 0.6 * wave), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  ctx.globalAlpha = 1;
+};
+
+// ---------------------------------------------------------------------------
+// diagonal: one angle family on a regular pitch. Experience.
+// Reference frames 600 and 1404.
+//
+// Deliberately one family where the hero uses two. Experience is a single
+// continuous rail of roles, and a field of evenly pitched parallel strokes says
+// the same thing; a second crossing angle would argue with it. Frame 1404 is
+// exactly this: thirty parallel diagonals at an even pitch.
+// ---------------------------------------------------------------------------
+
+const DIAGONAL_ANGLE = (-52 * Math.PI) / 180;
+const DIAGONAL_COUNT = 46;
+
+const DIAGONALS = (() => {
+  const rand = mulberry32(0xcc9e2d51);
+  return Array.from({ length: DIAGONAL_COUNT }, (_, i) => ({
+    // Even pitch with only slight jitter; the regularity is the point.
+    offset: i / DIAGONAL_COUNT + (rand() - 0.5) * 0.008,
+    length: 0.3 + rand() * 0.7,
+    weight: rand() > 0.88 ? 2 : 1,
+    rank: rand(),
+  }));
+})();
+
+export const diagonal: Treatment = ({
+  ctx,
+  box,
+  t,
+  density,
+  pigment,
+  strength,
+}) => {
+  const cx = box.width / 2;
+  const cy = box.height / 2;
+  const diag = Math.hypot(box.width, box.height);
+  const cull = 0.28 + 0.72 * density;
+
+  const dx = Math.cos(DIAGONAL_ANGLE);
+  const dy = Math.sin(DIAGONAL_ANGLE);
+  const px = -dy;
+  const py = dx;
+
+  ctx.strokeStyle = pigment;
+
+  for (const line of DIAGONALS) {
+    if (line.rank > cull) continue;
+
+    const travel = (wrap01(line.offset + t * 0.008) - 0.5) * diag * 1.5;
+    const mx = cx + px * travel;
+    const my = cy + py * travel;
+    const half = (diag * line.length) / 2;
+
+    ctx.globalAlpha = 0.7 * strength;
+    ctx.lineWidth = line.weight;
+    ctx.beginPath();
+    ctx.moveTo(mx - dx * half, my - dy * half);
+    ctx.lineTo(mx + dx * half, my + dy * half);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+};
+
+// ---------------------------------------------------------------------------
+// planes: overlapping hard-edged rectangles. Contact.
+// Reference frames 270, 910, 950.
+//
+// The only composition in the set built from area rather than stroke, and the
+// boldest. It closes the page, which is where the reference puts its heaviest
+// cards too. Edges are hard and fills are flat: no gradients, no rounding. The
+// shape lock in globals.css says structural surfaces are sharp, and these are
+// the most structural things the field draws.
+// ---------------------------------------------------------------------------
+
+interface Plane {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  speed: number;
+  alpha: number;
+  usesInk: boolean;
+  rank: number;
+}
+
+const PLANES: Plane[] = (() => {
+  const rand = mulberry32(0x85ebca6b);
+  return Array.from({ length: 26 }, () => ({
+    x: rand(),
+    y: rand() * 0.9,
+    width: 0.04 + rand() * rand() * 0.22,
+    height: 0.05 + rand() * rand() * 0.3,
+    speed: 0.003 + rand() * 0.006,
+    alpha: 0.2 + rand() * 0.5,
+    usesInk: rand() > 0.75,
+    rank: rand(),
+  }));
+})();
+
+export const planes: Treatment = ({
+  ctx,
+  box,
+  t,
+  density,
+  pigment,
+  ink,
+  strength,
+}) => {
+  const cull = 0.22 + 0.78 * density;
+
+  for (const plane of PLANES) {
+    if (plane.rank > cull) continue;
+
+    const x = wrap01(plane.x + t * plane.speed) * (box.width + 500) - 250;
+
+    ctx.fillStyle = plane.usesInk ? ink : pigment;
+    // Overlaps read as tone changes because the fills are partly transparent,
+    // which is how the reference's stacked blocks in frame 270 behave.
+    ctx.globalAlpha = plane.alpha * strength;
+    ctx.fillRect(
+      x,
+      plane.y * box.height,
+      plane.width * box.width,
+      plane.height * box.height
+    );
+  }
+
+  ctx.globalAlpha = 1;
+};
+
 export const TREATMENTS: Record<TreatmentName, Treatment> = {
   lines,
   bars,
-  // Added in the next step. Falling back rather than throwing keeps a
-  // half-wired section rendering something instead of a blank canvas.
-  rail: lines,
-  ribbon: lines,
-  lattice: lines,
-  diagonal: lines,
-  planes: lines,
+  rail,
+  ribbon,
+  lattice,
+  diagonal,
+  planes,
 };
 
 export function getTreatment(name: TreatmentName): Treatment {

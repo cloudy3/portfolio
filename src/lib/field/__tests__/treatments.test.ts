@@ -58,8 +58,13 @@ function recordingContext(): Recorder {
     beginPath: vi.fn(),
     moveTo: vi.fn(),
     lineTo: vi.fn(),
+    arc: vi.fn(),
+    bezierCurveTo: vi.fn(),
     stroke: vi.fn(() => {
       strokes += 1;
+    }),
+    fill: vi.fn(() => {
+      fills += 1;
     }),
     fillRect: vi.fn(() => {
       fills += 1;
@@ -110,6 +115,37 @@ describe("field treatments", () => {
     for (const name of Object.keys(TREATMENTS)) {
       expect(typeof getTreatment(name as never)).toBe("function");
     }
+  });
+
+  describe.each(Object.keys(TREATMENTS))("%s", (name) => {
+    const treatment = getTreatment(name as never);
+
+    it("draws something at full density", () => {
+      const recorder = recordingContext();
+      treatment(drawContext(recorder));
+      expect(recorder.strokes + recorder.fills).toBeGreaterThan(0);
+    });
+
+    it("leaves globalAlpha at 1", () => {
+      // Compositions share one context and cross-fade into each other, so a
+      // treatment that returns with alpha still lowered silently dims whatever
+      // draws next.
+      const recorder = recordingContext();
+      treatment(drawContext(recorder));
+      expect(recorder.finalAlpha()).toBe(1);
+    });
+
+    it("draws less at the trough than at full breath", () => {
+      const full = recordingContext();
+      treatment(drawContext(full, { density: 1 }));
+
+      const trough = recordingContext();
+      treatment(drawContext(trough, { density: 0 }));
+
+      expect(trough.strokes + trough.fills).toBeLessThan(
+        full.strokes + full.fills
+      );
+    });
   });
 
   describe("lines", () => {
