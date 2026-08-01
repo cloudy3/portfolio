@@ -8,6 +8,7 @@ import { NAVIGATION_ITEMS } from "@/lib/constants";
 import { LAND_SPRING } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn, smoothScrollTo } from "@/lib/utils";
+import ThemeToggle from "./ThemeToggle";
 
 interface NavigationProps {
   className?: string;
@@ -218,9 +219,19 @@ export default function Navigation({ className }: NavigationProps) {
                 </Link>
               )
             )}
+
+            {/* The toggle is a control, not a destination, so a hairline
+                separates it from the nav items rather than letting it read as
+                a seventh link. */}
+            <span className="mx-2 h-4 w-px bg-border-subtle" aria-hidden />
+            <ThemeToggle />
           </div>
 
-          <div className="md:hidden">
+          {/* On mobile the toggle stays outside the menu: changing the theme
+              should not cost two taps and a panel that covers the page you are
+              trying to look at. */}
+          <div className="flex items-center gap-1 md:hidden">
+            <ThemeToggle />
             <button
               id="mobile-menu-button"
               ref={menuButtonRef}

@@ -3,6 +3,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { detectWebGLSupport } from "@/lib/webgl";
+import { useTheme } from "@/lib/useTheme";
 // Import only the specific Three.js classes we need for better tree-shaking
 import { Vector3, BufferGeometry, LineBasicMaterial, Line } from "three";
 
@@ -472,8 +473,19 @@ export default function WaveLineVisualization({
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [prefersReducedMotion, setPrefersReducedMotion] =
     useState<boolean>(false);
-  const [prefersDark, setPrefersDark] = useState<boolean>(false);
   const [contextLost, setContextLost] = useState<boolean>(false);
+
+  /*
+   * Colour scheme. The lane pigments have to swap with it: ai indigo vanishes
+   * into the dark page and kihada amber vanishes into pale paper, so one fixed
+   * set cannot hold on both grounds. Three.js cannot read the --lane-* custom
+   * properties, so the values are literals here and the scheme is read in JS.
+   *
+   * This reads the resolved theme rather than matchMedia directly, because
+   * matchMedia only knows the OS preference — it would leave the field on the
+   * wrong palette for anyone who has used the theme toggle.
+   */
+  const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Detect WebGL support, mobile devices, and motion preferences on mount
@@ -507,23 +519,9 @@ export default function WaveLineVisualization({
     handleMotionChange(motionQuery);
     motionQuery.addEventListener("change", handleMotionChange);
 
-    /*
-     * Colour scheme. The lane pigments have to swap with the theme: ai indigo
-     * vanishes into the dark page and kihada amber vanishes into pale paper, so
-     * one fixed set cannot hold on both grounds. Three.js cannot read the
-     * --lane-* custom properties, hence matchMedia rather than getComputedStyle.
-     */
-    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleDarkChange = (e: MediaQueryListEvent | MediaQueryList) =>
-      setPrefersDark(e.matches);
-
-    handleDarkChange(darkQuery);
-    darkQuery.addEventListener("change", handleDarkChange);
-
     return () => {
       mobileQuery.removeEventListener("change", handleMobileChange);
       motionQuery.removeEventListener("change", handleMotionChange);
-      darkQuery.removeEventListener("change", handleDarkChange);
     };
   }, []);
 
@@ -582,7 +580,7 @@ export default function WaveLineVisualization({
 
   // Use provided color palette or the theme accents
   const effectiveColorPalette =
-    colorPalette ?? (prefersDark ? LANE_PALETTE_DARK : LANE_PALETTE_LIGHT);
+    colorPalette ?? (theme === "dark" ? LANE_PALETTE_DARK : LANE_PALETTE_LIGHT);
 
   return (
     <div

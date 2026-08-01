@@ -513,6 +513,30 @@
     }
   }
 
+  /* ---- Rails over the lane field --------------------------------------
+   * The hero variant, where the rails dissolve instead of running the full
+   * width.
+   *
+   * At full strength over the canvas they are a static grid laid across a
+   * moving one, and the eye reads the collision rather than the structure —
+   * eight motionless hairlines crossing every wave. It is worst in dark mode,
+   * where the rails are light-on-dark and the field is at its brightest.
+   *
+   * The fade runs on the same axis as the hero scrim: the rails hold where the
+   * page colour holds and the copy sits, and hand the frame to the field where
+   * the field is actually visible. Structure on the left, motion on the right,
+   * one gradient governing both.
+   */
+  .lane-rails-fade::before {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 0%,
+      #000 26%,
+      transparent 58%
+    );
+    mask-image: linear-gradient(to right, #000 0%, #000 26%, transparent 58%);
+  }
+
   /* ---- The judgment line ----------------------------------------------
    * The hairline a section opens on. The accent sweep across it is driven in
    * React (see the Section primitive); this is the resting state, and it is
@@ -592,6 +616,53 @@
     }
   }
 
+  /* ---- The theme mark -------------------------------------------------
+   * The glyph inside the theme toggle.
+   *
+   * This site has no icon library and no hand-drawn SVG: the hamburger is
+   * three spans, the loaders are bars on a track. So the theme control is CSS
+   * geometry too — a sharp square, half inked, on the shape lock like
+   * everything else. The inked half sits right under light and slides left
+   * under dark, which is the state change made visible rather than announced.
+   *
+   * The state is expressed in CSS, not in React, and that is deliberate: the
+   * correct half is painted on the first frame, before any JavaScript runs, so
+   * a dark-mode visitor never sees the light-mode mark flash. It is the same
+   * three-block pattern as the colour tokens at the top of this file
+   * (media query, [data-theme="dark"], [data-theme="light"]) — keep all four
+   * blocks in step.
+   */
+  .theme-mark {
+    position: relative;
+    display: block;
+    height: 0.875rem;
+    width: 0.875rem;
+    border: 1px solid currentColor;
+    overflow: hidden;
+  }
+
+  .theme-mark::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 0 50%;
+    background: currentColor;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .theme-mark::after {
+      transform: translateX(-100%);
+    }
+  }
+
+  :root[data-theme="dark"] .theme-mark::after {
+    transform: translateX(-100%);
+  }
+
+  :root[data-theme="light"] .theme-mark::after {
+    transform: none;
+  }
+
   /* ---- Numbers --------------------------------------------------------
    * The ONLY mono class on the site. Counts, dates, durations, the
    * rhythm-game-style counters. If it is not a number, it is not mono.
@@ -665,8 +736,17 @@
   scroll-behavior: auto !important;
 }
 
+/*
+ * Increased contrast. Four blocks rather than two, for the same reason the
+ * colour tokens have three: `[data-theme]` outranks a bare `:root` on
+ * specificity, so once someone uses the theme toggle the media-query-only
+ * version of this would simply stop applying and the contrast boost would go
+ * missing exactly for the people who asked for it. Each override needs a
+ * counterpart at matching specificity.
+ */
 @media (prefers-contrast: more) {
-  :root {
+  :root,
+  :root[data-theme="light"] {
     --color-content-secondary: #2a2d33;
     --color-content-muted: #3d4149;
     --color-border-strong: rgba(22, 24, 28, 0.4);
@@ -678,6 +758,12 @@
       --color-content-muted: #bcc2cb;
       --color-border-strong: rgba(232, 234, 238, 0.45);
     }
+  }
+
+  :root[data-theme="dark"] {
+    --color-content-secondary: #d4d8df;
+    --color-content-muted: #bcc2cb;
+    --color-border-strong: rgba(232, 234, 238, 0.45);
   }
 }
 

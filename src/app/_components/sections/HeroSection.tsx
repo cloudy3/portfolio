@@ -82,12 +82,14 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         aria-hidden
       />
 
-      {/* Full-height lane rails, aligned to the content column. */}
+      {/* Full-height lane rails, aligned to the content column, fading out on
+          the same axis as the scrim above so they never cross the live field.
+          See .lane-rails-fade in globals.css. */}
       <div
         className="container-custom pointer-events-none absolute inset-0 z-[3]"
         aria-hidden
       >
-        <div className="lane-rails h-full" />
+        <div className="lane-rails lane-rails-fade h-full" />
       </div>
 
       <div className="container-custom relative z-10 w-full">

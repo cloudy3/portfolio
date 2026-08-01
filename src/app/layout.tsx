@@ -5,6 +5,7 @@ import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 /*
  * Zen Kaku Gothic New. One family for the whole site: hierarchy comes from
@@ -124,7 +125,18 @@ export default function RootLayout({
     // (the keyboard story) still stick to the viewport. Moving this to <html>
     // would break that; if it ever needs to move, use `overflow-x: clip`,
     // which never establishes a scroll container.
-    <html lang="en" className="scroll-smooth">
+    // suppressHydrationWarning covers exactly one attribute: `data-theme`,
+    // written onto <html> by the bootstrap below before React ever sees the
+    // document. It is scoped to this element and does not extend to children.
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        {/*
+         * Applies the stored colour scheme before first paint. Must stay inline
+         * and render-blocking — an external or deferred script would run after
+         * the first frame, which is the flash it exists to prevent.
+         */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body
         className={`${zenKaku.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}
       >
