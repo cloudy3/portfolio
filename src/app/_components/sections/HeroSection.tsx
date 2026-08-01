@@ -1,23 +1,7 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { ErrorBoundary } from "../shared/ErrorBoundary";
+import FieldAnchor from "../shared/FieldAnchor";
 import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
-import { cn, smoothScrollTo } from "@/lib/utils";
-
-const WaveLineVisualization = dynamic(
-  () => import("../shared/WaveLineVisualization"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="absolute inset-0 bg-surface-page bg-grid-faint opacity-60" />
-    ),
-  }
-);
-
-function scrollToSection(sectionId: string) {
-  smoothScrollTo(sectionId, 80);
-}
+import { cn } from "@/lib/utils";
+import { HeroActions } from "./HeroActions";
 
 /**
  * Lead line of the profile summary.
@@ -36,6 +20,29 @@ interface HeroSectionProps {
   className?: string;
 }
 
+/**
+ * The hero.
+ *
+ * This is now a Server Component. It has no canvas of its own, no scrim and no
+ * lane rails: the site-wide field draws behind it and composes around the copy.
+ * Only the buttons need JavaScript, and they are isolated in HeroActions.
+ *
+ * What went, and why:
+ *
+ *   The three.js canvas was mounted here and nowhere else, which made the whole
+ *   WebGL stack an above-the-fold cost for one decorative element. It is
+ *   replaced by the shared 2D field.
+ *
+ *   The horizontal scrim existed only to keep the canvas off the copy. The
+ *   field is clipped to everything outside `[data-keepout]` instead, so there is
+ *   nothing to protect the text from. Composing around the type rather than
+ *   veiling it is what the reference does, and it means the field can run at
+ *   full strength where it is visible.
+ *
+ *   The static lane rails were eight motionless hairlines drawn over a moving
+ *   field. The `bars` composition is that idea actually moving, so keeping both
+ *   would be saying the same thing twice.
+ */
 export default function HeroSection({ className = "" }: HeroSectionProps) {
   return (
     <section
@@ -44,55 +51,11 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         className
       )}
       id="hero"
+      data-field
     >
-      <div className="absolute inset-0 bg-surface-page" />
+      <FieldAnchor treatment="bars" pigment="shu" />
 
-      {/*
-       * The lane field, at full strength. It was previously wrapped in
-       * opacity-[0.35], on top of the canvas's own 0.55 line opacity, under a
-       * three-stop vertical scrim — effectively invisible. It is the hero's
-       * primary visual now, so it gets the whole frame.
-       */}
-      <div className="absolute inset-0 z-[1]">
-        <ErrorBoundary
-          fallback={
-            <div className="absolute inset-0 bg-surface-subtle bg-grid-faint" />
-          }
-        >
-          <WaveLineVisualization
-            className="h-full w-full"
-            animationSpeed={0.55}
-          />
-        </ErrorBoundary>
-      </div>
-
-      {/*
-       * Scrims run HORIZONTALLY, not vertically. The copy sits on the left
-       * lanes, so the page colour holds solid there for contrast and clears to
-       * nothing on the right where the field should read. A vertical scrim has
-       * to flatten the entire field to protect centred text, which is exactly
-       * what the old centred hero did.
-       */}
-      <div
-        className="absolute inset-0 z-[2] bg-gradient-to-r from-surface-page via-surface-page/70 to-transparent"
-        aria-hidden
-      />
-      <div
-        className="absolute inset-x-0 bottom-0 z-[2] h-1/5 bg-gradient-to-t from-surface-page to-transparent"
-        aria-hidden
-      />
-
-      {/* Full-height lane rails, aligned to the content column, fading out on
-          the same axis as the scrim above so they never cross the live field.
-          See .lane-rails-fade in globals.css. */}
-      <div
-        className="container-custom pointer-events-none absolute inset-0 z-[3]"
-        aria-hidden
-      >
-        <div className="lane-rails lane-rails-fade h-full" />
-      </div>
-
-      <div className="container-custom relative z-10 w-full">
+      <div className="container-custom relative w-full">
         {/*
          * The hero entrance is CSS (`.lane-enter` in globals.css), not Motion,
          * and that is a measured performance decision.
@@ -109,7 +72,20 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
          * stylesheet, so no JS branch is needed here either.
          */}
         <div className="lane-grid">
-          <div className="md:col-span-6 md:pr-[var(--lane-inset)]">
+          {/*
+           * data-keepout marks the block the field must not draw over. It is
+           * the copy column rather than the whole container, which is what
+           * leaves the right-hand lanes free for the composition.
+           *
+           * "column" clips its horizontal extent for the full viewport height
+           * rather than just its own box, so the composition sits cleanly
+           * beside the copy. Clipping to the box alone left bars terminating in
+           * mid-air on the line above the headline, which read as a bug.
+           */}
+          <div
+            className="md:col-span-6 md:pr-[var(--lane-inset)]"
+            data-keepout="column"
+          >
             {/*
              * Weight contrast carries the headline: 900 against 300, one
              * family. The old version greyed the second clause out, which is
@@ -131,36 +107,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
               {SHORT_NAME}. {LEAD_SENTENCE}.
             </p>
 
-            {/*
-             * Two CTAs, one intent each. The hero previously carried four
-             * actions in a single row: "View selected work" and "All projects"
-             * were the same portfolio intent, and "Bonus: Keyboard story" was a
-             * fourth competing link. Both now live in the Work section, where
-             * that intent belongs.
-             *
-             * No scroll cue below them. If the visitor has not scrolled yet,
-             * they are looking at the hero; the bottom of the viewport does not
-             * need a label telling them what a scrollbar is.
-             */}
-            <div
-              className="lane-enter mt-[calc(var(--rhythm)*10)] flex flex-col gap-3 sm:flex-row sm:items-center"
-              style={{ "--enter-index": 2 } as React.CSSProperties}
-            >
-              <button
-                type="button"
-                onClick={() => scrollToSection("work")}
-                className="inline-flex items-center justify-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"
-              >
-                View selected work
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection("contact")}
-                className="inline-flex items-center justify-center rounded-control border border-border-strong px-6 py-3 text-sm font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
-              >
-                Contact
-              </button>
-            </div>
+            <HeroActions />
           </div>
         </div>
       </div>

@@ -16,16 +16,6 @@ vi.mock("next/link", () => ({
   },
 }));
 
-vi.mock("next/dynamic", () => ({
-  __esModule: true,
-  default: () => {
-    function MockWave() {
-      return <div data-testid="wave-line-visualization">Wave</div>;
-    }
-    return MockWave;
-  },
-}));
-
 vi.mock("framer-motion", () => {
   // Motion-only props must not reach the DOM or React warns about them.
   const MOTION_PROPS = new Set([
@@ -65,12 +55,6 @@ vi.mock("framer-motion", () => {
   };
 });
 
-vi.mock("../../shared/ErrorBoundary", () => ({
-  ErrorBoundary: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="error-boundary">{children}</div>
-  ),
-}));
-
 describe("HeroSection", () => {
   beforeEach(() => {
     window.scrollTo = vi.fn();
@@ -104,9 +88,16 @@ describe("HeroSection", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders wave visualization slot", () => {
-    render(<HeroSection />);
-    expect(screen.getByTestId("wave-line-visualization")).toBeInTheDocument();
+  it("opts into the site field and marks its copy as keep-out", () => {
+    // Replaces an assertion on the hero's own three.js canvas, which no longer
+    // exists: the background visual is the shared field, mounted in the layout.
+    // The hero's side of that contract is these two attributes, so this is the
+    // same guarantee expressed against the current architecture.
+    const { container } = render(<HeroSection />);
+
+    const section = container.querySelector("[data-field]");
+    expect(section).toBeTruthy();
+    expect(section?.querySelector("[data-keepout]")).toBeTruthy();
   });
 
   it("scrolls when primary CTA clicked", () => {

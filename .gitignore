@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# design reference material (large, not part of the app)
+animation_source.mp4
+frame_*.jpg

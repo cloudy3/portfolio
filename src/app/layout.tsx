@@ -5,6 +5,7 @@ import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
+import Field from "./_components/shared/Field";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 /*
@@ -142,8 +143,14 @@ export default function RootLayout({
       >
         <AccessibilityAuditor />
         <AccessibilityProvider>
+          {/*
+           * One canvas for the whole site, behind everything. Sections opt in
+           * with a FieldAnchor; this only mounts the surface they draw on.
+           */}
+          <Field />
           <Navigation />
-          <main id="main-content" className="relative pt-16">
+          {/* z-10 so the content column always sits above the field. */}
+          <main id="main-content" className="relative z-10 pt-16">
             {children}
           </main>
         </AccessibilityProvider>
