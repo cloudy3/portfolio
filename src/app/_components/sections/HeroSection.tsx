@@ -79,43 +79,39 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
          */}
         <div className="lane-grid">
           {/*
-           * data-keepout marks the block the field must not draw over. It is
-           * the copy column rather than the whole container, which is what
-           * leaves the right-hand lanes free for the composition.
+           * data-keepout marks the actual copy, not its six-column grid cell.
+           * Soft mode leaves a faint trace of the lines and feathers them back
+           * in, so the field stays continuous without competing with the type.
            *
-           * Box mode, not column. Column was right for vertical bars, which
-           * terminated in mid-air when clipped to a box. Long diagonals are the
-           * opposite case: passing around a rectangular hole is a composition
-           * the reference uses directly (frames 350, 380, 1130), while
-           * confining them to two narrow side strips wastes their length, which
-           * is the whole point of the primitive.
-           */}
-          <div
-            className="md:col-span-6 md:pr-[var(--lane-inset)]"
-            data-keepout="box"
-          >
-            {/*
-             * Weight contrast carries the headline: 900 against 300, one
-             * family. The old version greyed the second clause out, which is
-             * the standard two-tone headline trick and also gave away contrast.
-             * Both clauses are full-strength ink now.
-             */}
-            <h1
-              className="lane-enter text-content-primary"
-              style={{ "--enter-index": 0 } as React.CSSProperties}
-            >
-              <span className="block">Calm systems,</span>
-              <span className="block font-light">shipped with care.</span>
-            </h1>
+           * A hard box made the page background show through as a pasted-on
+           * rectangle, especially in dark mode. The soft mask keeps contrast
+           * without introducing another card or surface into the hero.
+          */}
+          <div className="md:col-span-6 md:pr-[var(--lane-inset)]">
+            <div className="w-fit max-w-full" data-keepout="soft">
+              {/*
+               * Weight contrast carries the headline: 900 against 300, one
+               * family. The old version greyed the second clause out, which is
+               * the standard two-tone headline trick and also gave away contrast.
+               * Both clauses are full-strength ink now.
+               */}
+              <h1
+                className="lane-enter text-content-primary"
+                style={{ "--enter-index": 0 } as React.CSSProperties}
+              >
+                <span className="block">Calm systems,</span>
+                <span className="block font-light">shipped with care.</span>
+              </h1>
 
-            <p
-              className="lane-enter mt-[calc(var(--rhythm)*6)] max-w-[44ch] text-content-secondary"
-              style={{ "--enter-index": 1 } as React.CSSProperties}
-            >
-              {SHORT_NAME}. {LEAD_SENTENCE}.
-            </p>
+              <p
+                className="lane-enter mt-[calc(var(--rhythm)*6)] max-w-[44ch] text-content-secondary"
+                style={{ "--enter-index": 1 } as React.CSSProperties}
+              >
+                {SHORT_NAME}. {LEAD_SENTENCE}.
+              </p>
 
-            <HeroActions />
+              <HeroActions />
+            </div>
           </div>
         </div>
       </div>

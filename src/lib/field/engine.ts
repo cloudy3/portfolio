@@ -49,6 +49,11 @@ const STRENGTH = 0.8;
  */
 const KEEP_OUT_PAD = 28;
 
+/** The hero keeps a trace of the field, then feathers it back to full strength. */
+const SOFT_KEEP_OUT_ALPHA = 0.9;
+const SOFT_KEEP_OUT_FEATHER_X = 112;
+const SOFT_KEEP_OUT_FEATHER_Y = 80;
+
 export interface FieldOptions {
   reduced: boolean;
   dark: boolean;
@@ -181,12 +186,40 @@ export function createField(
       return { x: r.left - KEEP_OUT_PAD, y: 0, width: r.width + KEEP_OUT_PAD * 2, height };
     }
 
+    const pad = entry.keepOutMode === "soft" ? 0 : KEEP_OUT_PAD;
     return {
-      x: r.left - KEEP_OUT_PAD,
-      y: r.top - KEEP_OUT_PAD,
-      width: r.width + KEEP_OUT_PAD * 2,
-      height: r.height + KEEP_OUT_PAD * 2,
+      x: r.left - pad,
+      y: r.top - pad,
+      width: r.width + pad * 2,
+      height: r.height + pad * 2,
     };
+  }
+
+  /**
+   * Removes most, but deliberately not all, of the field beneath hero copy.
+   * An elliptical radial fade has no rectangular edge for the eye to discover,
+   * while the surviving ten percent keeps the animation spatially continuous.
+   */
+  function softenKeepOut(rect: Rect): void {
+    const centerX = rect.x + rect.width / 2;
+    const centerY = rect.y + rect.height / 2;
+    const radiusX = Math.max(1, rect.width / 2 + SOFT_KEEP_OUT_FEATHER_X);
+    const radiusY = Math.max(1, rect.height / 2 + SOFT_KEEP_OUT_FEATHER_Y);
+
+    ctx!.save();
+    ctx!.globalCompositeOperation = "destination-out";
+    ctx!.translate(centerX, centerY);
+    ctx!.scale(radiusX, radiusY);
+
+    const fade = ctx!.createRadialGradient(0, 0, 0, 0, 0, 1);
+    fade.addColorStop(0, `rgba(0, 0, 0, ${SOFT_KEEP_OUT_ALPHA})`);
+    fade.addColorStop(0.62, `rgba(0, 0, 0, ${SOFT_KEEP_OUT_ALPHA})`);
+    fade.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx!.fillStyle = fade;
+    ctx!.beginPath();
+    ctx!.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx!.fill();
+    ctx!.restore();
   }
 
   function paint(composition: ActiveComposition, density: number): void {
@@ -199,7 +232,11 @@ export function createField(
     // Everything outside the type. even-odd turns the two rects into a frame
     // with a hole in it, which is the whole composition-around-the-type idea in
     // one call: treatments draw freely and are cut where the words are.
-    if (keepOut.width > 0 && keepOut.height > 0) {
+    if (
+      entry.keepOutMode !== "soft" &&
+      keepOut.width > 0 &&
+      keepOut.height > 0
+    ) {
       const clip = new Path2D();
       clip.rect(0, 0, width, height);
       clip.rect(keepOut.x, keepOut.y, keepOut.width, keepOut.height);
@@ -218,6 +255,14 @@ export function createField(
       dark,
       strength: STRENGTH,
     });
+
+    if (
+      entry.keepOutMode === "soft" &&
+      keepOut.width > 0 &&
+      keepOut.height > 0
+    ) {
+      softenKeepOut(keepOut);
+    }
 
     ctx!.restore();
   }

@@ -18,14 +18,15 @@ import type { PigmentName, TreatmentName } from "./types";
  *
  * `box` clips the element's own rectangle. `column` clips its horizontal extent
  * for the full viewport height, so the composition lives strictly beside the
- * text rather than also above and below it.
+ * text rather than also above and below it. `soft` attenuates the field through
+ * the element and feathers it back in around the edge, avoiding a visible cut.
  *
  * `column` exists because `box` leaves a visible arbitrary edge: bars stop dead
  * in mid-air at the top of the copy block, which reads as a clipping bug rather
  * than as a composition. The reference never does this. Its fields are bounded
  * by the frame, or they run the full height beside the type (frames 380, 1130).
  */
-export type KeepOutMode = "box" | "column";
+export type KeepOutMode = "box" | "column" | "soft";
 
 export interface FieldEntry {
   /** The <section>. Observed for visibility. */

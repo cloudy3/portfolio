@@ -83,6 +83,18 @@ describe("FieldAnchor", () => {
     unmount();
   });
 
+  it("registers a soft keep-out without falling back to a hard box", () => {
+    const { unmount } = render(
+      <section data-field>
+        <FieldAnchor treatment="lines" pigment="shu" />
+        <div data-keepout="soft">copy</div>
+      </section>
+    );
+
+    expect(getFieldEntries()[0].keepOutMode).toBe("soft");
+    unmount();
+  });
+
   it("registers with no keep-out when the section declares none", () => {
     // A section without one simply lets the composition use the whole frame.
     const { unmount } = render(

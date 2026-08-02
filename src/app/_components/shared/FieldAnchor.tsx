@@ -35,13 +35,19 @@ export default function FieldAnchor({ treatment, pigment }: FieldAnchorProps) {
     // the clip mode, defaulting to the element's own box.
     const keepOut = section.querySelector<HTMLElement>("[data-keepout]");
 
+    const requestedMode = keepOut?.getAttribute("data-keepout");
+
     return registerField({
       el: section,
       treatment,
       pigment,
       keepOut,
       keepOutMode:
-        keepOut?.getAttribute("data-keepout") === "column" ? "column" : "box",
+        requestedMode === "column"
+          ? "column"
+          : requestedMode === "soft"
+            ? "soft"
+            : "box",
     });
   }, [treatment, pigment]);
 

@@ -97,7 +97,10 @@ describe("HeroSection", () => {
 
     const section = container.querySelector("[data-field]");
     expect(section).toBeTruthy();
-    expect(section?.querySelector("[data-keepout]")).toBeTruthy();
+    expect(section?.querySelector("[data-keepout]")).toHaveAttribute(
+      "data-keepout",
+      "soft"
+    );
   });
 
   it("scrolls when primary CTA clicked", () => {
