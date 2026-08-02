@@ -25,13 +25,28 @@ export type TreatmentName =
   | "planes";
 
 /**
- * Which lane pigment a section's field draws in.
+ * Which traditional pigment a section's field draws in.
  *
- * These are the four traditional pigments already defined in globals.css. They
- * are the licensed exception to the colour lock: UI chrome stays ink plus
- * vermilion everywhere, the field is polychrome.
+ * These are defined in globals.css. They are the licensed exception to the
+ * colour lock: UI chrome stays ink plus vermilion while the expressive field
+ * may use the supporting palette.
  */
 export type PigmentName = "shu" | "ai" | "moegi" | "kihada";
+
+/**
+ * The material contract shared by every field composition.
+ *
+ * Geometry remains treatment-specific, while these values keep apparent
+ * energy, tempo, population and palette behavior coherent across sections.
+ */
+export interface TreatmentProfile {
+  energy: number;
+  tempo: number;
+  populationFloor: number;
+  paletteMode: "polychrome" | "pigment";
+  inkShareLight: number;
+  inkShareDark: number;
+}
 
 /** Viewport-relative, CSS pixels. */
 export interface Rect {
@@ -65,15 +80,13 @@ export interface DrawContext {
    * beside near-empty ones.
    */
   density: number;
-  /** Resolved lane pigment, as a CSS colour. The section's own hue. */
+  /** Resolved field pigment, as a CSS colour. The section's own hue. */
   pigment: string;
   /**
    * All four resolved pigments.
    *
-   * Only the hero uses this. The colour lock reads "chrome is ink plus one
-   * accent; the four-pigment lane field in the hero canvas is the single
-   * licensed exception", and that exception is what the polychrome line field
-   * spends. Every other section takes `pigment` alone.
+   * Only the hero uses this complete palette. Every other section takes its
+   * single `pigment`, keeping the sequence varied but coherent.
    */
   palette: Record<PigmentName, string>;
   /** Resolved ink, for the achromatic elements in a composition. */

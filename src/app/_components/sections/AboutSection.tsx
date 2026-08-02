@@ -16,7 +16,7 @@ import { FadeIn } from "../motion/FadeIn";
  * These were three equal bordered cards in a 3-column grid, each led by an
  * "01 / 02 / 03" label. The equal-thirds feature row is the most templated
  * layout on the web, and the numbers were decoration: the items are not a
- * sequence and nothing refers back to them. They are lane-aligned passages now,
+ * sequence and nothing refers back to them. They are grid-aligned passages now,
  * grouped by space alone, with no boxes and no counters.
  */
 const pillars = [
@@ -69,10 +69,10 @@ export default function AboutSection() {
         </FadeIn>
 
         {/*
-         * Portrait on lanes 1-2, prose on lanes 4-8, lane 3 deliberately empty.
+         * Portrait on columns 1-2, prose on columns 4-8, column 3 deliberately empty.
          * An offset composition rather than a 50/50 image-and-text split, partly
          * because the Work section above already spends that split once, and
-         * partly because the gap is the point: the empty lane is the ma.
+         * partly because the measured gap is the expression of ma.
          */}
         <div className="lane-grid">
           <FadeIn className="md:col-span-2">

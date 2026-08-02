@@ -34,12 +34,12 @@ type SectionProps = {
   /** Use section-padding utility */
   padded?: boolean;
   /**
-   * Opens the section with the judgment line. On by default; pass false for the
-   * hero, which has no preceding section to be separated from.
+   * Opens the section with its transition hairline. On by default; pass false
+   * for the hero, which has no preceding section to be separated from.
    */
   judgment?: boolean;
   /**
-   * The composition drawn behind this section, and the lane pigment it draws
+   * The composition drawn behind this section, and the field pigment it draws
    * in. Omit both and the section simply carries no field.
    *
    * One pigment per section is the whole colour scheme for the field layer. UI

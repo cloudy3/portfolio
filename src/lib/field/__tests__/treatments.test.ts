@@ -1,5 +1,10 @@
 import { vi } from "vitest";
-import { getTreatment, TREATMENTS } from "../treatments";
+import {
+  FIELD_MATERIAL,
+  getTreatment,
+  TREATMENTS,
+  TREATMENT_PROFILES,
+} from "../treatments";
 import type { DrawContext, PigmentName } from "../types";
 
 /**
@@ -21,6 +26,7 @@ interface Recorder {
   strokes: number;
   fills: number;
   colours: Set<string>;
+  lineWidths: Set<number>;
   /** Every composite mode the treatment left behind, to catch leaks. */
   finalAlpha: () => number;
 }
@@ -29,7 +35,13 @@ function recordingContext(): Recorder {
   let strokes = 0;
   let fills = 0;
   const colours = new Set<string>();
-  const state = { globalAlpha: 1, strokeStyle: "", fillStyle: "" };
+  const lineWidths = new Set<number>([1]);
+  const state = {
+    globalAlpha: 1,
+    strokeStyle: "",
+    fillStyle: "",
+    lineWidth: 1,
+  };
 
   const ctx = {
     get globalAlpha() {
@@ -52,7 +64,13 @@ function recordingContext(): Recorder {
       state.fillStyle = v;
       colours.add(v);
     },
-    lineWidth: 1,
+    get lineWidth() {
+      return state.lineWidth;
+    },
+    set lineWidth(v: number) {
+      state.lineWidth = v;
+      lineWidths.add(v);
+    },
     lineCap: "butt",
     globalCompositeOperation: "source-over",
     beginPath: vi.fn(),
@@ -80,6 +98,7 @@ function recordingContext(): Recorder {
       return fills;
     },
     colours,
+    lineWidths,
     finalAlpha: () => state.globalAlpha,
   };
 }
@@ -111,6 +130,44 @@ function drawContext(
 }
 
 describe("field treatments", () => {
+  it("defines a calibrated profile for every treatment", () => {
+    expect(Object.keys(TREATMENT_PROFILES).sort()).toEqual(
+      Object.keys(TREATMENTS).sort()
+    );
+
+    for (const profile of Object.values(TREATMENT_PROFILES)) {
+      expect(profile.energy).toBeGreaterThanOrEqual(0.55);
+      expect(profile.energy).toBeLessThanOrEqual(1);
+      expect(profile.tempo).toBeGreaterThanOrEqual(0.65);
+      expect(profile.tempo).toBeLessThanOrEqual(1);
+      expect(profile.populationFloor).toBeGreaterThan(0);
+      expect(profile.populationFloor).toBeLessThan(1);
+      expect(profile.inkShareLight).toBeLessThanOrEqual(0.2);
+      expect(profile.inkShareDark).toBeLessThanOrEqual(0.12);
+    }
+
+    expect(
+      Object.entries(TREATMENT_PROFILES)
+        .filter(([, profile]) => profile.paletteMode === "polychrome")
+        .map(([name]) => name)
+    ).toEqual(["lines"]);
+  });
+
+  it.each(["lines", "ribbon", "diagonal"] as const)(
+    "%s uses only the shared stroke scale",
+    (name) => {
+      const recorder = recordingContext();
+      getTreatment(name)(drawContext(recorder));
+      expect(
+        [...recorder.lineWidths].every((width) =>
+          [FIELD_MATERIAL.hairline, FIELD_MATERIAL.emphasisStroke].includes(
+            width as 1 | 1.5
+          )
+        )
+      ).toBe(true);
+    }
+  );
+
   it("exposes every declared treatment", () => {
     for (const name of Object.keys(TREATMENTS)) {
       expect(typeof getTreatment(name as never)).toBe("function");
@@ -181,6 +238,7 @@ describe("field treatments", () => {
       getTreatment("lines")(drawContext(recorder));
       expect(recorder.finalAlpha()).toBe(1);
     });
+
   });
 
   describe("bars", () => {

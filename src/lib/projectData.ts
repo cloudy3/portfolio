@@ -133,24 +133,24 @@ export const sampleProjects: Project[] = [
     id: "portfolio-website",
     title: "Professional Portfolio Website",
     description:
-      "Modern portfolio website built with Next.js, subtle motion, responsive design, and optimized performance.",
+      "Engineering portfolio built around a continuous geometric canvas field, Japanese kinetic minimalism, and accessible motion.",
     role: "Design, implementation, and deployment",
     problem:
       "Needed a fast, accessible site that presents engineering work clearly without feeling like a generic template.",
     solution:
-      "Next.js App Router with Tailwind, structured project pages, Framer Motion for UI motion, and performance-conscious lazy loading.",
+      "Next.js App Router with Tailwind, a shared Canvas 2D composition engine, structured project pages, and Framer Motion isolated to interface transitions.",
     outcomes: [
       "SSR for SEO and shareable project URLs",
       "CI/CD deploy pipeline to Vercel",
       "Accessibility and responsive layout across breakpoints",
     ],
     longDescription:
-      "Built a responsive portfolio using Next.js and Tailwind CSS (with AI assistance) featuring Server-Side Rendering (SSR) for SEO optimization, dynamic project pages, and CI/CD deployment pipeline to Vercel. The website showcases professional experience, technical skills, and project portfolio with modern web technologies. Includes Three.js for a restrained hero visual, Framer Motion for interface motion, and attention to Core Web Vitals. The site is accessible and optimized for all device sizes.",
+      "Built a responsive portfolio using Next.js and Tailwind CSS with server-rendered content, dynamic project pages, and a CI/CD deployment pipeline to Vercel. A fixed Canvas 2D field recomposes itself around protected content regions as sections change, creating a distinctive visual system without sacrificing legibility. Framer Motion handles restrained interface transitions, while reduced-motion visitors receive deliberate static compositions.",
     technologies: [
       "Next.js",
       "TypeScript",
       "Tailwind CSS",
-      "Three.js",
+      "Canvas 2D",
       "Framer Motion",
       "Vercel",
       "AI Assistance",

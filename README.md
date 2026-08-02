@@ -1,39 +1,47 @@
-# 🎯 Portfolio Website
+# Jing Feng Portfolio
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/YOUR_REPO)
 
-> A modern portfolio website that doesn't just look good—it performs like a Formula 1 car and is more accessible than a public library.
+An engineering portfolio built around a continuous geometric motion field,
+quiet editorial typography, and accessible interaction.
 
-Built with Next.js 15, Three.js, and an unhealthy obsession with performance metrics.
+The canonical visual direction is documented in [DESIGN.md](./DESIGN.md).
 
-## ✨ What Makes This Special
+## Visual direction
 
-This isn't your typical "throw React at everything" portfolio. It's a carefully engineered showcase that demonstrates:
+The site uses a custom 2D canvas system inspired by the title sequence for
+*Glass Heart*. A single fixed field recomposes itself for each section while
+leaving protected regions around the content. Japanese influence comes through
+Zen Kaku Gothic New, traditional pigments, measured empty space, and restrained
+cadence rather than literal game-interface elements.
 
-- **Performance Engineering**: Sub-500KB bundle sizes with intelligent code splitting
-- **3D Web Graphics**: Three.js integration that doesn't tank your frame rate
-- **Accessibility First**: WCAG compliant with automated testing
-- **Modern Architecture**: Next.js 15 App Router with TypeScript throughout
-- **Animation Mastery**: GSAP + Locomotive Scroll for buttery smooth interactions
-- **DevOps Mindset**: Comprehensive audit system with automated performance monitoring
+Key characteristics:
 
-## 🚀 Tech Stack
+- One shared canvas rather than a separate animation mounted in every section
+- Art-directed keep-out regions that preserve text clarity without scrims
+- Seven related geometric treatments with one consistent material language
+- Automatic light and dark palettes
+- Static composed frames for visitors who prefer reduced motion
+- Quiet UI motion that supports rather than competes with the field
 
-**Frontend Powerhouse**
+## Tech stack
 
-- Next.js 15 (App Router)
-- TypeScript (strict mode, because we're not animals)
+**Frontend**
+
+- Next.js 16 App Router
+- React 19
+- TypeScript in strict mode
 - Tailwind CSS v4 (utility-first styling)
-- Three.js + React Three Fiber (3D graphics)
-- GSAP (scroll animations)
-- Locomotive Scroll (smooth scrolling)
+- Canvas 2D for the shared geometric field
+- Framer Motion for interface transitions
+- Self-hosted Zen Kaku Gothic New
 
 **Performance & Quality**
 
 - Custom webpack optimization
 - Bundle analyzer integration
 - Lighthouse CI/CD
-- Jest + React Testing Library
+- Vitest + React Testing Library
 - ESLint + TypeScript compiler
 - Automated accessibility auditing
 
@@ -44,7 +52,7 @@ This isn't your typical "throw React at everything" portfolio. It's a carefully 
 - Image optimization (WebP/AVIF)
 - Security headers & CSP
 
-## 🏃‍♂️ Quick Start
+## Quick start
 
 ```bash
 # Clone and install
@@ -59,7 +67,7 @@ npm run dev
 npm run build
 ```
 
-## 🔧 Development Commands
+## Development commands
 
 ```bash
 # Development
@@ -79,7 +87,7 @@ npm run audit:a11y      # Accessibility audit
 npm run build:analyze   # Bundle analysis
 ```
 
-## 📊 Performance Standards
+## Performance standards
 
 This project maintains strict performance standards:
 
@@ -88,13 +96,15 @@ This project maintains strict performance standards:
 - **Accessibility**: WCAG AA compliance
 - **Test Coverage**: > 80% (because 100% is for show-offs)
 
-## 🎨 Architecture Highlights
+## Architecture highlights
 
-**Smart Loading Strategy**
+**Shared field system**
 
-- Hero section loads immediately (first impressions matter)
-- Below-the-fold sections are dynamically imported
-- Three.js chunks are split separately to avoid blocking
+- One fixed canvas is mounted in the root layout.
+- Sections register a treatment, pigment, and protected content region.
+- The canvas crossfades between compositions as the active section changes.
+- The animation loop pauses when the document is hidden.
+- Reduced-motion mode renders a deliberate still frame.
 
 **Performance Monitoring**
 
@@ -117,11 +127,12 @@ src/
 
 ## 🛠 Custom Optimizations
 
-**Webpack Magic**
+**Rendering strategy**
 
-- Custom chunk splitting for Three.js and GSAP
-- Tree shaking optimization
-- Development vs production configurations
+- Server Components render the primary layouts and content.
+- Interactive and animated behavior is isolated in client leaves.
+- Below-the-fold home sections are dynamically imported.
+- Hero copy enters with CSS so its first paint does not wait for hydration.
 
 **Image Optimization**
 
@@ -212,14 +223,14 @@ Or follow the [detailed deployment guide](./DEPLOYMENT.md).
 - Built-in image optimization
 - Zero configuration required
 
-## 📝 What This Demonstrates
+## What this demonstrates
 
 This portfolio showcases skills in:
 
 - **Modern React Development** (hooks, context, performance optimization)
 - **TypeScript Proficiency** (advanced types, strict configuration)
 - **Performance Engineering** (bundle optimization, monitoring, Core Web Vitals)
-- **3D Web Development** (Three.js, WebGL, animations)
+- **Creative Canvas Engineering** (deterministic compositions, lifecycle-aware rendering, reduced-motion stills)
 - **Accessibility Engineering** (WCAG compliance, automated testing)
 - **DevOps Practices** (CI/CD, automated auditing, deployment optimization)
 - **Modern CSS** (Tailwind, responsive design, animations)

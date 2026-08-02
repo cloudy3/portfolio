@@ -143,8 +143,8 @@ export default function Navigation({ className }: NavigationProps) {
     );
 
   /**
-   * The lit lane segment. The nav's bottom hairline is the page's judgment
-   * line, and the active section's slice of it turns vermilion. It slides
+   * The active section mark. A vermilion segment travels along the nav's bottom
+   * hairline as the reader changes sections. It slides
    * between items via layoutId, which is the state transition made visible
    * instead of a new indicator blinking in somewhere else.
    */

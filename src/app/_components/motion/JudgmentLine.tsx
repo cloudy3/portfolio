@@ -6,12 +6,12 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 /**
- * The judgment line: the hairline a section opens on, and the site's one
- * signature motion device.
+ * The section pulse: the hairline that marks a new editorial chapter.
+ * `JudgmentLine` is retained as a legacy component name for API stability.
  *
  * WHY THIS ANIMATES (the only justification test that matters): it announces
- * arrival at a new section and it is the rhythm-game "hit" on the judgment
- * line. State transition plus hierarchy. Nothing else on the home page is
+ * arrival at a new section and briefly connects the static layout to the
+ * moving field. State transition plus hierarchy. Nothing else on the home page is
  * scroll-triggered at this scale, which is what keeps it a signature rather
  * than decoration.
  *
@@ -22,8 +22,8 @@ import { cn } from "@/lib/utils";
  *
  * IntersectionObserver-backed via `whileInView`, so there is no scroll listener.
  *
- * The trigger fires when the line crosses 70% of the viewport height, which is
- * the fixed line the concept calls for. It was originally a symmetric
+ * The trigger fires when the line crosses 70% of the viewport height. It was
+ * originally a symmetric
  * `-45% 0px -45% 0px` margin to put that line dead centre, but that leaves only
  * a 10%-tall band: on a fast scroll or a short viewport the observer can miss it
  * entirely and the sweep silently never happens. A one-sided margin always

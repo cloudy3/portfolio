@@ -12,7 +12,7 @@ export function Container({
    *
    * Set it on the container holding a section's actual content. It is a prop
    * rather than something Container always emits because a `Section` renders
-   * two of these: one for the judgment line and one for the content. The field
+   * two of these: one for the section pulse and one for the content. The field
    * finds the first `[data-keepout]` in the section, so tagging every container
    * would hand it the hairline instead of the copy.
    */

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Experience, Education, Certification } from "@/types";
 import {
-  EXPERIENCE_DATA,
   EDUCATION_DATA,
   CERTIFICATIONS_DATA,
   getCurrentExperience,
@@ -27,18 +26,11 @@ function range(start: Date, end?: Date): string {
 }
 
 /**
- * A single lane, running the length of the section.
- *
- * Every entry hangs off one continuous rule with a tick where it starts. That
- * replaces a stack of `border-white/10 bg-white/[0.04]` glass cards, each with
- * its own inner gradient rail and its own two-letter monogram box ("DM", "ED",
- * "CR" — the last two were not even initials, just type codes).
- *
- * The tick is structural, not decorative: it marks where an entry begins on the
- * timeline. Only the current role's tick takes the accent, which is real state
- * rather than a coloured dot on every row.
+ * One entry in the editorial archive. Dates form a quiet metadata column while
+ * the content holds a stable reading edge. Only the current role receives an
+ * accent rule, because it communicates real state.
  */
-function RailEntry({
+function ArchiveEntry({
   children,
   meta,
   current = false,
@@ -48,21 +40,19 @@ function RailEntry({
   current?: boolean;
 }) {
   return (
-    <div className="lane-grid">
+    <article className="lane-grid">
       <div className="md:col-span-2 md:pr-[var(--lane-inset)] md:text-right">
         {meta}
       </div>
-      <div className="relative border-l border-border-subtle pb-[calc(var(--rhythm)*10)] pl-8 md:col-span-6">
-        <span
-          className={cn(
-            "absolute -left-[3px] top-[0.55rem] h-[5px] w-[5px]",
-            current ? "bg-accent" : "bg-border-strong"
-          )}
-          aria-hidden
-        />
+      <div
+        className={cn(
+          "pb-[calc(var(--rhythm)*10)] md:col-span-6",
+          current && "-ml-6 border-l-2 border-accent pl-[22px]"
+        )}
+      >
         {children}
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -94,7 +84,7 @@ function ExperienceEntry({
   current?: boolean;
 }) {
   return (
-    <RailEntry
+    <ArchiveEntry
       current={current}
       meta={
         <>
@@ -126,7 +116,7 @@ function ExperienceEntry({
         type="button"
         onClick={onToggle}
         aria-expanded={isExpanded}
-        className="mt-[calc(var(--rhythm)*5)] rounded-control border border-border-subtle px-4 py-1.5 text-xs font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
+        className="mt-[calc(var(--rhythm)*5)] text-xs font-medium text-accent-ink underline decoration-transparent underline-offset-4 transition-colors hover:decoration-current active:translate-y-px"
       >
         {isExpanded ? "Hide highlights" : "Highlights"}
       </button>
@@ -152,13 +142,13 @@ function ExperienceEntry({
           ))}
         </div>
       ) : null}
-    </RailEntry>
+    </ArchiveEntry>
   );
 }
 
 function EducationEntry({ education }: { education: Education }) {
   return (
-    <RailEntry
+    <ArchiveEntry
       meta={
         <p className="num text-xs text-content-muted">
           {range(education.startDate, education.endDate)}
@@ -181,7 +171,7 @@ function EducationEntry({ education }: { education: Education }) {
           ))}
         </div>
       ) : null}
-    </RailEntry>
+    </ArchiveEntry>
   );
 }
 
@@ -191,7 +181,7 @@ function CertificationEntry({
   certification: Certification;
 }) {
   return (
-    <RailEntry
+    <ArchiveEntry
       meta={
         <p className="num text-xs text-content-muted">
           {certification.credentialId}
@@ -202,7 +192,7 @@ function CertificationEntry({
       <p className="mt-1 text-sm text-content-secondary">
         {certification.issuer}
       </p>
-    </RailEntry>
+    </ArchiveEntry>
   );
 }
 
@@ -229,12 +219,6 @@ const ExperienceSection = () => {
   const pastExps = getPastExperiences();
   const totalYears = getTotalExperienceYears();
 
-  const counters: [string, string][] = [
-    [`${totalYears}+`, "Years"],
-    [String(EXPERIENCE_DATA.length), "Roles"],
-    [String(CERTIFICATIONS_DATA.length), "Certifications"],
-  ];
-
   return (
     /*
      * `variant="default"` and no dark inversion. This section used to be the one
@@ -257,22 +241,18 @@ const ExperienceSection = () => {
           />
         </FadeIn>
 
-        {/* Counters, left-aligned on the lane grid rather than centred. */}
         <FadeIn beat={1}>
-          <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
-            {counters.map(([value, label]) => (
-              <div key={label} className="flex items-baseline gap-2">
-                <span className="num text-3xl text-content-primary">
-                  {value}
-                </span>
-                <span className="text-xs text-content-muted">{label}</span>
-              </div>
-            ))}
-          </div>
+          <p className="text-sm text-content-muted">
+            <span className="num text-content-primary">{totalYears}+</span>{" "}
+            years building and supporting production systems.
+          </p>
         </FadeIn>
 
         <FadeIn beat={2}>
-          <div className="mt-[calc(var(--rhythm)*10)] flex flex-wrap gap-2">
+          <nav
+            className="mt-[calc(var(--rhythm)*8)] flex flex-wrap gap-x-7 gap-y-2 border-b border-border-subtle"
+            aria-label="Experience view"
+          >
             {TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -280,21 +260,21 @@ const ExperienceSection = () => {
                 aria-pressed={activeTab === tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  "rounded-control px-4 py-1.5 text-xs font-medium transition-colors active:translate-y-px",
+                  "border-b-2 px-0.5 py-3 text-sm font-medium transition-colors active:translate-y-px",
                   activeTab === tab.key
-                    ? "bg-surface-inverse text-content-inverse"
-                    : "border border-border-subtle text-content-secondary hover:border-accent hover:text-content-primary"
+                    ? "border-accent text-content-primary"
+                    : "border-transparent text-content-muted hover:text-content-primary"
                 )}
               >
                 {tab.label}
               </button>
             ))}
-          </div>
+          </nav>
         </FadeIn>
 
         <div className="mt-[calc(var(--rhythm)*10)]">
           {activeTab === "experience" ? (
-            <div>
+            <div className="space-y-[calc(var(--rhythm)*3)]">
               {currentExp ? (
                 <FadeIn>
                   <ExperienceEntry

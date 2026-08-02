@@ -5,9 +5,9 @@
  * call sites used five different ad-hoc stagger values (0.05, 0.06, 0.1, 0.15,
  * 0.2), which reads as noise rather than as rhythm.
  *
- * Everything now staggers on whole multiples of BEAT. That is the point of the
- * note-lane language: content arrives quantized, like notes on a chart, not on
- * arbitrary timings.
+ * Everything staggers on whole multiples of BEAT. Rhythm is now cadence rather
+ * than game imagery: related content arrives as one deliberate sequence instead
+ * of a collection of arbitrary delays.
  */
 
 export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -25,8 +25,8 @@ export const BEAT = 0.09;
 export const beats = (n: number) => n * BEAT;
 
 /**
- * The entrance spring. Notes land with a little weight instead of easing to a
- * stop, which is what separates "arrived" from "faded in".
+ * The entrance spring. Content settles with a little weight instead of merely
+ * easing to a stop.
  */
 export const LAND_SPRING = {
   type: "spring",
@@ -41,11 +41,11 @@ export const transitions = {
 } as const;
 
 /**
- * Travel distance for an entering note, in px.
+ * Travel distance for entering content, in px.
  *
- * Motion is strictly along the lane axis (vertical). There is no horizontal
- * entrance anywhere on this site: a note that drifts sideways has left its
- * lane, which breaks the one structural idea the layout is built on.
+ * Entrances are vertical so they stay subordinate to the field's richer
+ * geometry. Horizontal reveals would compete with the canvas and fragment the
+ * shared motion language. The exported name is retained for API stability.
  */
 export const LANE_TRAVEL = 20;
 

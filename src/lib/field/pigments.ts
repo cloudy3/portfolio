@@ -1,7 +1,7 @@
 import type { PigmentName } from "./types";
 
 /**
- * Lane pigments, read from CSS rather than duplicated as literals.
+ * Traditional field pigments, read from CSS rather than duplicated as literals.
  *
  * The component this replaces carried the four hex values inline with a comment
  * saying "keep the two in step", which is a standing invitation to drift: the

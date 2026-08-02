@@ -3,6 +3,7 @@ import type {
   PigmentName,
   Treatment,
   TreatmentName,
+  TreatmentProfile,
 } from "./types";
 
 /**
@@ -16,6 +17,102 @@ import type {
  * Every composition here is taken from the reference rather than invented. The
  * frame numbers in each doc comment are the ones it was read from.
  */
+
+/**
+ * Shared field material. Curves use rounded ends; grids and masses stay sharp.
+ * Treatments may change geometry, but not invent a separate edge language.
+ */
+export const FIELD_MATERIAL = {
+  hairline: 1,
+  emphasisStroke: 1.5,
+  inkShareLight: 0.2,
+  inkShareDark: 0.12,
+} as const;
+
+/**
+ * The seven compositions as one calibrated family.
+ *
+ * Energy scales visual presence, tempo scales each treatment's own clock, and
+ * populationFloor controls how much survives at the shared breathing trough.
+ */
+export const TREATMENT_PROFILES: Record<TreatmentName, TreatmentProfile> = {
+  lines: {
+    energy: 1,
+    tempo: 0.9,
+    populationFloor: 0.55,
+    paletteMode: "polychrome",
+    inkShareLight: 0,
+    inkShareDark: 0,
+  },
+  bars: {
+    energy: 0.75,
+    tempo: 0.85,
+    populationFloor: 0.25,
+    paletteMode: "pigment",
+    inkShareLight: FIELD_MATERIAL.inkShareLight,
+    inkShareDark: FIELD_MATERIAL.inkShareDark,
+  },
+  rail: {
+    energy: 0.8,
+    tempo: 0.8,
+    populationFloor: 0.25,
+    paletteMode: "pigment",
+    inkShareLight: FIELD_MATERIAL.inkShareLight,
+    inkShareDark: FIELD_MATERIAL.inkShareDark,
+  },
+  ribbon: {
+    energy: 0.55,
+    tempo: 0.65,
+    populationFloor: 0.12,
+    paletteMode: "pigment",
+    inkShareLight: 0,
+    inkShareDark: 0,
+  },
+  lattice: {
+    energy: 0.65,
+    tempo: 0.8,
+    populationFloor: 0.18,
+    paletteMode: "pigment",
+    inkShareLight: 0,
+    inkShareDark: 0,
+  },
+  diagonal: {
+    energy: 0.7,
+    tempo: 0.8,
+    populationFloor: 0.28,
+    paletteMode: "pigment",
+    inkShareLight: 0,
+    inkShareDark: 0,
+  },
+  planes: {
+    energy: 0.85,
+    tempo: 1,
+    populationFloor: 0.22,
+    paletteMode: "pigment",
+    inkShareLight: FIELD_MATERIAL.inkShareLight,
+    inkShareDark: FIELD_MATERIAL.inkShareDark,
+  },
+};
+
+function withProfile(name: TreatmentName, draw: Treatment): Treatment {
+  const profile = TREATMENT_PROFILES[name];
+  return (context) =>
+    draw({
+      ...context,
+      t: context.t * profile.tempo,
+      strength: context.strength * profile.energy,
+    });
+}
+
+function population(name: TreatmentName, density: number): number {
+  const floor = TREATMENT_PROFILES[name].populationFloor;
+  return floor + (1 - floor) * density;
+}
+
+function inkShare(name: TreatmentName, dark: boolean): number {
+  const profile = TREATMENT_PROFILES[name];
+  return dark ? profile.inkShareDark : profile.inkShareLight;
+}
 
 /**
  * Deterministic PRNG (mulberry32).
@@ -188,7 +285,11 @@ const LINES: FieldLine[] = (() => {
       offset: lead ? signed * 0.08 : Math.sign(signed) * Math.abs(signed) ** 2.2,
       pigment: LINE_PIGMENT_MIX[Math.floor(rand() * LINE_PIGMENT_MIX.length)],
       lead,
-      width: lead ? 1.5 : rand() > 0.9 ? 1.5 : 1,
+      width: lead
+        ? FIELD_MATERIAL.emphasisStroke
+        : rand() > 0.9
+          ? FIELD_MATERIAL.emphasisStroke
+          : FIELD_MATERIAL.hairline,
       amp: 0.012 + rand() * 0.032,
       freq: 0.7 + rand() * 1.5,
       phase: rand() * Math.PI * 2,
@@ -233,8 +334,6 @@ const WAIST_DRIFT = 0.03;
  * So the threshold moves over a narrow range and the fade band around it is
  * wide enough that a stroke takes several seconds to cross.
  */
-const CULL_FLOOR = 0.55;
-const CULL_RANGE = 0.45;
 const CULL_FEATHER = 0.5;
 
 /**
@@ -272,7 +371,7 @@ const SOLO_FLOOR_LEAD = 0.5;
  */
 const WAIST_FLOOR = 0.62;
 
-export const lines: Treatment = ({
+const drawLines: Treatment = ({
   ctx,
   box,
   keepOut,
@@ -282,7 +381,7 @@ export const lines: Treatment = ({
   dark,
   strength,
 }) => {
-  const cull = CULL_FLOOR + CULL_RANGE * density;
+  const cull = population("lines", density);
 
   /*
    * Where the band sits, and how tall it is.
@@ -463,6 +562,8 @@ export const lines: Treatment = ({
   ctx.globalAlpha = 1;
 };
 
+export const lines = withProfile("lines", drawLines);
+
 // ---------------------------------------------------------------------------
 // bars: vertical segments on the lane grid, drifting horizontally.
 // Reference frames 5, 22, 1396.
@@ -543,7 +644,7 @@ const BARS: Bar[] = (() => {
   return bars;
 })();
 
-export const bars: Treatment = ({
+const drawBars: Treatment = ({
   ctx,
   box,
   t,
@@ -556,7 +657,7 @@ export const bars: Treatment = ({
   // Population is the primary breathing mechanism, opacity the secondary one.
   // Measured off the reference: between frames 1396 and 1408 the element count
   // drops by roughly two thirds while the survivors keep their velocity.
-  const cull = 0.25 + 0.75 * density;
+  const cull = population("bars", density);
   const wrapWidth = box.width + 360;
 
   /*
@@ -568,7 +669,7 @@ export const bars: Treatment = ({
    * monochrome in the pigment with only one or two exceptions (frame 1400 is
    * all magenta but for two blue bars).
    */
-  const inkShare = dark ? 0.12 : 0.42;
+  const resolvedInkShare = inkShare("bars", dark);
 
   for (const bar of BARS) {
     if (bar.rank > cull) continue;
@@ -579,7 +680,7 @@ export const bars: Treatment = ({
     const top = (BANDS[bar.band] + bar.drift) * box.height - height / 2;
 
     const segmentHeight = height / bar.segments;
-    const usesInk = bar.inkRoll < inkShare;
+    const usesInk = bar.inkRoll < resolvedInkShare;
 
     for (let s = 0; s < bar.segments; s += 1) {
       const isInk = usesInk && (bar.startsInk ? s % 2 === 0 : s % 2 === 1);
@@ -600,6 +701,8 @@ export const bars: Treatment = ({
 
   ctx.globalAlpha = 1;
 };
+
+export const bars = withProfile("bars", drawBars);
 
 // ---------------------------------------------------------------------------
 // rail: horizontal segments in tight stacks. Work.
@@ -622,7 +725,7 @@ interface RailGroup {
   /** Each line shorter than the last, so the stack reads as a wedge. */
   tapers: boolean;
   rank: number;
-  usesInk: boolean;
+  inkRoll: number;
 }
 
 const RAIL_GROUPS: RailGroup[] = (() => {
@@ -634,41 +737,50 @@ const RAIL_GROUPS: RailGroup[] = (() => {
     x: rand(),
     tapers: rand() > 0.6,
     rank: rand(),
-    usesInk: rand() > 0.78,
+    inkRoll: rand(),
   }));
 })();
 
 /** Pixels between the rules inside one stack. Tight on purpose. */
 const RAIL_PITCH = 7;
 
-export const rail: Treatment = ({
+const drawRail: Treatment = ({
   ctx,
   box,
   t,
   density,
   pigment,
   ink,
+  dark,
   strength,
 }) => {
-  const cull = 0.25 + 0.75 * density;
+  const cull = population("rail", density);
+  const resolvedInkShare = inkShare("rail", dark);
 
   for (const group of RAIL_GROUPS) {
     if (group.rank > cull) continue;
 
     const x = wrap01(group.x + t * 0.006) * (box.width + 400) - 200;
     const top = group.y * box.height;
-    ctx.fillStyle = group.usesInk ? ink : pigment;
+    ctx.fillStyle = group.inkRoll < resolvedInkShare ? ink : pigment;
 
     for (let i = 0; i < group.count; i += 1) {
       const shrink = group.tapers ? 1 - (i / group.count) * 0.65 : 1;
       const width = group.width * box.width * shrink;
       ctx.globalAlpha = (0.9 - i * 0.06) * strength;
-      ctx.fillRect(x, top + i * RAIL_PITCH, width, 1.5);
+      ctx.fillRect(
+        x,
+        top + i * RAIL_PITCH,
+        width,
+        FIELD_MATERIAL.emphasisStroke
+      );
     }
   }
 
   ctx.globalAlpha = 1;
 };
+
+export const rail = withProfile("rail", drawRail);
 
 // ---------------------------------------------------------------------------
 // ribbon: long slow curves, near empty. About.
@@ -700,12 +812,15 @@ const RIBBONS: Ribbon[] = (() => {
     y2: rand(),
     amplitude: 0.04 + rand() * 0.12,
     speed: 0.05 + rand() * 0.12,
-    weight: rand() > 0.8 ? 1.5 : 0.75,
+    weight:
+      rand() > 0.8
+        ? FIELD_MATERIAL.emphasisStroke
+        : FIELD_MATERIAL.hairline,
     rank: rand(),
   }));
 })();
 
-export const ribbon: Treatment = ({
+const drawRibbon: Treatment = ({
   ctx,
   box,
   t,
@@ -714,7 +829,7 @@ export const ribbon: Treatment = ({
   strength,
 }) => {
   // Culls harder than any other composition: at the trough this is nearly bare.
-  const cull = 0.12 + 0.88 * density;
+  const cull = population("ribbon", density);
 
   ctx.lineCap = "round";
   ctx.strokeStyle = pigment;
@@ -745,6 +860,8 @@ export const ribbon: Treatment = ({
   ctx.lineCap = "butt";
 };
 
+export const ribbon = withProfile("ribbon", drawRibbon);
+
 // ---------------------------------------------------------------------------
 // lattice: a dot matrix on a regular pitch. Skills.
 // Reference frames 350, 380, 1130.
@@ -762,7 +879,7 @@ export const ribbon: Treatment = ({
 const LATTICE_PITCH = 68;
 const LATTICE_RADIUS = 3.5;
 
-export const lattice: Treatment = ({
+const drawLattice: Treatment = ({
   ctx,
   box,
   t,
@@ -798,7 +915,7 @@ export const lattice: Treatment = ({
             t * 1.1 - (col / columns) * 5 - (row / rows) * 2.5 + phase * 6.28
           );
 
-      if (wave < 1 - density) continue;
+      if (wave < 1 - population("lattice", density)) continue;
 
       ctx.globalAlpha = (0.25 + 0.7 * wave) * strength;
       ctx.beginPath();
@@ -809,6 +926,8 @@ export const lattice: Treatment = ({
 
   ctx.globalAlpha = 1;
 };
+
+export const lattice = withProfile("lattice", drawLattice);
 
 // ---------------------------------------------------------------------------
 // diagonal: one angle family on a regular pitch. Experience.
@@ -829,12 +948,15 @@ const DIAGONALS = (() => {
     // Even pitch with only slight jitter; the regularity is the point.
     offset: i / DIAGONAL_COUNT + (rand() - 0.5) * 0.008,
     length: 0.3 + rand() * 0.7,
-    weight: rand() > 0.88 ? 2 : 1,
+    weight:
+      rand() > 0.88
+        ? FIELD_MATERIAL.emphasisStroke
+        : FIELD_MATERIAL.hairline,
     rank: rand(),
   }));
 })();
 
-export const diagonal: Treatment = ({
+const drawDiagonal: Treatment = ({
   ctx,
   box,
   t,
@@ -845,7 +967,7 @@ export const diagonal: Treatment = ({
   const cx = box.width / 2;
   const cy = box.height / 2;
   const diag = Math.hypot(box.width, box.height);
-  const cull = 0.28 + 0.72 * density;
+  const cull = population("diagonal", density);
 
   const dx = Math.cos(DIAGONAL_ANGLE);
   const dy = Math.sin(DIAGONAL_ANGLE);
@@ -873,6 +995,8 @@ export const diagonal: Treatment = ({
   ctx.globalAlpha = 1;
 };
 
+export const diagonal = withProfile("diagonal", drawDiagonal);
+
 // ---------------------------------------------------------------------------
 // planes: overlapping hard-edged rectangles. Contact.
 // Reference frames 270, 910, 950.
@@ -891,7 +1015,7 @@ interface Plane {
   height: number;
   speed: number;
   alpha: number;
-  usesInk: boolean;
+  inkRoll: number;
   rank: number;
 }
 
@@ -904,28 +1028,30 @@ const PLANES: Plane[] = (() => {
     height: 0.05 + rand() * rand() * 0.3,
     speed: 0.003 + rand() * 0.006,
     alpha: 0.2 + rand() * 0.5,
-    usesInk: rand() > 0.75,
+    inkRoll: rand(),
     rank: rand(),
   }));
 })();
 
-export const planes: Treatment = ({
+const drawPlanes: Treatment = ({
   ctx,
   box,
   t,
   density,
   pigment,
   ink,
+  dark,
   strength,
 }) => {
-  const cull = 0.22 + 0.78 * density;
+  const cull = population("planes", density);
+  const resolvedInkShare = inkShare("planes", dark);
 
   for (const plane of PLANES) {
     if (plane.rank > cull) continue;
 
     const x = wrap01(plane.x + t * plane.speed) * (box.width + 500) - 250;
 
-    ctx.fillStyle = plane.usesInk ? ink : pigment;
+    ctx.fillStyle = plane.inkRoll < resolvedInkShare ? ink : pigment;
     // Overlaps read as tone changes because the fills are partly transparent,
     // which is how the reference's stacked blocks in frame 270 behave.
     ctx.globalAlpha = plane.alpha * strength;
@@ -939,6 +1065,8 @@ export const planes: Treatment = ({
 
   ctx.globalAlpha = 1;
 };
+
+export const planes = withProfile("planes", drawPlanes);
 
 export const TREATMENTS: Record<TreatmentName, Treatment> = {
   lines,

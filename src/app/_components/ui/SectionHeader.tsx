@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  *   says what it is. There is no replacement prop, deliberately.
  *
  * - The decorative `from-accent-cyan/50 to-transparent` hairline that trailed
- *   every headline. It organised nothing. The judgment line on Section is the
+   *   every headline. It organised nothing. The section pulse is the
  *   one piece of accent geometry a section gets.
  *
  * - `align="center"`. Headers sit on the lane grid, left-aligned, like

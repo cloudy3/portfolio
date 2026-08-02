@@ -6,16 +6,18 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 /**
- * A note arriving on its lane.
+ * The site's quiet content entrance.
  *
- * One gesture, one tempo. Travel is strictly along the lane axis (vertical) and
- * the only timing control is `beat`, a whole number of BEATs.
+ * One gesture, one tempo. Travel is vertical and the only timing control is
+ * `beat`, a whole number of BEATs. This cadence supports the animated field
+ * without turning content itself into another motion effect.
  *
  * The previous version took a free-form `delay` in seconds plus a `direction`
  * of "up" | "left" | "right" | "none", and its 23 call sites had drifted into
  * five different stagger values with horizontal entrances in two sections.
- * Horizontal travel is gone by design: a note that drifts sideways has left its
- * lane, which breaks the one structural idea the layout is built on.
+ * Horizontal travel remains excluded because it competes with the field's
+ * directional geometry and weakens the distinction between content and
+ * atmosphere.
  */
 type FadeInProps = {
   children: React.ReactNode;
