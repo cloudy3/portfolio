@@ -122,11 +122,8 @@ export default function Navigation({ className }: NavigationProps) {
   }, [isOpen]);
 
   const isActive = (id: string, path?: string) => {
-    const onProjects = pathname.startsWith("/projects");
-    return Boolean(
-      (path && onProjects && id === "work") ||
-        (!path && isHome && activeSection === id)
-    );
+    if (isHome) return activeSection === id;
+    return Boolean(path && pathname.startsWith(path));
   };
 
   /*
@@ -190,16 +187,7 @@ export default function Navigation({ className }: NavigationProps) {
 
           <div className="hidden h-full items-center md:flex">
             {NAVIGATION_ITEMS.map((item) =>
-              "path" in item && item.path ? (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  className={navLinkClass(item.id, item.path)}
-                >
-                  {item.label}
-                  {isActive(item.id, item.path) ? <LaneMark /> : null}
-                </Link>
-              ) : isHome ? (
+              isHome ? (
                 <button
                   key={item.id}
                   type="button"
@@ -209,6 +197,15 @@ export default function Navigation({ className }: NavigationProps) {
                   {item.label}
                   {isActive(item.id) ? <LaneMark /> : null}
                 </button>
+              ) : "path" in item && item.path ? (
+                <Link
+                  key={item.id}
+                  href={item.path}
+                  className={navLinkClass(item.id, item.path)}
+                >
+                  {item.label}
+                  {isActive(item.id, item.path) ? <LaneMark /> : null}
+                </Link>
               ) : (
                 <Link
                   key={item.id}
@@ -281,21 +278,7 @@ export default function Navigation({ className }: NavigationProps) {
             which is the vertical form of the same lane mark used on desktop. */}
         <div className="flex flex-col py-2">
           {NAVIGATION_ITEMS.map((item) =>
-            "path" in item && item.path ? (
-              <Link
-                key={item.id}
-                href={item.path}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  "border-l-2 px-5 py-3 text-left text-base font-medium transition-colors",
-                  isActive(item.id, item.path)
-                    ? "border-accent text-content-primary"
-                    : "border-transparent text-content-secondary hover:border-border-strong hover:text-content-primary"
-                )}
-              >
-                {item.label}
-              </Link>
-            ) : isHome ? (
+            isHome ? (
               <button
                 key={item.id}
                 type="button"
@@ -309,6 +292,20 @@ export default function Navigation({ className }: NavigationProps) {
               >
                 {item.label}
               </button>
+            ) : "path" in item && item.path ? (
+              <Link
+                key={item.id}
+                href={item.path}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  "border-l-2 px-5 py-3 text-left text-base font-medium transition-colors",
+                  isActive(item.id, item.path)
+                    ? "border-accent text-content-primary"
+                    : "border-transparent text-content-secondary hover:border-border-strong hover:text-content-primary"
+                )}
+              >
+                {item.label}
+              </Link>
             ) : (
               <Link
                 key={item.id}
