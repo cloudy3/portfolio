@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./_components/shared/Navigation";
 import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
@@ -50,11 +49,28 @@ const zenKaku = localFont({
   display: "swap",
 });
 
-/* Numbers only. See the mono rule in globals.css. */
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+/*
+ * Numbers only. See the mono rule in globals.css.
+ *
+ * SELF-HOSTED ON PURPOSE — do not move this back to next/font/google.
+ *
+ * Unlike the sans above, this one had to move: next/font/google broke the dev
+ * server outright. Google served the vietnamese chunk from its dynamic
+ * `/l/font?kit=...&skey=...&v=v24` endpoint, and Turbopack builds a font
+ * specifier by appending JSON after a `?`, then parses the result as a query
+ * string — so each `&` inside that URL read as another entry and resolution
+ * failed with "next/font/google queries have exactly one entry". `next build`
+ * happened to survive it; `next dev` did not. `subsets` could not help, since
+ * it controls preloading rather than which @font-face rules Google emits.
+ *
+ * scripts/fetch-mono-subset.py regenerates the woff2. Weight 400 only: `.num`
+ * is the sole mono consumer and hardcodes font-weight: 400, so the 500 this
+ * previously loaded was never rendered. Add a glyph to the script's INVENTORY
+ * rather than reverting to the Google loader.
+ */
+const jetbrainsMono = localFont({
+  src: [{ path: "../fonts/JetBrainsMono-400.woff2", weight: "400", style: "normal" }],
   variable: "--font-mono",
-  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -71,7 +87,7 @@ export const metadata: Metadata = {
   keywords:
     "Jing Feng, software engineer, Flutter, Python, Google Cloud, full-stack, portfolio",
   authors: [{ name: "Cheah Jing Feng" }],
-  // Icons come from the app/ file conventions (favicon.ico, icon.svg,
+  // Icons come from the app/ file conventions (favicon.ico, icon.png,
   // apple-icon.png) — declaring metadata.icons here would override them.
   manifest: "/site.webmanifest",
   appleWebApp: {

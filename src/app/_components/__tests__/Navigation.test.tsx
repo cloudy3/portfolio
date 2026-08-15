@@ -11,6 +11,28 @@ const mockUsePathname = usePathname as Mock;
 let observerCallback: IntersectionObserverCallback | undefined;
 let sectionElements: Map<string, HTMLElement>;
 
+/**
+ * Navigation reads only `isIntersecting` and `target.id`, but the DOM type
+ * demands the full geometry. Filling it from the element keeps this a real
+ * IntersectionObserverEntry rather than a cast that would silently survive the
+ * component starting to read a field this never supplies.
+ */
+function intersection(
+  target: HTMLElement,
+  isIntersecting: boolean
+): IntersectionObserverEntry {
+  const rect = target.getBoundingClientRect();
+  return {
+    target,
+    isIntersecting,
+    intersectionRatio: isIntersecting ? 1 : 0,
+    boundingClientRect: rect,
+    intersectionRect: rect,
+    rootBounds: null,
+    time: 0,
+  };
+}
+
 describe("Navigation", () => {
   beforeEach(() => {
     mockUsePathname.mockReset();
@@ -88,10 +110,7 @@ describe("Navigation", () => {
     }
 
     act(() => {
-      notifyIntersection(
-        [{ isIntersecting: true, target: work } as IntersectionObserverEntry],
-        {} as IntersectionObserver
-      );
+      notifyIntersection([intersection(work, true)], {} as IntersectionObserver);
     });
 
     const workButtons = screen.getAllByRole("button", { name: /^Work$/ });
