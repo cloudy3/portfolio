@@ -1,102 +1,68 @@
-# Vercel Deployment Guide
+# Deployment
 
-## Quick Setup (5 minutes)
+The site is hosted on Vercel, which builds it with `npm run build`
+(`vercel.json`). GitHub Actions runs typecheck, lint, tests and the build on the
+same pushes (`.github/workflows/ci.yml`), so a red check in the pull request
+usually means the Vercel build will fail too.
 
-### 1. Install Vercel CLI (Optional)
+## Automatic deployments
 
-```bash
-npm i -g vercel
-```
+- **Production:** every push to `main`
+- **Preview:** every pull request gets its own URL
+- **Rollback:** promote any earlier deployment from the Vercel dashboard
 
-### 2. Deploy via Vercel Dashboard (Recommended)
+## Environment variables
 
-1. Go to [vercel.com](https://vercel.com) and sign up with GitHub
-2. Click "Add New Project"
-3. Import your GitHub repository
-4. Vercel auto-detects Next.js - no configuration needed
-5. Click "Deploy"
+Set these in Vercel under Project Settings → Environment Variables. For local
+development, copy `.env.example` to `.env.local` and fill in the same names.
 
-That's it! Your site will be live at `your-project.vercel.app`
+| Variable | Needed for | Notes |
+| --- | --- | --- |
+| `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | Contact form | From the EmailJS dashboard |
+| `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` | Contact form | From the EmailJS dashboard |
+| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | Contact form | EmailJS dashboard → Account |
+| `NEXT_PUBLIC_SITE_URL` | Canonical, Open Graph, robots and sitemap URLs | Optional; see below |
 
-### 3. Configure Environment Variables
+`NEXT_PUBLIC_` variables are inlined at build time, so redeploy after changing
+any of them.
 
-If using EmailJS or other services:
+`NEXT_PUBLIC_SITE_URL` falls back to `https://www.jingfeng-cheah.me` on every
+Vercel build, previews included, so previews never declare themselves
+canonical. Off Vercel it falls back to `http://localhost:3000`. Set it only if
+the production domain changes (`src/lib/site.ts`).
 
-1. Go to Project Settings → Environment Variables
-2. Add your variables from `.env.example`
-3. Redeploy (automatic on next push)
+## Custom domain
 
-### 4. Custom Domain (Optional)
+The production domain is configured under Project Settings → Domains. The apex
+redirects to `www`, which is the host the canonical URLs use.
 
-1. Go to Project Settings → Domains
-2. Add your custom domain
-3. Follow DNS configuration instructions
-
-## Automatic Deployments
-
-- **Production**: Every push to `main` branch
-- **Preview**: Every pull request gets a unique URL
-- **Instant Rollbacks**: One-click rollback to any previous deployment
-
-## Local Development
+## Checking a build locally
 
 ```bash
-# Install dependencies
-npm install
-
-# Run dev server
-npm run dev
-
-# Build for production (test locally)
 npm run build
-npm start
+npm start                # http://localhost:3000
+npm run lighthouse       # mobile + desktop scores against the build
 ```
 
-## Vercel CLI Deployment
+## Deploying from the CLI
+
+Not needed for the normal flow, but useful for a one-off preview of
+uncommitted work:
 
 ```bash
-# Login
-vercel login
-
-# Deploy to preview
-vercel
-
-# Deploy to production
-vercel --prod
+npx vercel               # preview deployment
+npx vercel --prod        # production deployment
 ```
-
-## Performance Features (Automatic)
-
-✅ Image optimization (WebP/AVIF)
-✅ Edge caching
-✅ Automatic HTTPS
-✅ Brotli compression
-✅ Smart CDN routing
-✅ Zero-config
-
-## Monitoring
-
-View analytics in Vercel Dashboard:
-
-- Real-time traffic
-- Core Web Vitals
-- Function logs
-- Build logs
 
 ## Troubleshooting
 
-### Build fails
+**Build fails on Vercel.** Check the GitHub Actions run for the same commit
+first; it shows typecheck, lint and test failures separately. Reproduce
+locally with `npm run build`.
 
-- Check build logs in Vercel dashboard
-- Test locally: `npm run build`
-- Verify all dependencies in `package.json`
+**Contact form says EmailJS is not configured.** One of the three EmailJS
+variables is missing from the environment the deployment was built in
+(Production and Preview are set separately). Add it and redeploy.
 
-### Environment variables not working
-
-- Ensure variables start with `NEXT_PUBLIC_` for client-side
-- Redeploy after adding variables
-
-### Images not loading
-
-- Ensure images are in `public` folder
-- Check image paths (use `/image.png` not `./image.png`)
+**Canonical or sitemap URLs point at the wrong host.** Check
+`NEXT_PUBLIC_SITE_URL` in Vercel; unset, it uses the production domain.

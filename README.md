@@ -1,11 +1,10 @@
 # Jing Feng Portfolio
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/YOUR_REPO)
-
 An engineering portfolio built around a continuous geometric motion field,
 quiet editorial typography, and accessible interaction.
 
-The canonical visual direction is documented in [DESIGN.md](./DESIGN.md).
+Live at [www.jingfeng-cheah.me](https://www.jingfeng-cheah.me). The canonical
+visual direction is documented in [DESIGN.md](./DESIGN.md).
 
 ## Visual direction
 
@@ -26,216 +25,121 @@ Key characteristics:
 
 ## Tech stack
 
-**Frontend**
-
-- Next.js 16 App Router
+- Next.js 16 App Router, built with Turbopack
 - React 19
 - TypeScript in strict mode
-- Tailwind CSS v4 (utility-first styling)
-- Canvas 2D for the shared geometric field
+- Tailwind CSS v4
+- Canvas 2D for the shared geometric field and the keyboard frame sequence
 - Framer Motion for interface transitions
-- Self-hosted Zen Kaku Gothic New
+- Self-hosted Zen Kaku Gothic New and JetBrains Mono subsets
+- EmailJS for the contact form
+- Vitest, React Testing Library and jsdom for tests
+- ESLint and the TypeScript compiler for static checks
+- GitHub Actions for CI, Vercel for hosting
 
-**Performance & Quality**
+## Getting started
 
-- Custom webpack optimization
-- Bundle analyzer integration
-- Lighthouse CI/CD
-- Vitest + React Testing Library
-- ESLint + TypeScript compiler
-- Automated accessibility auditing
-
-**Infrastructure**
-
-- Vercel deployment
-- EmailJS contact integration
-- Image optimization (WebP/AVIF)
-- Security headers & CSP
-
-## Quick start
+Requires Node 22 (CI uses the same version).
 
 ```bash
-# Clone and install
-git clone <your-repo>
-cd portfolio-website
+git clone https://github.com/cloudy3/portfolio.git
+cd portfolio
 npm install
-
-# Start development (with Turbopack for speed)
+cp .env.example .env.local   # then fill in the EmailJS values
 npm run dev
-
-# Build for production
-npm run build
 ```
 
-## Development commands
+The site runs without `.env.local`; only the contact form needs it, and it
+shows an error on send until the three EmailJS variables are set.
+
+## Commands
 
 ```bash
 # Development
-npm run dev              # Start with Turbopack
-npm run build           # Production build
-npm run start           # Production server
+npm run dev                  # Dev server on :3000
+npm run build                # Production build
+npm run start                # Serve the production build
 
-# Testing & Quality
-npm test                # Run test suite
-npm run test:coverage   # Coverage report
-npm run lint            # ESLint check
+# Quality (CI runs typecheck, lint, test and build on every push to main)
+npm run typecheck            # tsc --noEmit
+npm run lint                 # ESLint
+npm test                     # Vitest, single run
+npm run test:watch           # Vitest, watch mode
+npm run test:coverage        # Coverage report
 
-# Performance Auditing
-npm run audit:all       # Complete audit suite
-npm run perf:audit      # Build, then Lighthouse mobile + desktop
-npm run audit:a11y      # Accessibility audit
-npm run analyze         # Bundle analysis (Turbopack, opens on :4000)
+# Performance
+npm run analyze              # Bundle analysis (Turbopack, opens on :4000)
+npm run lighthouse           # Lighthouse mobile + desktop against the last build
+npm run lighthouse:mobile    # Mobile only
+npm run lighthouse:desktop   # Desktop only
+npm run perf:audit           # Build, then Lighthouse mobile + desktop
+
+# Dependencies
+npm run audit:security       # npm audit
+npm run audit:deps           # Unused dependencies (depcheck)
+npm run audit:all            # Both
 ```
 
-## Performance standards
+`npm run lighthouse` starts the production server on :3100 itself, prints the
+category scores and writes full reports to `.lighthouse/`. Run `npm run build`
+first, or use `npm run perf:audit`.
 
-This project maintains strict performance standards:
+## Current numbers
 
-- **Bundle Size**: < 500KB first load JS
-- **Core Web Vitals**: LCP < 2.5s, CLS < 0.1, FCP < 1.8s
-- **Accessibility**: WCAG AA compliance
-- **Test Coverage**: > 80% (because 100% is for show-offs)
+Measured locally in October 2026:
 
-## Architecture highlights
+- **Lighthouse, mobile:** performance 91, accessibility 100, best practices
+  100, SEO 100
+- **Lighthouse, desktop:** 100 in all four categories
+- **Tests:** 161 passing, about 56% line coverage
 
-**Shared field system**
+## Architecture
+
+### Shared field system
 
 - One fixed canvas is mounted in the root layout.
 - Sections register a treatment, pigment, and protected content region.
-- The canvas crossfades between compositions as the active section changes.
+- The canvas crossfades between compositions as the active section changes,
+  using the same reading band as the navigation's active item.
 - The animation loop pauses when the document is hidden.
 - Reduced-motion mode renders a deliberate still frame.
 
-**Performance Monitoring**
-
-- Real-time Core Web Vitals logging in development
-- Automated bundle size warnings
-- Accessibility issue detection
-- Lighthouse integration for CI/CD
-
-**Component Architecture**
-
-```
-src/
-├── app/                 # Next.js App Router
-│   ├── _components/     # Page-specific components
-│   └── globals.css      # Global styles
-├── components/          # Shared components
-├── lib/                 # Utilities & helpers
-└── types/              # TypeScript definitions
-```
-
-## 🛠 Custom Optimizations
-
-**Rendering strategy**
+### Rendering strategy
 
 - Server Components render the primary layouts and content.
 - Interactive and animated behavior is isolated in client leaves.
 - Below-the-fold home sections are dynamically imported.
 - Hero copy enters with CSS so its first paint does not wait for hydration.
 
-**Image Optimization**
+### Layout
 
-- Next.js Image component with WebP/AVIF
-- Responsive image sizing
-- 30-day cache headers
-
-**Security Headers**
-
-- X-Frame-Options: DENY
-- Content Security Policy
-- X-Content-Type-Options: nosniff
-
-## 🧪 Testing Strategy
-
-- **Unit Tests**: Jest + React Testing Library
-- **Accessibility**: Automated axe-core testing
-- **Performance**: Lighthouse CI integration
-- **Visual Regression**: Manual Lighthouse audits
-- **Integration**: Custom test scripts
-
-## 📈 Monitoring & Auditing
-
-The project includes a comprehensive audit system:
-
-```bash
-# Weekly maintenance routine
-npm run audit:all
-
-# Pre-deployment checklist
-npm run perf:audit
-npm run audit:security
-npm run audit:bundle
+```text
+src/
+├── app/                  # App Router routes, metadata, robots and sitemap
+│   ├── _components/      # Components, grouped by role
+│   │   ├── motion/       # Small motion primitives
+│   │   ├── projects/     # Project catalogue cards
+│   │   ├── sections/     # Home page sections
+│   │   ├── shared/       # Navigation, theme toggle, field mounting
+│   │   └── ui/           # Layout primitives
+│   ├── projects/         # Project catalogue and case studies
+│   ├── keyboard-story/   # Keyboard build scroll story
+│   └── globals.css       # Design tokens and global styles
+├── fonts/                # Self-hosted font subsets
+├── lib/                  # Field engine, data, hooks and helpers
+└── types/                # Shared TypeScript types
 ```
 
-**What Gets Monitored**
+### Headers and images
 
-- Bundle size growth
-- Performance regressions
-- Accessibility violations
-- Security vulnerabilities
-- Dependency bloat
+- Static Content Security Policy, plus `X-Frame-Options: DENY`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy` and
+  `Permissions-Policy`, all set in `next.config.ts`
+- `next/image` with AVIF and WebP output and a 30-day optimizer cache
+- In development, a console accessibility check runs once after the app loads
+  (alt text, form labels, heading order, landmarks, token contrast)
 
-## 🎯 Key Features Demonstrated
+## Deployment
 
-**Frontend Engineering**
-
-- Advanced React patterns (dynamic imports, custom hooks)
-- TypeScript mastery (strict mode, custom types)
-- CSS architecture (Tailwind + custom animations)
-- 3D web graphics integration
-
-**Performance Engineering**
-
-- Bundle optimization strategies
-- Lazy loading implementation
-- Image optimization techniques
-- Core Web Vitals monitoring
-
-**DevOps & Quality**
-
-- Automated testing pipelines
-- Performance budgets
-- Accessibility compliance
-- Security best practices
-
-**Modern Web Standards**
-
-- Progressive enhancement
-- Responsive design
-- SEO optimization
-- Web accessibility (WCAG AA)
-
-## 🚀 Deployment
-
-**One-Click Deploy to Vercel:**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/YOUR_REPO)
-
-Or follow the [detailed deployment guide](./DEPLOYMENT.md).
-
-**Features:**
-
-- Automatic deployments from main branch
-- Preview deployments for PRs
-- Edge function optimization
-- Global CDN distribution
-- Built-in image optimization
-- Zero configuration required
-
-## What this demonstrates
-
-This portfolio showcases skills in:
-
-- **Modern React Development** (hooks, context, performance optimization)
-- **TypeScript Proficiency** (advanced types, strict configuration)
-- **Performance Engineering** (bundle optimization, monitoring, Core Web Vitals)
-- **Creative Canvas Engineering** (deterministic compositions, lifecycle-aware rendering, reduced-motion stills)
-- **Accessibility Engineering** (WCAG compliance, automated testing)
-- **DevOps Practices** (CI/CD, automated auditing, deployment optimization)
-- **Modern CSS** (Tailwind, responsive design, animations)
-- **Testing Strategies** (unit, integration, accessibility, performance)
-
----
-
-_Built with attention to detail, optimized for performance, and designed to impress both users and hiring managers._
+Vercel deploys `main` to production and every pull request to a preview URL.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for the environment variables and setup.
