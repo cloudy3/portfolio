@@ -82,9 +82,9 @@ npm run lint            # ESLint check
 
 # Performance Auditing
 npm run audit:all       # Complete audit suite
-npm run perf:audit      # Performance check
+npm run perf:audit      # Build, then Lighthouse mobile + desktop
 npm run audit:a11y      # Accessibility audit
-npm run build:analyze   # Bundle analysis
+npm run analyze         # Bundle analysis (Turbopack, opens on :4000)
 ```
 
 ## Performance standards

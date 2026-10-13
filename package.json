@@ -11,12 +11,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "analyze": "ANALYZE=true npm run build",
-    "build:analyze": "cross-env ANALYZE=true npm run build",
-    "lighthouse": "lighthouse http://localhost:3000 --config-path=./lighthouse.config.js --output=html --output-path=./lighthouse-report.html --chrome-flags=\"--headless\"",
-    "lighthouse:mobile": "lighthouse http://localhost:3000 --config-path=./lighthouse.config.js --preset=perf --form-factor=mobile --output=html --output-path=./lighthouse-mobile-report.html --chrome-flags=\"--headless\"",
-    "perf:audit": "npm run build && npm run lighthouse && npm run lighthouse:mobile",
-    "audit:bundle": "npm run build:analyze",
+    "analyze": "next analyze",
+    "lighthouse": "node scripts/lighthouse.mjs",
+    "lighthouse:mobile": "node scripts/lighthouse.mjs mobile",
+    "lighthouse:desktop": "node scripts/lighthouse.mjs desktop",
+    "perf:audit": "npm run build && npm run lighthouse",
     "audit:deps": "npx depcheck",
     "audit:security": "npm audit",
     "audit:all": "npm run audit:security && npm run audit:deps"
@@ -32,7 +31,6 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^16.4.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.0",
@@ -43,7 +41,6 @@
     "@vitejs/plugin-react": "^6.0.3",
     "@vitest/coverage-v8": "^4.1.10",
     "baseline-browser-mapping": "^2.10.43",
-    "cross-env": "^10.0.0",
     "depcheck": "^1.4.7",
     "eslint": "^9",
     "eslint-config-next": "^16.4.0",
