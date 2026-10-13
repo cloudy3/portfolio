@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
 import { lastInDocument, READING_BAND } from "@/lib/readingBand";
 import { LAND_SPRING } from "@/lib/motion";

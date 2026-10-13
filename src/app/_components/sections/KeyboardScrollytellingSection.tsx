@@ -5,7 +5,7 @@ import {
   useMotionValueEvent,
   useScroll,
   useSpring,
-} from "framer-motion";
+} from "motion/react";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -23,7 +23,7 @@ interface CanvasDimensions {
 }
 
 export default function KeyboardScrollytellingSection() {
-  // Not framer's useReducedMotion: it caches in a useState initializer and can
+  // Not Motion's useReducedMotion: it caches in a useState initializer and can
   // stay false for the component's lifetime, which left the 400vh scroll
   // region in place for reduced-motion visitors.
   const shouldReduceMotion = usePrefersReducedMotion();

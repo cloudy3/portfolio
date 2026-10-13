@@ -68,7 +68,7 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
          *
          * Motion applies its `initial` state during server rendering, so this
          * copy used to ship as `style="opacity:0"` and stayed invisible until
-         * framer-motion hydrated, behind the three.js chunk. Chrome will not
+         * Motion hydrated, behind the three.js chunk. Chrome will not
          * take an LCP candidate while an element is fully transparent, so the
          * largest text on the page reported ~6s while actually painting at
          * ~0.9s. A CSS animation starts at first paint with no JS involved.

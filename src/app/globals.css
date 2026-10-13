@@ -520,7 +520,7 @@
    * decision, not a style one.
    *
    * Motion applies its `initial` state during SSR, so the hero copy shipped as
-   * `style="opacity:0"` and only became visible once framer-motion had
+   * `style="opacity:0"` and only became visible once Motion had
    * hydrated behind the former Three.js chunk. Chrome does not
    * record an LCP candidate while it is fully transparent, so the largest text
    * on the page reported ~6s while actually painting at ~0.9s. A CSS animation

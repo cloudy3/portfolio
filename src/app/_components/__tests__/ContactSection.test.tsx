@@ -26,7 +26,7 @@ const fillValidForm = () => {
   });
 };
 
-vi.mock("framer-motion", () => {
+vi.mock("motion/react", () => {
   const React = require("react");
   return {
     motion: { div: ({ children, ...p }: { children?: React.ReactNode }) => <div {...p}>{children}</div> },

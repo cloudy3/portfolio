@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { BEAT, ENTER_VIEWPORT, LANE_TRAVEL, LAND_SPRING } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ type FadeInProps = {
 };
 
 export function FadeIn({ children, className, beat = 0 }: FadeInProps) {
-  // See usePrefersReducedMotion: framer's equivalent can latch a stale value.
+  // See usePrefersReducedMotion: Motion's equivalent can latch a stale value.
   const reduce = usePrefersReducedMotion();
 
   if (reduce) {

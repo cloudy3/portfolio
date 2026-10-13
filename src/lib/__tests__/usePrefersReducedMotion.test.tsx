@@ -45,7 +45,7 @@ describe("usePrefersReducedMotion", () => {
   });
 
   it("updates when the preference changes after mount", () => {
-    // The bug this guards: framer's useReducedMotion caches in a useState
+    // The bug this guards: Motion's useReducedMotion caches in a useState
     // initializer, so the value never updates for the component's lifetime.
     const setMatches = mockMatchMedia(false);
     const { result } = renderHook(() => usePrefersReducedMotion());

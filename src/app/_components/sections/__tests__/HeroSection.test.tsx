@@ -16,7 +16,7 @@ vi.mock("next/link", () => ({
   },
 }));
 
-vi.mock("framer-motion", () => {
+vi.mock("motion/react", () => {
   // Motion-only props must not reach the DOM or React warns about them.
   const MOTION_PROPS = new Set([
     "initial",

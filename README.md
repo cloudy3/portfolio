@@ -30,7 +30,7 @@ Key characteristics:
 - TypeScript in strict mode
 - Tailwind CSS v4
 - Canvas 2D for the shared geometric field and the keyboard frame sequence
-- Framer Motion for interface transitions
+- Motion (`motion/react`) for interface transitions
 - Self-hosted Zen Kaku Gothic New and JetBrains Mono subsets
 - EmailJS for the contact form
 - Vitest, React Testing Library and jsdom for tests
@@ -39,7 +39,8 @@ Key characteristics:
 
 ## Getting started
 
-Requires Node 22 (CI uses the same version).
+Requires Node 22.19 or later (CI uses the latest 22.x). Vitest 5 needs 22.12 and
+Lighthouse 13 declares 22.19.
 
 ```bash
 git clone https://github.com/cloudy3/portfolio.git

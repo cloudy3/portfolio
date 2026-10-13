@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { EASE_OUT } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
@@ -37,7 +37,7 @@ export function JudgmentLine({ className }: { className?: string }) {
       {reduce ? null : (
         /*
          * motion.div, not motion.span: the section test suites mock
-         * framer-motion with only `motion.div`, so any other element type
+         * Motion with only `motion.div`, so any other element type
          * resolves to undefined and throws at render.
          */
         <motion.div

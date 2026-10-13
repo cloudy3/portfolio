@@ -7,11 +7,11 @@ const QUERY = "(prefers-reduced-motion: reduce)";
 /**
  * Subscribes to the reduced-motion preference.
  *
- * framer-motion's `useReducedMotion()` captures its value in a `useState`
+ * Motion's `useReducedMotion()` captures its value in a `useState`
  * initializer, so a component that renders before the preference is read keeps
  * the stale value for its whole life — the keyboard story kept its 400vh
  * scroll region under reduced motion because of exactly that. Use this hook
- * for structural decisions (what to render, what to fetch); framer's is fine
+ * for structural decisions (what to render, what to fetch); Motion's is fine
  * for animation config.
  *
  * Returns false on the server and on the first client render so markup
