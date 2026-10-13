@@ -142,4 +142,28 @@ describe("ContactSection", () => {
     expect(screen.getByLabelText("Name *")).toHaveValue("");
     expect(screen.getByLabelText("Message *")).toHaveValue("");
   });
+
+  // The recipient is fixed in the EmailJS template. One sent from the browser
+  // would let anyone holding the public key choose who gets the mail.
+  it("sends no recipient and throttles repeat sends", async () => {
+    render(<ContactSection />);
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: /Send message/i }));
+    await screen.findByText(/Sent\. Thank you/i);
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    const [, , params, options] = mockSend.mock.calls[0];
+    expect(params).toEqual({
+      from_name: "Ada Lovelace",
+      from_email: "ada@example.com",
+      subject: "Collaboration",
+      message: "I would like to discuss a project.",
+      reply_to: "ada@example.com",
+    });
+    expect(options).toMatchObject({
+      publicKey: "k",
+      limitRate: { throttle: 10_000 },
+    });
+  });
 });

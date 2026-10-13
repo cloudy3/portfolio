@@ -199,16 +199,24 @@ export default function ContactSection() {
         );
       }
 
+      // No recipient here. The public key ships in the bundle, so a recipient
+      // sent from the browser would let anyone mail anyone through the
+      // account; the EmailJS template has its own fixed "To Email" instead.
       const templateParams = {
         from_name: formData.name,
         from_email: formData.email,
         subject: formData.subject,
         message: formData.message,
-        to_email: CONTACT_EMAIL,
         reply_to: formData.email,
       };
 
-      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      // limitRate is per browser, so it only stops repeat sends from this
+      // page (it rejects with a 429). The account-wide limits and the domain
+      // allowlist are set in the EmailJS dashboard.
+      await emailjs.send(serviceId, templateId, templateParams, {
+        publicKey,
+        limitRate: { id: "contact-form", throttle: 10_000 },
+      });
 
       setFormState((prev) => ({
         ...prev,
