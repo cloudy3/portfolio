@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Project } from "@/types";
@@ -78,7 +76,9 @@ function Frame({
       {project.images[0] ? (
         <Image
           src={project.images[0]}
-          alt={project.title}
+          // Decorative: the linked title beside it already names the project,
+          // so a screen reader would hear it twice.
+          alt=""
           fill
           sizes={sizes}
           priority={priority}

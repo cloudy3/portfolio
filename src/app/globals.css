@@ -207,10 +207,12 @@
     --color-content-inverse: #0e1014;
     --color-content-inverse-muted: #494d56;
 
-    /* Verified against #0e1014: primary 15.8:1, secondary 8.5:1, muted 5.1:1 */
+    /* Verified against #0e1014: primary 15.8:1, secondary 8.5:1, muted 5.3:1.
+       Muted is also 4.6:1 on surface-elevated, where the form placeholders sit;
+       #7e8593 fell just short there at 4.45:1. */
     --color-content-primary: #e8eaee;
     --color-content-secondary: #a7adb8;
-    --color-content-muted: #7e8593;
+    --color-content-muted: #808796;
 
     --color-border-subtle: rgba(232, 234, 238, 0.1);
     --color-border-strong: rgba(232, 234, 238, 0.2);
@@ -242,7 +244,7 @@
 
   --color-content-primary: #e8eaee;
   --color-content-secondary: #a7adb8;
-  --color-content-muted: #7e8593;
+  --color-content-muted: #808796;
 
   --color-border-subtle: rgba(232, 234, 238, 0.1);
   --color-border-strong: rgba(232, 234, 238, 0.2);

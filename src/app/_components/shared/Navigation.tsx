@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
+import { lastInDocument, READING_BAND } from "@/lib/readingBand";
 import { LAND_SPRING } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn, smoothScrollTo } from "@/lib/utils";
@@ -14,8 +15,31 @@ interface NavigationProps {
   className?: string;
 }
 
-/** Matches the nav's own height, so a section counts as active once it clears it. */
-const ACTIVE_BAND_TOP = 140;
+/**
+ * The active section mark. A vermilion segment travels along the nav's bottom
+ * hairline as the reader changes sections. It slides between items via
+ * layoutId, which is the state transition made visible instead of a new
+ * indicator blinking in somewhere else.
+ *
+ * Module scope, not declared inside Navigation: a component defined in a
+ * render is a new type on every render, so React remounted the mark each time
+ * and the shared-layout animation had nothing stable to animate from.
+ */
+function LaneMark({ reduce }: { reduce: boolean }) {
+  return reduce ? (
+    <span
+      className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
+      aria-hidden
+    />
+  ) : (
+    <motion.div
+      layoutId="nav-lane-mark"
+      className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
+      transition={LAND_SPRING}
+      aria-hidden
+    />
+  );
+}
 
 export default function Navigation({ className }: NavigationProps) {
   const pathname = usePathname();
@@ -42,43 +66,36 @@ export default function Navigation({ className }: NavigationProps) {
   });
 
   /*
-   * Active section, via IntersectionObserver rather than per-frame geometry.
-   * The observed band starts just below the nav and ends 55% up the viewport,
-   * so the active item changes when a section genuinely occupies the reading
-   * area. Entries are sorted by document order and the last one to have
-   * entered the band wins, which matches how the old rect check behaved.
+   * Active section on the home page, via IntersectionObserver rather than
+   * per-frame geometry. The band and the tie-break live in lib/readingBand,
+   * shared with the field engine so the canvas and the nav always agree.
+   * Other pages derive their active item from the pathname in isActive.
    */
   useEffect(() => {
-    if (!isHome) {
-      setActiveSection(pathname.startsWith("/projects") ? "work" : "");
-      return;
-    }
+    if (!isHome) return;
 
-    const ids = NAVIGATION_ITEMS.map((item) => item.id);
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
+    const elements = NAVIGATION_ITEMS.map((item) =>
+      document.getElementById(item.id)
+    ).filter((el): el is HTMLElement => el !== null);
 
     if (elements.length === 0) return;
 
-    const visible = new Set<string>();
+    const visible = new Set<Element>();
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) visible.add(entry.target.id);
-          else visible.delete(entry.target.id);
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
         }
-        // Document order, so overlapping sections resolve to the lower one.
-        const current = ids.filter((id) => visible.has(id)).pop();
-        setActiveSection(current ?? "hero");
+        setActiveSection(lastInDocument(visible)?.id ?? "hero");
       },
-      { rootMargin: `-${ACTIVE_BAND_TOP}px 0px -55% 0px` }
+      { rootMargin: READING_BAND }
     );
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [isHome, pathname]);
+  }, [isHome]);
 
   const handleNavClick = (href: string) => {
     setIsOpen(false);
@@ -139,27 +156,6 @@ export default function Navigation({ className }: NavigationProps) {
         : "text-content-secondary hover:text-content-primary"
     );
 
-  /**
-   * The active section mark. A vermilion segment travels along the nav's bottom
-   * hairline as the reader changes sections. It slides
-   * between items via layoutId, which is the state transition made visible
-   * instead of a new indicator blinking in somewhere else.
-   */
-  const LaneMark = () =>
-    reduce ? (
-      <span
-        className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
-        aria-hidden
-      />
-    ) : (
-      <motion.div
-        layoutId="nav-lane-mark"
-        className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
-        transition={LAND_SPRING}
-        aria-hidden
-      />
-    );
-
   return (
     <nav
       className={cn(
@@ -195,7 +191,7 @@ export default function Navigation({ className }: NavigationProps) {
                   className={navLinkClass(item.id)}
                 >
                   {item.label}
-                  {isActive(item.id) ? <LaneMark /> : null}
+                  {isActive(item.id) ? <LaneMark reduce={reduce} /> : null}
                 </button>
               ) : "path" in item && item.path ? (
                 <Link
@@ -204,7 +200,7 @@ export default function Navigation({ className }: NavigationProps) {
                   className={navLinkClass(item.id, item.path)}
                 >
                   {item.label}
-                  {isActive(item.id, item.path) ? <LaneMark /> : null}
+                  {isActive(item.id, item.path) ? <LaneMark reduce={reduce} /> : null}
                 </Link>
               ) : (
                 <Link

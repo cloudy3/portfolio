@@ -1,3 +1,4 @@
+import { lastInDocument, READING_BAND } from "../readingBand";
 import { readPalette, invalidatePalette } from "./pigments";
 import { getFieldEntries, subscribeToFields, type FieldEntry } from "./registry";
 import { getTreatment } from "./treatments";
@@ -120,10 +121,10 @@ export function createField(
   let observer: IntersectionObserver | null = null;
 
   function pickActive(): void {
-    const entries = getFieldEntries();
-    // Document order, so overlapping sections resolve to the lower one. Same
-    // rule the nav's active-section observer uses.
-    const next = entries.find((entry) => visible.has(entry.el)) ?? null;
+    // Same band and same tie-break as the nav's active item, so the two never
+    // disagree about which section is being read.
+    const lowest = lastInDocument(visible);
+    const next = getFieldEntries().find((entry) => entry.el === lowest) ?? null;
 
     if (next?.el === current?.entry.el) return;
 
@@ -150,9 +151,7 @@ export function createField(
         pickActive();
         ensureRunning();
       },
-      // A section owns the field once it occupies the reading area, not the
-      // moment its top edge appears.
-      { rootMargin: "-25% 0px -25% 0px" }
+      { rootMargin: READING_BAND }
     );
 
     for (const entry of getFieldEntries()) observer.observe(entry.el);

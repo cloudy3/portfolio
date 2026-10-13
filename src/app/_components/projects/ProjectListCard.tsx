@@ -28,7 +28,9 @@ export function ProjectListCard({
         {project.images[0] ? (
           <Image
             src={project.images[0]}
-            alt={project.title}
+            // Decorative: the linked title below names the project, so a
+            // screen reader would hear it twice.
+            alt=""
             fill
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.015]"
             sizes="(max-width: 768px) 100vw, 50vw"

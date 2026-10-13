@@ -23,17 +23,36 @@ interface CanvasDimensions {
 }
 
 export default function KeyboardScrollytellingSection() {
+  // Not framer's useReducedMotion: it caches in a useState initializer and can
+  // stay false for the component's lifetime, which left the 400vh scroll
+  // region in place for reduced-motion visitors.
+  const shouldReduceMotion = usePrefersReducedMotion();
+
+  /*
+   * Keyed on the preference, so a change starts the story over with fresh
+   * state: the frame budget and the layout both depend on it. The preference
+   * is only read after hydration, so reduced-motion visitors pass through
+   * this once on load.
+   */
+  return (
+    <KeyboardStory
+      key={shouldReduceMotion ? "still" : "scrub"}
+      shouldReduceMotion={shouldReduceMotion}
+    />
+  );
+}
+
+function KeyboardStory({
+  shouldReduceMotion,
+}: {
+  shouldReduceMotion: boolean;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number | null>(null);
   const pendingFrameRef = useRef<number>(0);
   const currentFrameRef = useRef<number>(0);
   const hasDrawnInitialRef = useRef(false);
-
-  // Not framer's useReducedMotion: it caches in a useState initializer and can
-  // stay false for the component's lifetime, which left the 400vh scroll
-  // region in place for reduced-motion visitors.
-  const shouldReduceMotion = usePrefersReducedMotion();
 
   const [frames, setFrames] = useState<HTMLImageElement[]>([]);
   const [frameBackgrounds, setFrameBackgrounds] = useState<string[]>([]);
@@ -137,9 +156,6 @@ export default function KeyboardScrollytellingSection() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoadError(null);
-    setLoadedCount(0);
-    setIsReady(false);
 
     /*
      * Frame 0 first, so something is on screen after a single request; the
@@ -257,23 +273,27 @@ export default function KeyboardScrollytellingSection() {
        * Reduced motion gets a single screen-height section rather than a 400vh
        * scroll region: the frame never changes, so the tall container was just
        * a long empty scroll.
+       *
+       * The stage is 100dvh rather than h-screen (100vh), so it tracks the
+       * visible area as the mobile browser bars show and hide, like
+       * loading.tsx. The resize listener below redraws the canvas when it does.
        */}
       <div
         ref={containerRef}
         className={
-          shouldReduceMotion ? "relative h-screen" : "relative h-[400vh]"
+          shouldReduceMotion ? "relative h-[100dvh]" : "relative h-[400vh]"
         }
       >
         <div
           className={
             shouldReduceMotion
-              ? "h-screen w-full overflow-hidden"
-              : "sticky top-0 h-screen w-full overflow-hidden"
+              ? "h-[100dvh] w-full overflow-hidden"
+              : "sticky top-0 h-[100dvh] w-full overflow-hidden"
           }
         >
           <canvas
             ref={canvasRef}
-            className="keyboard-story-canvas h-screen w-full"
+            className="keyboard-story-canvas h-[100dvh] w-full"
             aria-label="Keyboard disassembly sequence"
             role="img"
           />

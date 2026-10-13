@@ -45,8 +45,8 @@ describe("field registry", () => {
   });
 
   it("keeps entries in registration order", () => {
-    // The engine resolves overlapping sections by taking the first visible one
-    // in this order, which is document order in practice.
+    // Insertion order. Which section owns the field when two overlap is
+    // decided by document position (lib/readingBand), not by this order.
     const first = registerField(entry("first"));
     const second = registerField(entry("second"));
 
