@@ -482,62 +482,6 @@
     }
   }
 
-  /* ---- Legacy composition rails ---------------------------------------
-   * Hairlines on the lane boundaries. These are permitted decoration-adjacent
-   * geometry only because they organise real content: everything on the page
-   * is placed against them.
-   *
-   * Apply to the element that IS the lane grid (or shares its box exactly),
-   * so the rails land on the grid lines rather than on the container padding.
-   *
-   * Painted via a pseudo-element rather than 8 divs, and hidden below md where
-   * the grid is a single column and rails would mean nothing.
-   */
-  .lane-rails {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .lane-rails::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: repeating-linear-gradient(
-      to right,
-      var(--color-border-subtle) 0 1px,
-      transparent 1px calc(100% / var(--lane-count))
-    );
-  }
-
-  @media (max-width: 767px) {
-    .lane-rails::before {
-      display: none;
-    }
-  }
-
-  /* ---- Legacy rail fade ------------------------------------------------
-   * Retained for older fallbacks and tests. The current hero does not render
-   * static rails because they compete with the moving field.
-   *
-   * At full strength over the canvas they are a static grid laid across a
-   * moving one, and the eye reads the collision rather than the structure —
-   * eight motionless hairlines crossing every wave. It is worst in dark mode,
-   * where the rails are light-on-dark and the field is at its brightest.
-   *
-   * The fade hands the frame from static structure to motion.
-   */
-  .lane-rails-fade::before {
-    -webkit-mask-image: linear-gradient(
-      to right,
-      #000 0%,
-      #000 26%,
-      transparent 58%
-    );
-    mask-image: linear-gradient(to right, #000 0%, #000 26%, transparent 58%);
-  }
-
   /* ---- Section pulse ---------------------------------------------------
    * The hairline a section opens on. The legacy class name remains part of the
    * component API. The accent sweep across it is driven in
@@ -696,11 +640,6 @@
     line-clamp: 3;
   }
 
-  .touch-manipulation {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-
   /*
    * The frames are photos on a baked-in near-white ground. In light mode the
    * section takes that ground (--frame-bg, sampled per frame) so the photo
@@ -793,10 +732,6 @@
 }
 
 @media print {
-  .no-print {
-    display: none !important;
-  }
-
   body {
     background: white !important;
     color: black !important;

@@ -3,7 +3,8 @@
  *
  * Trimmed to what the app actually imports. The removed helpers (trapFocus,
  * announceToScreenReader, handleArrowKeyNavigation, prefersHighContrast,
- * enhanceFormAccessibility, makeModalAccessible) had no callers.
+ * enhanceFormAccessibility, makeModalAccessible, LiveRegionManager) had no
+ * callers.
  */
 
 /**
@@ -54,50 +55,3 @@ export const prefersReducedMotion = (): boolean => {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 };
 
-/** ARIA live region manager — one polite and one assertive region. */
-export class LiveRegionManager {
-  private politeRegion: HTMLElement | null = null;
-  private assertiveRegion: HTMLElement | null = null;
-
-  constructor() {
-    this.createRegions();
-  }
-
-  private createRegions() {
-    if (typeof window === "undefined") return;
-
-    this.politeRegion = document.createElement("div");
-    this.politeRegion.setAttribute("aria-live", "polite");
-    this.politeRegion.setAttribute("aria-atomic", "true");
-    this.politeRegion.className = "sr-only";
-    document.body.appendChild(this.politeRegion);
-
-    this.assertiveRegion = document.createElement("div");
-    this.assertiveRegion.setAttribute("aria-live", "assertive");
-    this.assertiveRegion.setAttribute("aria-atomic", "true");
-    this.assertiveRegion.className = "sr-only";
-    document.body.appendChild(this.assertiveRegion);
-  }
-
-  announce(message: string, priority: "polite" | "assertive" = "polite") {
-    const region =
-      priority === "assertive" ? this.assertiveRegion : this.politeRegion;
-
-    if (region) {
-      region.textContent = message;
-
-      setTimeout(() => {
-        region.textContent = "";
-      }, 1000);
-    }
-  }
-
-  destroy() {
-    if (this.politeRegion) {
-      document.body.removeChild(this.politeRegion);
-    }
-    if (this.assertiveRegion) {
-      document.body.removeChild(this.assertiveRegion);
-    }
-  }
-}

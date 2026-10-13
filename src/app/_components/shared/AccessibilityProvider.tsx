@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, ReactNode } from "react";
-import { LiveRegionManager, prefersReducedMotion } from "@/lib/accessibility";
+import { prefersReducedMotion } from "@/lib/accessibility";
 
 interface AccessibilityProviderProps {
   children: ReactNode;
@@ -13,9 +13,6 @@ interface AccessibilityProviderProps {
 const AccessibilityProvider = ({ children }: AccessibilityProviderProps) => {
   useEffect(() => {
     // NOTE: the skip link is rendered in JSX by Navigation — do not inject one here.
-
-    // Initialize live region manager
-    const liveRegionManager = new LiveRegionManager();
 
     // Add reduced motion class if user prefers reduced motion
     if (prefersReducedMotion()) {
@@ -36,7 +33,6 @@ const AccessibilityProvider = ({ children }: AccessibilityProviderProps) => {
 
     // Cleanup
     return () => {
-      liveRegionManager.destroy();
       mediaQuery.removeEventListener("change", handleMotionChange);
     };
   }, []);

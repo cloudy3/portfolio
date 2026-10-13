@@ -168,17 +168,6 @@ export const TECHNICAL_SKILLS: TechnicalSkills = {
   },
 };
 
-// Utility functions for skills data
-export const getSkillsByCategory = (categoryName: string) => {
-  const categories = Object.values(TECHNICAL_SKILLS);
-  const category = categories.find((cat) => cat.name === categoryName);
-  return category ? category.items : [];
-};
-
-export const getAllSkillCategories = () => {
-  return Object.values(TECHNICAL_SKILLS).map((category) => category.name);
-};
-
 // Flattened skills array for section lists
 export const SKILLS_DATA = Object.values(TECHNICAL_SKILLS).flatMap(
   (category) => category.items

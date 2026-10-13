@@ -78,18 +78,23 @@ const AccessibilityAuditor = () => {
         console.log("✅ Main landmark found");
       }
 
-      // Check color contrast for the theme's real body-text pairs. These
-      // mirror the @theme tokens in globals.css; the previous check used
-      // #1a1a2e on #ffffff, colors the site no longer uses.
+      // Check color contrast for the theme's text pairs. The values are read
+      // from the live tokens rather than copied here, so the check follows
+      // globals.css and covers whichever theme is active. A hard-coded copy
+      // went stale once already, after the palette changed.
+      const tokens = getComputedStyle(document.documentElement);
+      const token = (name: string) =>
+        tokens.getPropertyValue(`--color-${name}`).trim();
       const CONTRAST_PAIRS: Array<[string, string, string]> = [
-        ["body text on page", "#1a1a1c", "#faf8f5"],
-        ["secondary text on page", "#4a4a52", "#faf8f5"],
-        ["muted text on page", "#6b6b76", "#faf8f5"],
-        ["inverse text on inverse surface", "#f4f4f5", "#161618"],
+        ["body text on page", "content-primary", "surface-page"],
+        ["secondary text on page", "content-secondary", "surface-page"],
+        ["muted text on page", "content-muted", "surface-page"],
+        ["muted text on elevated surface", "content-muted", "surface-elevated"],
+        ["inverse text on inverse surface", "content-inverse", "surface-inverse"],
       ];
 
-      for (const [label, fg, bg] of CONTRAST_PAIRS) {
-        const ratio = checkColorContrast(fg, bg);
+      for (const [label, fgToken, bgToken] of CONTRAST_PAIRS) {
+        const ratio = checkColorContrast(token(fgToken), token(bgToken));
         if (ratio < 4.5) {
           console.warn(
             `Low color contrast (${label}): ${ratio.toFixed(2)}, needs 4.5`

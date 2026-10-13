@@ -60,7 +60,7 @@ npm run dev                  # Dev server on :3000
 npm run build                # Production build
 npm run start                # Serve the production build
 
-# Quality (CI runs typecheck, lint, test and build on every push to main)
+# Quality (CI runs typecheck, lint, audit:deps, test and build on each push)
 npm run typecheck            # tsc --noEmit
 npm run lint                 # ESLint
 npm test                     # Vitest, single run
@@ -76,7 +76,7 @@ npm run perf:audit           # Build, then Lighthouse mobile + desktop
 
 # Dependencies
 npm run audit:security       # npm audit
-npm run audit:deps           # Unused dependencies (depcheck)
+npm run audit:deps           # Unused files, exports and dependencies (knip)
 npm run audit:all            # Both
 ```
 
@@ -91,7 +91,7 @@ Measured locally in October 2026:
 - **Lighthouse, mobile:** performance 91, accessibility 100, best practices
   100, SEO 100
 - **Lighthouse, desktop:** 100 in all four categories
-- **Tests:** 161 passing, about 56% line coverage
+- **Tests:** 143 passing, about 57% line coverage
 
 ## Architecture
 

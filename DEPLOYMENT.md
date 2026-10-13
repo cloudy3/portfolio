@@ -1,9 +1,9 @@
 # Deployment
 
 The site is hosted on Vercel, which builds it with `npm run build`
-(`vercel.json`). GitHub Actions runs typecheck, lint, tests and the build on the
-same pushes (`.github/workflows/ci.yml`), so a red check in the pull request
-usually means the Vercel build will fail too.
+(`vercel.json`). GitHub Actions runs typecheck, lint, a dead-code check (knip),
+tests and the build on the same pushes (`.github/workflows/ci.yml`), so a red
+check in the pull request usually means the Vercel build will fail too.
 
 ## Automatic deployments
 
@@ -57,7 +57,7 @@ npx vercel --prod        # production deployment
 ## Troubleshooting
 
 **Build fails on Vercel.** Check the GitHub Actions run for the same commit
-first; it shows typecheck, lint and test failures separately. Reproduce
+first; it shows typecheck, lint, knip and test failures separately. Reproduce
 locally with `npm run build`.
 
 **Contact form says EmailJS is not configured.** One of the three EmailJS

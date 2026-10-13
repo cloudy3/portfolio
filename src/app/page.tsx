@@ -13,8 +13,7 @@ export const metadata: Metadata = {
 /*
  * Structured data naming the person behind the site, and tying the GitHub and
  * LinkedIn profiles to it. The h1 is a tagline rather than a name, so this is
- * the plainest statement of whose portfolio this is. Fields are picked one by
- * one: the profile module holds contact details that must not reach the HTML.
+ * the plainest statement of whose portfolio this is.
  */
 const PERSON_JSON_LD = {
   "@context": "https://schema.org",

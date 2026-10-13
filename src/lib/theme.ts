@@ -8,9 +8,6 @@
  * hook lives in `useTheme.ts`.
  */
 
-/** What the visitor has actually chosen. `system` means "no choice stored". */
-export type ThemeChoice = "system" | "light" | "dark";
-
 /** What the page is actually painted as, once `system` has been resolved. */
 export type ResolvedTheme = "light" | "dark";
 

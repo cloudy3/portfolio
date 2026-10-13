@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  // Treatments and helpers are exported for tests and read inside their own
+  // module; only flag exports nothing uses at all.
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    // Run by path from scripts/lighthouse.mjs, so there is no import to find.
+    "lighthouse",
+    // Pinned at the top level so Next and browserslist share the current copy
+    // instead of an older one that warns on every build.
+    "baseline-browser-mapping"
+  ]
+}

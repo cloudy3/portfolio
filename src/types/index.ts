@@ -72,25 +72,10 @@ export interface Education {
   logo?: string;
 }
 
-export interface ContactInfo {
-  phone: string;
-  email: string;
-  linkedin: string;
-}
-
 export interface PersonalInfo {
   name: string;
   title: string;
   summary: string;
-  contact: ContactInfo;
-}
-
-export interface ProfessionalProfile {
-  personalInfo: PersonalInfo;
-  experience: Experience[];
-  education: Education[];
-  skills: TechnicalSkills;
-  projects: Project[];
 }
 
 export interface Certification {
@@ -102,14 +87,6 @@ export interface Certification {
 }
 
 // Additional utility types
-export interface NavigationItem {
-  id: string;
-  label: string;
-  href: string;
-  /** App Router path when linking to a full page (e.g. /projects) */
-  path?: string;
-}
-
 export interface ContactForm {
   name: string;
   email: string;

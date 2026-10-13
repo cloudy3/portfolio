@@ -1,5 +1,4 @@
 import type {
-  DrawContext,
   PigmentName,
   Treatment,
   TreatmentName,
@@ -1082,4 +1081,3 @@ export function getTreatment(name: TreatmentName): Treatment {
   return TREATMENTS[name] ?? lines;
 }
 
-export type { DrawContext };
