@@ -159,14 +159,17 @@ export const getPastExperiences = () => {
  * Day-based approximations (`diff / 30`) drift: exactly two years came out as
  * "2 years 1 month". Counting calendar months keeps the card and the stats row
  * in agreement.
+ *
+ * UTC getters, because the dates are ISO strings parsed as midnight UTC (see
+ * formatMonthStamp in lib/utils).
  */
 export const monthsBetween = (start: Date, end: Date): number => {
   let months =
-    (end.getFullYear() - start.getFullYear()) * 12 +
-    (end.getMonth() - start.getMonth());
+    (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +
+    (end.getUTCMonth() - start.getUTCMonth());
 
   // The final month is only complete once the day-of-month has been reached.
-  if (end.getDate() < start.getDate()) months -= 1;
+  if (end.getUTCDate() < start.getUTCDate()) months -= 1;
 
   return Math.max(0, months);
 };

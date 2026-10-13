@@ -267,8 +267,11 @@ export default function Navigation({ className }: NavigationProps) {
         </div>
       </div>
 
+      {/* `inert` while closed: the panel is only collapsed visually, so without
+          it Tab walks through six invisible links and screen readers read them. */}
       <div
         id="mobile-nav"
+        inert={!isOpen}
         className={cn(
           "overflow-hidden border-b border-border-subtle bg-surface-elevated transition-all duration-300 md:hidden",
           isOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"

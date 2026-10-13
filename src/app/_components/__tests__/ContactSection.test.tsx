@@ -62,7 +62,8 @@ describe("ContactSection", () => {
 
   describe("submit failure", () => {
     it("shows a dedicated alert and does not blame the message field", async () => {
-      mockSend.mockRejectedValue(new Error("network unreachable"));
+      // What fetch() rejects with when the request never leaves the browser.
+      mockSend.mockRejectedValue(new TypeError("Failed to fetch"));
       render(<ContactSection />);
 
       fillValidForm();
@@ -80,6 +81,25 @@ describe("ContactSection", () => {
         screen.queryByText(/Message must be at least/i)
       ).not.toBeInTheDocument();
     });
+
+    // EmailJS rejects with { status, text }, not an Error.
+    it.each([
+      [429, "Too Many Requests", /Too many requests/i],
+      [400, "The template ID is invalid", /configuration error/i],
+      [0, "Network Error", /Network error/i],
+      [500, "Internal Server Error", /Failed to send message/i],
+    ])(
+      "maps an EmailJS %i response to the right message",
+      async (status, text, expected) => {
+        mockSend.mockRejectedValue({ status, text });
+        render(<ContactSection />);
+
+        fillValidForm();
+        fireEvent.click(screen.getByRole("button", { name: /Send message/i }));
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(expected);
+      }
+    );
 
     it("keeps the entered values so the user can retry", async () => {
       mockSend.mockRejectedValue(new Error("boom"));

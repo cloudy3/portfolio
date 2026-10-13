@@ -40,6 +40,10 @@ export function FadeIn({ children, className, beat = 0 }: FadeInProps) {
   return (
     <motion.div
       className={cn(className)}
+      // Hook for the <noscript> rule in layout.tsx. Motion writes the hidden
+      // `initial` state into the server HTML as inline style, so without
+      // JavaScript nothing would ever reveal it.
+      data-fade-in=""
       initial={{ opacity: 0, y: LANE_TRAVEL }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={ENTER_VIEWPORT}

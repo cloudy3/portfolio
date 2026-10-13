@@ -7,6 +7,13 @@ const bundleAnalyzer = withBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  // Inlined into both server and client bundles at build time, so the
+  // prerendered HTML and the hydrating browser agree on "today" (see
+  // src/lib/useToday.ts).
+  env: {
+    BUILD_DATE: new Date().toISOString(),
+  },
+
   // Image optimization configuration
   images: {
     // Enable image optimization

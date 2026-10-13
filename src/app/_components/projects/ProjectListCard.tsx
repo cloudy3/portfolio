@@ -1,12 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Project } from "@/types";
-import { cn } from "@/lib/utils";
-
-/** `2024.02` — the same stamp the homepage Work section uses. */
-function stamp(date: Date): string {
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
-}
+import { cn, formatMonthStamp } from "@/lib/utils";
 
 /**
  * Catalogue entry, used by the /projects index.
@@ -43,7 +38,7 @@ export function ProjectListCard({
 
       <div className="mt-[calc(var(--rhythm)*4)] flex items-baseline gap-4">
         <p className="num text-xs text-content-muted">
-          {stamp(new Date(project.completedAt))}
+          {formatMonthStamp(new Date(project.completedAt))}
         </p>
         <p className="text-xs text-content-muted">{project.category}</p>
         {project.featured ? (

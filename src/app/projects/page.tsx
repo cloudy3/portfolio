@@ -7,7 +7,8 @@ import { sampleProjects, sortProjectsByFeatured } from "@/lib/projectData";
 import { ProjectsCatalog } from "./ProjectsCatalog";
 
 export const metadata: Metadata = {
-  title: "Selected work | Jing Feng",
+  // The root layout's title template appends " | Jing Feng".
+  title: "Selected work",
   description:
     "Engineering projects across mobile, cloud, and full-stack systems.",
   alternates: { canonical: "/projects" },

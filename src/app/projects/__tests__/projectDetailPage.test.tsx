@@ -36,7 +36,8 @@ describe("generateMetadata", () => {
       params: Promise.resolve({ slug }),
     });
 
-    expect(metadata.title).toContain(project.title);
+    // Bare title: the root layout's template adds the " | Jing Feng" suffix.
+    expect(metadata.title).toBe(project.title);
     expect(metadata.description).toBe(project.description);
   });
 

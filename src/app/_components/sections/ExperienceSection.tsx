@@ -10,19 +10,15 @@ import {
   getTotalExperienceYears,
   getExperienceDuration,
 } from "@/lib/data/experience";
-import { cn } from "@/lib/utils";
+import { cn, formatMonthStamp } from "@/lib/utils";
+import { useToday } from "@/lib/useToday";
 import { Container } from "../ui/Container";
 import { Section } from "../ui/Section";
 import { SectionHeader } from "../ui/SectionHeader";
 import { FadeIn } from "../motion/FadeIn";
 
-/** `2024.02` — the same stamp format the Work section uses. */
-function stamp(date: Date): string {
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
-}
-
 function range(start: Date, end?: Date): string {
-  return `${stamp(start)} - ${end ? stamp(end) : "now"}`;
+  return `${formatMonthStamp(start)} - ${end ? formatMonthStamp(end) : "now"}`;
 }
 
 /**
@@ -77,8 +73,10 @@ function ExperienceEntry({
   isExpanded,
   onToggle,
   current = false,
+  today,
 }: {
   experience: Experience;
+  today: Date;
   isExpanded: boolean;
   onToggle: () => void;
   current?: boolean;
@@ -92,7 +90,7 @@ function ExperienceEntry({
             {range(experience.startDate, experience.endDate)}
           </p>
           <p className="mt-1 text-xs text-content-muted">
-            {getExperienceDuration(experience)}
+            {getExperienceDuration(experience, today)}
           </p>
           {current ? (
             <p className="mt-2 text-xs font-medium text-accent-ink">Current</p>
@@ -217,7 +215,8 @@ const ExperienceSection = () => {
 
   const currentExp = getCurrentExperience();
   const pastExps = getPastExperiences();
-  const totalYears = getTotalExperienceYears();
+  const today = useToday();
+  const totalYears = getTotalExperienceYears(today);
 
   return (
     /*
@@ -280,6 +279,7 @@ const ExperienceSection = () => {
                   <ExperienceEntry
                     experience={currentExp}
                     current
+                    today={today}
                     isExpanded={expandedExperience === currentExp.id}
                     onToggle={() => handleToggleExpanded(currentExp.id)}
                   />
@@ -289,6 +289,7 @@ const ExperienceSection = () => {
                 <FadeIn key={exp.id} beat={index}>
                   <ExperienceEntry
                     experience={exp}
+                    today={today}
                     isExpanded={expandedExperience === exp.id}
                     onToggle={() => handleToggleExpanded(exp.id)}
                   />

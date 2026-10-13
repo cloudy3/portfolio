@@ -8,7 +8,7 @@ import {
   sampleProjects,
   sortProjectsByDate,
 } from "@/lib/projectData";
-import { cn } from "@/lib/utils";
+import { cn, formatMonthStamp } from "@/lib/utils";
 import { Container } from "../ui/Container";
 import { Section } from "../ui/Section";
 import { SectionHeader } from "../ui/SectionHeader";
@@ -18,11 +18,6 @@ interface ProjectsSectionProps {
   projects?: Project[];
   /** Max featured items on the homepage */
   limit?: number;
-}
-
-/** `2024.02` reads as a chart timestamp and keeps mono to numbers. */
-function stamp(date: Date): string {
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 /**
@@ -124,7 +119,7 @@ function FeatureBand({ project }: { project: Project }) {
     <article className="group lane-grid relative items-start">
       <div className="md:col-span-3 md:pr-[var(--lane-inset)]">
         <p className="num text-xs text-content-muted">
-          {stamp(new Date(project.completedAt))}
+          {formatMonthStamp(new Date(project.completedAt))}
         </p>
         <h3 className="mt-[calc(var(--rhythm)*3)] text-2xl md:text-[1.75rem]">
           <TitleLink project={project} />
@@ -158,7 +153,7 @@ function ProjectTile({ project }: { project: Project }) {
         sizes="(max-width: 768px) 100vw, 40vw"
       />
       <p className="num mt-[calc(var(--rhythm)*4)] text-xs text-content-muted">
-        {stamp(new Date(project.completedAt))}
+        {formatMonthStamp(new Date(project.completedAt))}
       </p>
       <h3 className="mt-[calc(var(--rhythm)*2)] text-lg">
         <TitleLink project={project} />

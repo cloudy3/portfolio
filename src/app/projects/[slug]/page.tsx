@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { formatMonthStamp } from "@/lib/utils";
 import { Container } from "@/app/_components/ui/Container";
 import { Section } from "@/app/_components/ui/Section";
 import {
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = getProjectBySlug(slug);
   if (!project) return { title: "Project" };
   return {
-    title: `${project.title} | Jing Feng`,
+    title: project.title,
     description: project.description,
     alternates: { canonical: `/projects/${slug}` },
   };
@@ -66,9 +67,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             {/* Mono on the date only, and no middle dot as a default separator. */}
             <p className="flex items-baseline gap-4 text-xs text-content-muted">
               <span className="num">
-                {`${new Date(project.completedAt).getFullYear()}.${String(
-                  new Date(project.completedAt).getMonth() + 1
-                ).padStart(2, "0")}`}
+                {formatMonthStamp(new Date(project.completedAt))}
               </span>
               <span>{project.category}</span>
             </p>

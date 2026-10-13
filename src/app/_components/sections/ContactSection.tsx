@@ -48,6 +48,37 @@ const inputClass = (hasError: boolean) =>
 
 const labelClass = "mb-2 block text-xs font-medium text-content-secondary";
 
+const NETWORK_ERROR =
+  "Network error. Please check your internet connection and try again.";
+
+/**
+ * Visitor-facing text for a failed send.
+ *
+ * EmailJS rejects with an `EmailJSResponseStatus` (`{ status, text }`), which
+ * is not an `Error`, so the old `instanceof Error` checks never matched it and
+ * every failure showed the generic message. Branch on the HTTP status instead.
+ * A request that never leaves the browser rejects from fetch() as a TypeError.
+ */
+function sendErrorMessage(error: unknown): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+  ) {
+    if (error.status === 429) {
+      return "Too many requests. Please wait a moment and try again.";
+    }
+    // EmailJSResponseStatus defaults to status 0, "Network Error".
+    if (error.status === 0) return NETWORK_ERROR;
+    if (error.status >= 400 && error.status < 500) {
+      return "Email service configuration error. Please try again later.";
+    }
+  }
+  if (error instanceof TypeError) return NETWORK_ERROR;
+  return "Failed to send message. Please try again.";
+}
+
 /**
  * Direct lines.
  *
@@ -192,25 +223,10 @@ export default function ContactSection() {
         setFormState((prev) => ({ ...prev, isSubmitted: false }));
       }, 5000);
     } catch (error) {
-      let errorMessage = "Failed to send message. Please try again.";
-
-      if (error instanceof Error) {
-        if (error.message.includes("network")) {
-          errorMessage =
-            "Network error. Please check your internet connection and try again.";
-        } else if (error.message.includes("template")) {
-          errorMessage =
-            "Email service configuration error. Please try again later.";
-        } else if (error.message.includes("rate")) {
-          errorMessage =
-            "Too many requests. Please wait a moment and try again.";
-        }
-      }
-
       setFormState((prev) => ({
         ...prev,
         isSubmitting: false,
-        submitError: errorMessage,
+        submitError: sendErrorMessage(error),
       }));
     }
   };

@@ -6,7 +6,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Smooth scroll utility
+/**
+ * True when the visitor asked for reduced motion, either through the OS
+ * preference or the `.reduce-motion` class AccessibilityProvider mirrors onto
+ * <html>.
+ */
+const prefersReducedMotion = (): boolean =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+  document.documentElement.classList.contains("reduce-motion");
+
+/**
+ * Scrolls to a section. An explicit `behavior: "smooth"` would override the
+ * `scroll-behavior: auto` that the reduced-motion CSS sets, so the behaviour
+ * is chosen here too.
+ */
 export const smoothScrollTo = (elementId: string, offset: number = 0) => {
   const element = document.getElementById(elementId);
   if (element) {
@@ -16,7 +29,7 @@ export const smoothScrollTo = (elementId: string, offset: number = 0) => {
 
     window.scrollTo({
       top: offsetPosition,
-      behavior: "smooth",
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
   }
 };
@@ -55,6 +68,17 @@ export const formatDate = (date: Date): string => {
     month: "long",
   }).format(date);
 };
+
+/**
+ * `2024.02`, the month stamp used across the Work and Experience sections.
+ *
+ * Read in UTC on purpose. Dates in the data are ISO strings such as
+ * "2023-07-01", which parse as midnight UTC; local getters turn that into
+ * June 30 for anyone west of UTC, and the prerendered (UTC) HTML would then
+ * disagree with the browser during hydration.
+ */
+export const formatMonthStamp = (date: Date): string =>
+  `${date.getUTCFullYear()}.${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
 
 // Check if element is in viewport
 export const isInViewport = (element: HTMLElement): boolean => {

@@ -74,10 +74,21 @@ const jetbrainsMono = localFont({
   display: "swap",
 });
 
+/*
+ * Absolute base for the canonical and og:image URLs. NEXT_PUBLIC_SITE_URL wins
+ * when set. Otherwise every Vercel build, production or preview, uses the
+ * production domain: production shipped `http://localhost:3000` as its
+ * canonical for months because the variable was never set there. Previews
+ * pointing at production is intended, since they must not be canonical.
+ * The www host is the one the apex redirects to.
+ */
+const PRODUCTION_URL = "https://www.jingfeng-cheah.me";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL ? PRODUCTION_URL : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Jing Feng - Software Engineer",
     template: "%s | Jing Feng",
@@ -152,6 +163,18 @@ export default function RootLayout({
          * the first frame, which is the flash it exists to prevent.
          */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/*
+         * FadeIn's starting state (opacity 0, shifted down) is inline style in
+         * the server HTML and only JavaScript reveals it. Without this, a
+         * visitor with JS off saw nothing below the hero. !important is what
+         * lets a stylesheet beat an inline style.
+         */}
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html:
+              "<style>[data-fade-in]{opacity:1!important;transform:none!important}</style>",
+          }}
+        />
       </head>
       <body
         className={`${zenKaku.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface-page text-content-primary overflow-x-hidden`}

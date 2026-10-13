@@ -131,6 +131,16 @@ describe("Navigation", () => {
     expect(mobileNav?.getAttribute("class") ?? "").toMatch(/max-h-\[28rem\]/);
   });
 
+  it("keeps the closed mobile menu out of the tab order", () => {
+    const { container } = render(<Navigation />);
+    const mobileNav = container.querySelector("#mobile-nav");
+
+    expect(mobileNav).toHaveAttribute("inert");
+
+    fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
+    expect(mobileNav).not.toHaveAttribute("inert");
+  });
+
   it("uses elevated styles when not on home", () => {
     mockUsePathname.mockReturnValue("/projects");
     render(<Navigation />);
