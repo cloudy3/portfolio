@@ -10,6 +10,7 @@ import {
   getProjectBySlug,
   sampleProjects,
 } from "@/lib/projectData";
+import { SHARED_OPEN_GRAPH } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,6 +26,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: project.title,
     description: project.description,
     alternates: { canonical: `/projects/${slug}` },
+    // The image comes from the colocated opengraph-image.tsx.
+    openGraph: {
+      ...SHARED_OPEN_GRAPH,
+      type: "article",
+      title: project.title,
+      description: project.description,
+      url: `/projects/${slug}`,
+    },
   };
 }
 

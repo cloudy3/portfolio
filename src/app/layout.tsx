@@ -6,6 +6,7 @@ import AccessibilityProvider from "./_components/shared/AccessibilityProvider";
 import AccessibilityAuditor from "./_components/ui/AccessibilityAuditor";
 import Field from "./_components/shared/Field";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
+import { SHARED_OPEN_GRAPH, SITE_URL } from "@/lib/site";
 
 /*
  * Zen Kaku Gothic New. One family for the whole site: hierarchy comes from
@@ -74,19 +75,6 @@ const jetbrainsMono = localFont({
   display: "swap",
 });
 
-/*
- * Absolute base for the canonical and og:image URLs. NEXT_PUBLIC_SITE_URL wins
- * when set. Otherwise every Vercel build, production or preview, uses the
- * production domain: production shipped `http://localhost:3000` as its
- * canonical for months because the variable was never set there. Previews
- * pointing at production is intended, since they must not be canonical.
- * The www host is the one the apex redirects to.
- */
-const PRODUCTION_URL = "https://www.jingfeng-cheah.me";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL ? PRODUCTION_URL : "http://localhost:3000");
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -104,33 +92,22 @@ export const metadata: Metadata = {
   appleWebApp: {
     title: "JF Portfolio",
   },
-  openGraph: {
-    title: "Jing Feng - Software Engineer",
-    description:
-      "Full-stack engineer. Flutter, Python, Google Cloud, and product-minded delivery.",
-    type: "website",
-    locale: "en_US",
-    siteName: "Jing Feng Portfolio",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Jing Feng - Software Engineer",
-    description:
-      "Full-stack engineer. Flutter, Python, Google Cloud, and product-minded delivery.",
-  },
   // No `alternates.canonical` and no `openGraph.url` here: every route
   // inherits root metadata, so a "/" set at this level declared the homepage
   // as the canonical URL of every project page. Each page sets its own.
+  openGraph: SHARED_OPEN_GRAPH,
+  // Card type only. X falls back to the og: title, description and image, so
+  // repeating them here would pin every page's card to the homepage's copy.
+  twitter: {
+    card: "summary_large_image",
+  },
+  // No index/follow: those are the defaults, and spelling them out here put
+  // "index, follow" on the 404 page next to the "noindex" Next injects there.
+  // The preview limits apply to every crawler that reads them, not just Google.
   robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    "max-video-preview": -1,
+    "max-image-preview": "large",
+    "max-snippet": -1,
   },
 };
 

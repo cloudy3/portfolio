@@ -4,14 +4,19 @@ import { Container } from "../_components/ui/Container";
 import { Section } from "../_components/ui/Section";
 import { SectionHeader } from "../_components/ui/SectionHeader";
 import { sampleProjects, sortProjectsByFeatured } from "@/lib/projectData";
+import { SHARED_OPEN_GRAPH } from "@/lib/site";
 import { ProjectsCatalog } from "./ProjectsCatalog";
+
+const title = "Selected work";
+const description =
+  "Engineering projects across mobile, cloud, and full-stack systems.";
 
 export const metadata: Metadata = {
   // The root layout's title template appends " | Jing Feng".
-  title: "Selected work",
-  description:
-    "Engineering projects across mobile, cloud, and full-stack systems.",
+  title,
+  description,
   alternates: { canonical: "/projects" },
+  openGraph: { ...SHARED_OPEN_GRAPH, title, description, url: "/projects" },
 };
 
 export default function ProjectsPage() {

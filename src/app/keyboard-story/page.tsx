@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import KeyboardScrollytellingSection from "../_components/sections/KeyboardScrollytellingSection";
+import { SHARED_OPEN_GRAPH } from "@/lib/site";
+
+const title = "Keyboard Story";
+const description =
+  "Scroll-driven keyboard deconstruction and reassembly sequence built with Next.js and Framer Motion.";
 
 export const metadata: Metadata = {
-  title: "Keyboard Story",
-  description:
-    "Scroll-driven keyboard deconstruction and reassembly sequence built with Next.js and Framer Motion.",
+  title,
+  description,
   alternates: { canonical: "/keyboard-story" },
+  openGraph: { ...SHARED_OPEN_GRAPH, title, description, url: "/keyboard-story" },
 };
 
 export default function KeyboardStoryPage() {

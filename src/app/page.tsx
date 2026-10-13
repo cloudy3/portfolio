@@ -1,9 +1,31 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import HeroSection from "./_components/sections/HeroSection";
+import { SHARED_OPEN_GRAPH, SITE_URL } from "@/lib/site";
+import { SOCIAL_LINKS } from "@/lib/constants";
+import { JING_FENG_PROFILE } from "@/lib/data/professional-profile";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
+  openGraph: { ...SHARED_OPEN_GRAPH, url: "/" },
+};
+
+/*
+ * Structured data naming the person behind the site, and tying the GitHub and
+ * LinkedIn profiles to it. The h1 is a tagline rather than a name, so this is
+ * the plainest statement of whose portfolio this is. Fields are picked one by
+ * one: the profile module holds contact details that must not reach the HTML.
+ */
+const PERSON_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: JING_FENG_PROFILE.name,
+  alternateName: "Jing Feng",
+  jobTitle: JING_FENG_PROFILE.title,
+  url: new URL("/", SITE_URL).href,
+  sameAs: SOCIAL_LINKS.filter((link) => link.url.startsWith("https://")).map(
+    (link) => link.url
+  ),
 };
 
 /**
@@ -72,6 +94,13 @@ const ContactSection = dynamic(
 export default function Home() {
   return (
     <div>
+      <script
+        type="application/ld+json"
+        // Escaped so a "</script>" inside a value could not close the tag.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(PERSON_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
       <HeroSection />
       <ProjectsSection />
       <AboutSection />

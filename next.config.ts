@@ -6,6 +6,32 @@ const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+const isDev = process.env.NODE_ENV === "development";
+
+/*
+ * Static CSP, so every page can stay prerendered. A nonce-based policy would
+ * force each request through the server, which costs more than it protects on
+ * a site with no user content and no logins.
+ *
+ * The trade-off is script-src 'unsafe-inline': the theme bootstrap in
+ * layout.tsx and Next's own RSC payload are inline scripts. The policy still
+ * blocks scripts from any other origin, and connect-src limits where a page
+ * can send data to this site and EmailJS (the contact form).
+ * 'unsafe-eval' is development only; React uses eval for its error overlay.
+ */
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' blob: data:",
+  "font-src 'self'",
+  "connect-src 'self' https://api.emailjs.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 const nextConfig: NextConfig = {
   // Inlined into both server and client bundles at build time, so the
   // prerendered HTML and the hydrating browser agree on "today" (see
@@ -67,6 +93,17 @@ const nextConfig: NextConfig = {
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: contentSecurityPolicy,
+          },
+          // Nothing here uses these, so no embedded or injected script can
+          // ask for them either.
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
           },
         ],
       },
