@@ -248,7 +248,8 @@ const ExperienceSection = () => {
         </FadeIn>
 
         <FadeIn beat={2}>
-          <nav
+          <div
+            role="group"
             className="mt-[calc(var(--rhythm)*8)] flex flex-wrap gap-x-7 gap-y-2 border-b border-border-subtle"
             aria-label="Experience view"
           >
@@ -268,7 +269,7 @@ const ExperienceSection = () => {
                 {tab.label}
               </button>
             ))}
-          </nav>
+          </div>
         </FadeIn>
 
         <div className="mt-[calc(var(--rhythm)*10)]">

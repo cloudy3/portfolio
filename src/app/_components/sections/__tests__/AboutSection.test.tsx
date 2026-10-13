@@ -28,9 +28,10 @@ describe("AboutSection", () => {
 
   it("renders résumé and contact actions", () => {
     render(<AboutSection />);
-    expect(
-      screen.getByRole("button", { name: /Download résumé/i })
-    ).toBeInTheDocument();
+    // A plain link, so the download works before (or without) hydration.
+    const resume = screen.getByRole("link", { name: /Download résumé/i });
+    expect(resume).toHaveAttribute("href", "/resume.pdf");
+    expect(resume).toHaveAttribute("download", "Cheah_Jing_Feng_Resume.pdf");
     expect(screen.getByRole("link", { name: /Contact/i })).toHaveAttribute(
       "href",
       "#contact"

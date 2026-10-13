@@ -11,6 +11,16 @@ export function ProjectsCatalog({ projects }: { projects: Project[] }) {
   const [category, setCategory] =
     useState<(typeof PROJECT_CATEGORIES)[number]>("all");
 
+  // Only categories that have something in them. "desktop" and "other" have
+  // no projects today, so as buttons they could only ever lead to an empty list.
+  const categories = useMemo(
+    () =>
+      PROJECT_CATEGORIES.filter(
+        (cat) => cat === "all" || projects.some((p) => p.category === cat)
+      ),
+    [projects]
+  );
+
   const filtered = useMemo(() => {
     const list = filterProjectsByCategory(projects, category);
     return sortProjectsByFeatured(list);
@@ -18,11 +28,16 @@ export function ProjectsCatalog({ projects }: { projects: Project[] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-10 md:mb-12">
-        {PROJECT_CATEGORIES.map((cat) => (
+      <div
+        role="group"
+        aria-label="Filter projects by category"
+        className="flex flex-wrap gap-2 mb-10 md:mb-12"
+      >
+        {categories.map((cat) => (
           <button
             key={cat}
             type="button"
+            aria-pressed={category === cat}
             onClick={() => setCategory(cat)}
             className={cn(
               "rounded-control px-4 py-1.5 text-xs font-medium transition-colors active:translate-y-px",

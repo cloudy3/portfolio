@@ -131,7 +131,8 @@ export default function SkillsSection() {
           {/* No role="toolbar": that contract requires arrow-key roving
               tabindex. These are plain toggle buttons; aria-pressed already
               conveys state, and Tab reaches each one. */}
-          <nav
+          <div
+            role="group"
             className="flex flex-wrap gap-x-6 gap-y-2 border-b border-border-subtle"
             aria-label="Filter skills by domain"
           >
@@ -154,7 +155,7 @@ export default function SkillsSection() {
                 </button>
               );
             })}
-          </nav>
+          </div>
         </FadeIn>
 
         <p className="sr-only" aria-live="polite">

@@ -242,9 +242,16 @@ export default function KeyboardScrollytellingSection() {
   }, []);
 
   return (
+    /*
+     * The sampled frame colour is handed to CSS rather than painted inline, so
+     * the stylesheet can decide where it applies: in light mode the section
+     * takes it and the photo blends edge to edge; in dark mode the section
+     * keeps the page colour and the photo sits on it as a plate. Painting it
+     * inline turned the dark route into a 400vh near-white band.
+     */
     <section
-      className="relative text-content-primary transition-colors duration-300"
-      style={{ backgroundColor: currentBackground }}
+      className="keyboard-story relative text-content-primary transition-colors duration-300"
+      style={{ "--frame-bg": currentBackground } as React.CSSProperties}
     >
       {/*
        * Reduced motion gets a single screen-height section rather than a 400vh
@@ -267,7 +274,6 @@ export default function KeyboardScrollytellingSection() {
           <canvas
             ref={canvasRef}
             className="keyboard-story-canvas h-screen w-full"
-            style={{ backgroundColor: currentBackground }}
             aria-label="Keyboard disassembly sequence"
             role="img"
           />

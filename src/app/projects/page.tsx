@@ -20,12 +20,19 @@ export default function ProjectsPage() {
   return (
     <Section variant="default" judgment={false} field="bars" pigment="shu">
       <Container keepOut>
-        <nav className="mb-[calc(var(--rhythm)*10)] text-sm text-content-muted">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-[calc(var(--rhythm)*10)] text-sm text-content-muted"
+        >
           <Link href="/" className="transition-colors hover:text-accent-ink">
             Home
           </Link>
-          <span className="mx-2 text-border-strong">/</span>
-          <span className="text-content-primary">Work</span>
+          <span className="mx-2 text-border-strong" aria-hidden>
+            /
+          </span>
+          <span className="text-content-primary" aria-current="page">
+            Work
+          </span>
         </nav>
         <SectionHeader
           title="Selected work"

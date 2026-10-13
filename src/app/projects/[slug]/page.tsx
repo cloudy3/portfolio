@@ -43,22 +43,29 @@ export default async function ProjectDetailPage({ params }: Props) {
         pigment="ai"
       >
         <Container keepOut>
-          <nav className="text-sm text-content-muted mb-8">
+          <nav aria-label="Breadcrumb" className="text-sm text-content-muted mb-8">
             <Link
               href="/"
               className="transition-colors hover:text-accent-ink"
             >
               Home
             </Link>
-            <span className="mx-2 text-border-strong">/</span>
+            <span className="mx-2 text-border-strong" aria-hidden>
+              /
+            </span>
             <Link
               href="/projects"
               className="transition-colors hover:text-accent-ink"
             >
               Work
             </Link>
-            <span className="mx-2 text-border-strong">/</span>
-            <span className="text-content-primary line-clamp-1">
+            <span className="mx-2 text-border-strong" aria-hidden>
+              /
+            </span>
+            <span
+              className="text-content-primary line-clamp-1"
+              aria-current="page"
+            >
               {project.title}
             </span>
           </nav>

@@ -66,14 +66,34 @@ describe("ProjectsCatalog", () => {
     expect(screen.getByText("Mobile A")).toBeInTheDocument();
   });
 
-  it("renders an empty state for a category with no projects", () => {
+  it("offers only categories that have projects", () => {
     render(<ProjectsCatalog projects={PROJECTS} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "desktop" }));
-
+    expect(screen.getByRole("button", { name: "web" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "mobile" })).toBeInTheDocument();
     expect(
-      screen.getByText(/No projects in this category/i)
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: "desktop" })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "other" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("announces which filter is selected", () => {
+    render(<ProjectsCatalog projects={PROJECTS} />);
+
+    const all = screen.getByRole("button", { name: "All" });
+    const mobile = screen.getByRole("button", { name: "mobile" });
+    expect(all).toHaveAttribute("aria-pressed", "true");
+    expect(mobile).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(mobile);
+
+    expect(all).toHaveAttribute("aria-pressed", "false");
+    expect(mobile).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("group", { name: "Filter projects by category" })
+    ).toContainElement(mobile);
   });
 
   it("sorts featured projects ahead of the rest", () => {

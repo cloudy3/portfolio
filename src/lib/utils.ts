@@ -19,6 +19,12 @@ const prefersReducedMotion = (): boolean =>
  * Scrolls to a section. An explicit `behavior: "smooth"` would override the
  * `scroll-behavior: auto` that the reduced-motion CSS sets, so the behaviour
  * is chosen here too.
+ *
+ * Focus follows the scroll. Without that, keyboard focus stayed on the button
+ * that was pressed, so the next Tab went back to the header instead of into
+ * the section the visitor had just moved to. The heading takes focus rather
+ * than the section so a screen reader announces where they landed.
+ * `preventScroll` keeps focus() from jumping ahead of the smooth scroll.
  */
 export const smoothScrollTo = (elementId: string, offset: number = 0) => {
   const element = document.getElementById(elementId);
@@ -31,6 +37,10 @@ export const smoothScrollTo = (elementId: string, offset: number = 0) => {
       top: offsetPosition,
       behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
+
+    const target = element.querySelector<HTMLElement>("h1, h2") ?? element;
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
   }
 };
 

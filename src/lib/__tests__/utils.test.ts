@@ -55,6 +55,23 @@ describe("smoothScrollTo", () => {
     );
   });
 
+  it("moves focus to the section's heading without scrolling it", () => {
+    const heading = document.createElement("h2");
+    target.appendChild(heading);
+    const focus = vi.spyOn(heading, "focus");
+
+    smoothScrollTo("work", 80);
+
+    expect(document.activeElement).toBe(heading);
+    expect(heading.getAttribute("tabindex")).toBe("-1");
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
+  it("focuses the section itself when it has no heading", () => {
+    smoothScrollTo("work", 80);
+    expect(document.activeElement).toBe(target);
+  });
+
   it("does nothing for a missing section", () => {
     smoothScrollTo("no-such-section");
     expect(window.scrollTo).not.toHaveBeenCalled();

@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import {
   JING_FENG_PROFILE,
@@ -43,15 +41,6 @@ const breadth = [
 ];
 
 export default function AboutSection() {
-  const handleDownloadCV = () => {
-    const link = document.createElement("a");
-    link.href = "/resume.pdf";
-    link.download = "Cheah_Jing_Feng_Resume.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <Section
       id="about"
@@ -98,13 +87,13 @@ export default function AboutSection() {
               {JING_FENG_PROFILE.summary}
             </p>
             <div className="mt-[calc(var(--rhythm)*8)] flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={handleDownloadCV}
+              <a
+                href="/resume.pdf"
+                download="Cheah_Jing_Feng_Resume.pdf"
                 className="inline-flex items-center rounded-control bg-surface-inverse px-6 py-3 text-sm font-medium text-content-inverse transition-opacity hover:opacity-90 active:translate-y-px"
               >
                 Download résumé
-              </button>
+              </a>
               <a
                 href="#contact"
                 className="inline-flex items-center rounded-control border border-border-strong px-6 py-3 text-sm font-medium text-content-primary transition-colors hover:border-accent active:translate-y-px"
