@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Selected work | Jing Feng",
   description:
     "Engineering projects across mobile, cloud, and full-stack systems.",
+  alternates: { canonical: "/projects" },
 };
 
 export default function ProjectsPage() {

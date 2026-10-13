@@ -40,6 +40,16 @@ describe("generateMetadata", () => {
     expect(metadata.description).toBe(project.description);
   });
 
+  it("declares the project's own URL as canonical, not the homepage", async () => {
+    const [slug] = getAllProjectSlugs();
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ slug }),
+    });
+
+    expect(metadata.alternates?.canonical).toBe(`/projects/${slug}`);
+  });
+
   it("falls back to a generic title for an unknown slug", async () => {
     const metadata = await generateMetadata({
       params: Promise.resolve({ slug: "no-such-project" }),

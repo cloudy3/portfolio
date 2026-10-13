@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Keyboard Story",
   description:
     "Scroll-driven keyboard deconstruction and reassembly sequence built with Next.js and Framer Motion.",
+  alternates: { canonical: "/keyboard-story" },
 };
 
 export default function KeyboardStoryPage() {

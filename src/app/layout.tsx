@@ -100,7 +100,6 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Jing Feng Portfolio",
-    url: "/",
   },
   twitter: {
     card: "summary_large_image",
@@ -108,9 +107,9 @@ export const metadata: Metadata = {
     description:
       "Full-stack engineer. Flutter, Python, Google Cloud, and product-minded delivery.",
   },
-  alternates: {
-    canonical: "/",
-  },
+  // No `alternates.canonical` and no `openGraph.url` here: every route
+  // inherits root metadata, so a "/" set at this level declared the homepage
+  // as the canonical URL of every project page. Each page sets its own.
   robots: {
     index: true,
     follow: true,
