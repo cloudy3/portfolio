@@ -122,24 +122,38 @@ export const EDUCATION_DATA: Education[] = [
 export const CERTIFICATIONS_DATA: Certification[] = [
   {
     id: "cert-1",
-    name: "The Complete 2024 Web Development Bootcamp",
-    issuer: "Udemy",
-    credentialId: "AWS-SAA-123456",
-    logo: "☁️",
+    name: "Introduction to Agent Skills",
+    issuer: "Anthropic",
+    credentialId: "hu4a5koxstjs",
+    logo: "🤖",
   },
   {
     id: "cert-2",
-    name: "React Developer Certification",
-    issuer: "Meta",
-    credentialId: "META-REACT-789012",
-    logo: "⚛️",
+    name: "Claude Code 101",
+    issuer: "Anthropic",
+    credentialId: "nt6kaz8dpp2g",
+    logo: "⌨️",
   },
   {
     id: "cert-3",
-    name: "Google Analytics Certified",
-    issuer: "Google",
-    credentialId: "GOOGLE-GA-345678",
-    logo: "📊",
+    name: "The Complete 2024 Web Development Bootcamp",
+    issuer: "Udemy",
+    credentialId: "UC-10be47d0-74a8-4884-b67f-fe42a8eeef31",
+    logo: "🌐",
+  },
+  {
+    id: "cert-4",
+    name: "The Complete Flutter UI Masterclass | iOS, Android, & Web",
+    issuer: "Udemy",
+    credentialId: "UC-897af31b-6a61-4afe-bbb2-533b858c8bca",
+    logo: "📱",
+  },
+  {
+    id: "cert-5",
+    name: "GitLab CI: Pipelines, CI/CD and DevOps for Beginners",
+    issuer: "Udemy",
+    credentialId: "UC-f3e019b8-8eb3-4c09-82ae-45f0bbe4a751",
+    logo: "🔁",
   },
 ];
 
@@ -149,7 +163,7 @@ export const getCurrentExperience = () => {
 
 export const getPastExperiences = () => {
   return EXPERIENCE_DATA.filter((exp) => exp.endDate).sort(
-    (a, b) => new Date(b.endDate!).getTime() - new Date(a.endDate!).getTime()
+    (a, b) => new Date(b.endDate!).getTime() - new Date(a.endDate!).getTime(),
   );
 };
 
@@ -194,14 +208,16 @@ export const formatDuration = (months: number): string => {
 /** Duration of a single role, treating an open-ended role as running to today. */
 export const getExperienceDuration = (
   experience: Pick<Experience, "startDate" | "endDate">,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): string =>
-  formatDuration(monthsBetween(experience.startDate, experience.endDate ?? now));
+  formatDuration(
+    monthsBetween(experience.startDate, experience.endDate ?? now),
+  );
 
 export const getTotalExperienceYears = (now: Date = new Date()) => {
   const totalMonths = EXPERIENCE_DATA.reduce(
     (total, exp) => total + monthsBetween(exp.startDate, exp.endDate ?? now),
-    0
+    0,
   );
 
   return Math.round((totalMonths / 12) * 10) / 10; // 1 decimal place
