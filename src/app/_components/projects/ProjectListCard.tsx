@@ -48,7 +48,11 @@ export function ProjectListCard({
         ) : null}
       </div>
 
-      <h3 className="mt-[calc(var(--rhythm)*2)] text-lg">
+      {/*
+       * h2: this card only appears under the /projects h1. The tracking pins
+       * the h3 letter-spacing it had before, so the look is unchanged.
+       */}
+      <h2 className="mt-[calc(var(--rhythm)*2)] text-lg tracking-[-0.01em]">
         {/*
          * Accessible card-link pattern: only the title is a link, and the
          * stretched span carries the hit area over the whole entry, so the
@@ -61,7 +65,7 @@ export function ProjectListCard({
           {project.title}
           <span className="absolute inset-0" aria-hidden />
         </Link>
-      </h3>
+      </h2>
 
       <p className="mt-[calc(var(--rhythm)*3)] line-clamp-2 text-sm text-content-secondary">
         {project.description}

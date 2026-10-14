@@ -138,20 +138,20 @@ export const sampleProjects: Project[] = [
     problem:
       "Needed a fast, accessible site that presents engineering work clearly without feeling like a generic template.",
     solution:
-      "Next.js App Router with Tailwind, a shared Canvas 2D composition engine, structured project pages, and Framer Motion isolated to interface transitions.",
+      "Next.js App Router with Tailwind, a shared Canvas 2D composition engine, structured project pages, and Motion isolated to interface transitions.",
     outcomes: [
       "SSR for SEO and shareable project URLs",
       "CI/CD deploy pipeline to Vercel",
       "Accessibility and responsive layout across breakpoints",
     ],
     longDescription:
-      "Built a responsive portfolio using Next.js and Tailwind CSS with server-rendered content, dynamic project pages, and a CI/CD deployment pipeline to Vercel. A fixed Canvas 2D field recomposes itself around protected content regions as sections change, creating a distinctive visual system without sacrificing legibility. Framer Motion handles restrained interface transitions, while reduced-motion visitors receive deliberate static compositions.",
+      "Built a responsive portfolio using Next.js and Tailwind CSS with server-rendered content, dynamic project pages, and a CI/CD deployment pipeline to Vercel. A fixed Canvas 2D field recomposes itself around protected content regions as sections change, creating a distinctive visual system without sacrificing legibility. Motion handles restrained interface transitions, while reduced-motion visitors receive deliberate static compositions.",
     technologies: [
       "Next.js",
       "TypeScript",
       "Tailwind CSS",
       "Canvas 2D",
-      "Framer Motion",
+      "Motion",
       "Vercel",
       "AI Assistance",
     ],

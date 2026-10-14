@@ -10,6 +10,6 @@ export default function KeyboardStoryOpengraphImage() {
   return renderShareCard({
     title: "Keyboard Story",
     subtitle: "A scroll-driven frame sequence",
-    tags: ["Next.js", "Canvas", "Framer Motion"],
+    tags: ["Next.js", "Canvas", "Motion"],
   });
 }

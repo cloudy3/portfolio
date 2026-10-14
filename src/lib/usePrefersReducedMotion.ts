@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribe(onStoreChange: () => void): () => void {
+  const query = window.matchMedia(QUERY);
+  query.addEventListener("change", onStoreChange);
+  return () => query.removeEventListener("change", onStoreChange);
+}
+
+const getSnapshot = (): boolean => window.matchMedia(QUERY).matches;
+
+// The server cannot know, so assume motion and let hydration correct it.
+const getServerSnapshot = (): boolean => false;
 
 /**
  * Subscribes to the reduced-motion preference.
@@ -14,21 +25,9 @@ const QUERY = "(prefers-reduced-motion: reduce)";
  * for structural decisions (what to render, what to fetch); Motion's is fine
  * for animation config.
  *
- * Returns false on the server and on the first client render so markup
- * hydrates consistently, then updates from the media query.
+ * Returns false on the server and during hydration so markup matches, then
+ * reads the media query live.
  */
 export function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const query = window.matchMedia(QUERY);
-    const update = (e: MediaQueryListEvent | MediaQueryList) =>
-      setPrefersReducedMotion(e.matches);
-
-    update(query);
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-
-  return prefersReducedMotion;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

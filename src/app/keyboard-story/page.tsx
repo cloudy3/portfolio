@@ -5,7 +5,7 @@ import { SHARED_OPEN_GRAPH } from "@/lib/site";
 
 const title = "Keyboard Story";
 const description =
-  "Scroll-driven keyboard deconstruction and reassembly sequence built with Next.js and Framer Motion.";
+  "Scroll-driven keyboard deconstruction and reassembly sequence built with Next.js and Motion.";
 
 export const metadata: Metadata = {
   title,

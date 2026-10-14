@@ -26,21 +26,27 @@ import { cn } from "@/lib/utils";
  *
  * Type scale comes from the h2 rule in globals.css. No local font-size or weight
  * utilities here, so every section headline is identical by construction.
+ *
+ * `as="h1"` is for a page whose header IS the page title (/projects), so the
+ * document still has exactly one h1. It takes the h1 scale, like every other
+ * page title.
  */
 type SectionHeaderProps = {
   title: string;
   description?: string;
+  as?: "h1" | "h2";
   className?: string;
 };
 
 export function SectionHeader({
   title,
   description,
+  as: Heading = "h2",
   className,
 }: SectionHeaderProps) {
   return (
     <header className={cn("mb-[calc(var(--rhythm)*10)]", className)}>
-      <h2 className="max-w-[24ch] text-content-primary">{title}</h2>
+      <Heading className="max-w-[24ch] text-content-primary">{title}</Heading>
       {description ? (
         <p className="mt-[calc(var(--rhythm)*5)] max-w-[60ch] text-content-secondary">
           {description}

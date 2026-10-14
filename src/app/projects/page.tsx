@@ -40,6 +40,7 @@ export default function ProjectsPage() {
           </span>
         </nav>
         <SectionHeader
+          as="h1"
           title="Selected work"
           description="Product-minded engineering across Flutter, Python and Google Cloud, shipping systems that hold up in the field."
         />
