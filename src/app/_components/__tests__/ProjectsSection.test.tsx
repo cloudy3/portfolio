@@ -49,7 +49,7 @@ describe("ProjectsSection", () => {
   it("renders featured work heading", () => {
     render(<ProjectsSection projects={mockProjects} limit={3} />);
     expect(
-      screen.getByText("Systems that hold up in production")
+      screen.getByText("Selected work")
     ).toBeInTheDocument();
   });
 
@@ -64,4 +64,13 @@ describe("ProjectsSection", () => {
       "/projects/test-1"
     );
   });
+});
+
+
+it("leads selected work with Passaggio and its poster", () => {
+  const { container } = render(<ProjectsSection />);
+  const first = container.querySelector("article");
+  expect(first).toHaveTextContent("Passaggio");
+  expect(first?.querySelector("img")).toHaveAttribute("src", "/projects/passaggio/poster.webp");
+  expect(container.querySelectorAll("article")).toHaveLength(3);
 });

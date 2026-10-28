@@ -5,6 +5,17 @@ export interface Project {
   title: string;
   description: string;
   longDescription?: string;
+  tagline?: string;
+  video?: {
+    src: string;
+    poster: string;
+    width: number;
+    height: number;
+    duration: number;
+    description: string;
+    captionsSrc?: string;
+  };
+  caseStudy?: { heading: string; paragraphs: string[] }[];
   /** Primary responsibility on the project */
   role?: string;
   /** Problem or context (1–2 sentences) */

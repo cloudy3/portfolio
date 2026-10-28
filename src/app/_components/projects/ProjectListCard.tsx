@@ -25,9 +25,9 @@ export function ProjectListCard({
   return (
     <article className={cn("group relative", className)}>
       <div className="relative aspect-[16/10] overflow-hidden border border-border-subtle bg-surface-subtle transition-colors group-hover:border-accent">
-        {project.images[0] ? (
+        {(project.images[0] ?? project.video?.poster) ? (
           <Image
-            src={project.images[0]}
+            src={(project.images[0] ?? project.video?.poster)!}
             // Decorative: the linked title below names the project, so a
             // screen reader would hear it twice.
             alt=""

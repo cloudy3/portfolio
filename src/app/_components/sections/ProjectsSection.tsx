@@ -73,9 +73,9 @@ function Frame({
         ratio
       )}
     >
-      {project.images[0] ? (
+      {(project.images[0] ?? project.video?.poster) ? (
         <Image
-          src={project.images[0]}
+          src={(project.images[0] ?? project.video?.poster)!}
           // Decorative: the linked title beside it already names the project,
           // so a screen reader would hear it twice.
           alt=""
@@ -192,8 +192,8 @@ export function ProjectsSection({
       <Container keepOut>
         <FadeIn>
           <SectionHeader
-            title="Systems that hold up in production"
-            description="A few recent builds across mobile, APIs and real-time data, with clear ownership from design through deployment."
+            title="Selected work"
+            description="Professional systems and personal tools, built from design through deployment."
           />
         </FadeIn>
 

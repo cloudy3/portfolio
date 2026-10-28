@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { preload } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -41,6 +42,10 @@ export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
   if (!project) notFound();
+
+  if (project.video) {
+    preload(project.video.poster, { as: "image", fetchPriority: "high" });
+  }
 
   return (
     <article>
@@ -90,6 +95,9 @@ export default async function ProjectDetailPage({ params }: Props) {
             <h1 className="mb-[calc(var(--rhythm)*6)] mt-[calc(var(--rhythm)*4)] text-content-primary">
               {project.title}
             </h1>
+            {project.tagline ? (
+              <p className="mb-4 text-xl text-content-primary">{project.tagline}</p>
+            ) : null}
             <p className="text-lg text-content-secondary leading-relaxed">
               {project.description}
             </p>
@@ -118,6 +126,40 @@ export default async function ProjectDetailPage({ params }: Props) {
           </header>
         </Container>
       </Section>
+
+      {project.video ? (
+        <Section variant="subtle" padded className="pt-0">
+          <Container keepOut>
+            <figure>
+              <video
+                controls
+                playsInline
+                preload="none"
+                poster={project.video.poster}
+                width={project.video.width}
+                height={project.video.height}
+                aria-label={`${project.title} product teaser`}
+                aria-describedby="project-video-description"
+                className="aspect-video w-full border border-border-subtle bg-surface-elevated object-contain"
+              >
+                <source src={project.video.src} type="video/mp4" />
+                {project.video.captionsSrc ? (
+                  <track kind="captions" src={project.video.captionsSrc} srcLang="en" label="English" />
+                ) : null}
+              </video>
+              <figcaption className="mt-4 flex flex-wrap items-baseline justify-between gap-3 text-sm text-content-secondary">
+                <span>Product teaser · <span className="num">{Math.round(project.video.duration)}</span> seconds</span>
+                <a href={project.video.src} className="underline underline-offset-4 transition-colors hover:text-accent-ink">
+                  Open video directly
+                </a>
+              </figcaption>
+              <p id="project-video-description" className="mt-3 max-w-3xl text-sm leading-relaxed text-content-muted">
+                {project.video.description}
+              </p>
+            </figure>
+          </Container>
+        </Section>
+      ) : null}
 
       {project.images.length > 0 ? (
         <Section variant="subtle" padded className="pt-0">
@@ -162,6 +204,20 @@ export default async function ProjectDetailPage({ params }: Props) {
         <Container>
           <div className="grid gap-12 lg:grid-cols-12 max-w-5xl">
             <div className="lg:col-span-7 space-y-10">
+              {project.caseStudy ? (
+                project.caseStudy.map((section) => (
+                  <section key={section.heading}>
+                    <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">
+                      {section.heading}
+                    </h2>
+                    <div className="space-y-4 text-content-secondary leading-relaxed">
+                      {section.paragraphs.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
+                      ))}
+                    </div>
+                  </section>
+                ))
+              ) : (<>
               {project.role ? (
                 <div>
                   <h2 className="mb-[calc(var(--rhythm)*3)] text-sm font-medium text-content-primary">Role</h2>
@@ -205,6 +261,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                   </p>
                 </div>
               ) : null}
+              </>)}
             </div>
             <aside className="lg:col-span-5 lg:pl-8">
               <div className="sticky top-24 border-t border-border-strong pt-[calc(var(--rhythm)*6)]">

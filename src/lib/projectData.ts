@@ -2,6 +2,61 @@ import { Project } from "@/types";
 
 export const sampleProjects: Project[] = [
   {
+    id: "passaggio",
+    title: "Passaggio",
+    tagline: "Turning my singing lessons into focused practice.",
+    description:
+      "An iPhone app I built and use to turn recorded singing lessons into timestamped feedback, recurring insights, and practice routines.",
+    technologies: ["Swift", "SwiftUI", "SwiftData", "AVFoundation", "OpenAI API"],
+    category: "mobile",
+    images: [],
+    githubUrl: "https://github.com/cloudy3/passaggio",
+    featured: true,
+    // Portfolio reference month, not a claim that this actively used app is finished.
+    completedAt: new Date("2026-10-01"),
+    video: {
+      src: "/projects/passaggio/teaser.mp4",
+      poster: "/projects/passaggio/poster.webp",
+      width: 1920,
+      height: 1080,
+      duration: 24.3,
+      description:
+        "The teaser shows teacher feedback linked to moments in a lesson, corrections recurring across lessons, and practice routines with piano tracks for my range. It also introduces support for screaming lessons. The closing line reads: So your teacher only has to say it once.",
+      captionsSrc: "/projects/passaggio/teaser.vtt",
+    },
+    caseStudy: [
+      {
+        heading: "Why I built it",
+        paragraphs: [
+          "I record my singing lessons, but having the recordings didn't make them easy to revisit. Finding one explanation meant scrubbing through a long lesson. Between sessions, I'd forget corrections, lose track of issues that kept coming back, and struggle to remember when we covered a particular concept.",
+          "I built Passaggio to bring those details into my daily practice. I now use it for my own lessons.",
+        ],
+      },
+      {
+        heading: "From recordings to practice",
+        paragraphs: [
+          "Revisit the exact moment. Timestamped key points let me jump from a correction to where my teacher explained it, with the original words and context close at hand.",
+          "See what keeps coming back. Recurring insights bring repeated corrections together across lessons, so I can recognize patterns without comparing recordings by hand.",
+          "Know what to practise. Focused routines draw on recent and recurring feedback, with piano exercises for my range and clips from lessons to practise along with.",
+        ],
+      },
+      {
+        heading: "The engineering behind it",
+        paragraphs: [
+          "Speaker-labeled transcription separates teacher speech from the rest of a lesson. Extracted feedback points refer to transcript segments, so their timestamps lead back to the source recording. Long recordings are processed in overlapping chunks while preserving the lesson timeline.",
+          "Routine planning weights topics by both recurrence and recency. Piano scales and exercises are rendered locally with AVFoundation, while SwiftData stores the lesson library and practice history.",
+          "The teacher remains the authority. Prompts are designed to organize their guidance and preserve their wording, rather than introduce new vocal advice. Keeping the recording one tap away makes it easier to check the original context.",
+        ],
+      },
+      {
+        heading: "What changed for me",
+        paragraphs: [
+          "I now find specific feedback faster, have a clearer idea of what to practise between lessons, and notice patterns that were difficult to recognize across separate recordings.",
+        ],
+      },
+    ],
+  },
+  {
     id: "image-processing-api",
     title: "Cloud-Native Image Processing API",
     description:
