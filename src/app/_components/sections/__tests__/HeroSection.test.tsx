@@ -76,16 +76,12 @@ describe("HeroSection", () => {
   });
 
   it("keeps the hero to two CTAs, one intent each", () => {
-    // "View selected work" and "All projects" were both portfolio intent, and
-    // a fourth "Bonus: Keyboard story" link competed with all of them. Those
-    // two links now live in the Work section instead.
+    // The project catalogue link belongs in the Work section.
     render(<HeroSection />);
     expect(
       screen.queryByRole("link", { name: /All projects/i })
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("link", { name: /Keyboard story/i })
-    ).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button")).toHaveLength(2);
   });
 
   it("opts into the site field and marks its copy as keep-out", () => {

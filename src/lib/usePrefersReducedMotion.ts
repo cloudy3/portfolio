@@ -20,9 +20,8 @@ const getServerSnapshot = (): boolean => false;
  *
  * Motion's `useReducedMotion()` captures its value in a `useState`
  * initializer, so a component that renders before the preference is read keeps
- * the stale value for its whole life — the keyboard story kept its 400vh
- * scroll region under reduced motion because of exactly that. Use this hook
- * for structural decisions (what to render, what to fetch); Motion's is fine
+ * the stale value for its whole life. Use this hook for structural decisions
+ * (what to render, what to fetch); Motion's is fine
  * for animation config.
  *
  * Returns false on the server and during hydration so markup matches, then

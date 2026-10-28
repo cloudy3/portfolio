@@ -13,10 +13,8 @@ function scrollToSection(sectionId: string) {
  * part of the hero that needs JavaScript, and the headline is the LCP element,
  * so the less of this block that waits on hydration the better.
  *
- * Two CTAs, one intent each. The hero previously carried four actions in a
- * single row: "View selected work" and "All projects" were the same portfolio
- * intent, and "Bonus: Keyboard story" was a fourth competing link. Both now live
- * in the Work section, where that intent belongs.
+ * Two CTAs, one intent each: selected work and contact. The project catalogue
+ * link lives in the Work section.
  *
  * No scroll cue below them. If the visitor has not scrolled yet, they are
  * looking at the hero; the bottom of the viewport does not need a label telling

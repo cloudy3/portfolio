@@ -169,9 +169,6 @@
   --lane-moegi: #6f8f22;
   --lane-kihada: #b8860b;
 
-  /* Semi-transparent page colour, for canvas loaders and overlays. */
-  --scrim: rgba(236, 237, 240, 0.82);
-
   /* Focus ring: the locked accent, at fill contrast. */
   --focus-ring: var(--color-accent);
   --focus-offset: 2px;
@@ -225,8 +222,6 @@
     --lane-ai: #5c86d8;
     --lane-moegi: #a8bf3c;
     --lane-kihada: #e0b33c;
-
-    --scrim: rgba(14, 16, 20, 0.82);
   }
 }
 
@@ -256,8 +251,6 @@
   --lane-ai: #5c86d8;
   --lane-moegi: #a8bf3c;
   --lane-kihada: #e0b33c;
-
-  --scrim: rgba(14, 16, 20, 0.82);
 }
 
 /*
@@ -290,8 +283,6 @@
   --lane-ai: #2b4a8b;
   --lane-moegi: #6f8f22;
   --lane-kihada: #b8860b;
-
-  --scrim: rgba(236, 237, 240, 0.82);
 }
 
 /*
@@ -638,42 +629,6 @@
   .line-clamp-3 {
     -webkit-line-clamp: 3;
     line-clamp: 3;
-  }
-
-  /*
-   * The frames are photos on a baked-in near-white ground. In light mode the
-   * section takes that ground (--frame-bg, sampled per frame) so the photo
-   * has no visible edge. In dark mode it stays on the page colour and the
-   * photo reads as a plate: DESIGN.md keeps section washes inside the active
-   * theme. Same three-block pattern as the colour tokens; keep them in step.
-   */
-  .keyboard-story {
-    background-color: var(--frame-bg, var(--color-surface-page));
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .keyboard-story {
-      background-color: var(--color-surface-page);
-    }
-  }
-
-  :root[data-theme="dark"] .keyboard-story {
-    background-color: var(--color-surface-page);
-  }
-
-  :root[data-theme="light"] .keyboard-story {
-    background-color: var(--frame-bg, var(--color-surface-page));
-  }
-
-  /* Transparent: the section behind it supplies the ground in both themes. */
-  .keyboard-story-canvas {
-    display: block;
-    background: transparent;
-  }
-
-  .keyboard-story-loader {
-    background: var(--scrim);
-    backdrop-filter: blur(4px);
   }
 }
 

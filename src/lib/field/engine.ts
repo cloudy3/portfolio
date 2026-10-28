@@ -14,7 +14,7 @@ import type { Rect } from "./types";
  * this that is affordable on a site whose LCP is already the problem.
  */
 
-/** Matches MAX_DPR in lib/keyboardStory.ts, the project's other canvas. */
+/** Cap pixel density to limit the canvas rendering cost on high-DPI screens. */
 const MAX_DPR = 2;
 
 /**

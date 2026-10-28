@@ -12,7 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/",
     "/projects",
     ...getAllProjectSlugs().map((slug) => `/projects/${slug}`),
-    "/keyboard-story",
   ];
   return paths.map((path) => ({ url: new URL(path, SITE_URL).href }));
 }

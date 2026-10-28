@@ -231,13 +231,6 @@ export function ProjectsSection({
             >
               View all projects
             </Link>
-            {/* Moved out of the hero, which had four competing actions. */}
-            <Link
-              href="/keyboard-story"
-              className="text-sm font-medium text-accent-ink underline decoration-transparent underline-offset-4 transition-colors hover:decoration-current"
-            >
-              Keyboard story
-            </Link>
             <p className="max-w-[40ch] text-sm text-content-muted">
               Each build has a full case study with context, stack and outcomes.
             </p>

@@ -126,7 +126,7 @@ export default function RootLayout({
     // Because <html> keeps `overflow: visible`, the body's overflow propagates
     // up to the viewport and the body itself is treated as `visible` — so it
     // does not become a scroll container, and `position: sticky` descendants
-    // (the keyboard story) still stick to the viewport. Moving this to <html>
+    // still stick to the viewport. Moving this to <html>
     // would break that; if it ever needs to move, use `overflow-x: clip`,
     // which never establishes a scroll container.
     // suppressHydrationWarning covers exactly one attribute: `data-theme`,

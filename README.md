@@ -29,7 +29,7 @@ Key characteristics:
 - React 19
 - TypeScript in strict mode
 - Tailwind CSS v4
-- Canvas 2D for the shared geometric field and the keyboard frame sequence
+- Canvas 2D for the shared geometric field
 - Motion (`motion/react`) for interface transitions
 - Self-hosted Zen Kaku Gothic New and JetBrains Mono subsets
 - EmailJS for the contact form
@@ -124,7 +124,6 @@ src/
 │   │   ├── shared/       # Navigation, theme toggle, field mounting
 │   │   └── ui/           # Layout primitives
 │   ├── projects/         # Project catalogue and case studies
-│   ├── keyboard-story/   # Keyboard build scroll story
 │   └── globals.css       # Design tokens and global styles
 ├── fonts/                # Self-hosted font subsets
 ├── lib/                  # Field engine, data, hooks and helpers
